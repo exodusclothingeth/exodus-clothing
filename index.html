@@ -42,7 +42,6 @@
             width: auto;
         }
 
-        /* Mobile menu - hamburger style */
         .nav-links {
             display: flex;
             gap: 20px;
@@ -446,9 +445,15 @@
             font-size: 0.8rem;
         }
 
+        .social-icons a {
+            color: white;
+            text-decoration: none;
+            margin: 0 8px;
+            display: inline-block;
+        }
+
         .social-icons i {
             font-size: 1.2rem;
-            margin: 0 8px;
             cursor: pointer;
         }
 
@@ -625,9 +630,9 @@
                 <p>📞 +251968621548<br>✉️ exodusclothingeth@gmail.com</p>
             </div>
             <div class="footer-col social-icons">
-                <i class="fab fa-instagram"></i>
-                <i class="fab fa-telegram"></i>
-                <i class="fab fa-tiktok"></i>
+                <a href="https://www.instagram.com/exodus_stw" target="_blank"><i class="fab fa-instagram"></i></a>
+                <a href="https://www.tiktok.com/@exodus_stw" target="_blank"><i class="fab fa-tiktok"></i></a>
+                <a href="#" target="_blank"><i class="fab fa-telegram"></i></a>
             </div>
         </div>
         <p style="text-align:center; margin-top:32px; color:#444; font-size:0.7rem;">© 2025 EXODUS CLOTHING</p>
@@ -635,12 +640,13 @@
 </footer>
 
 <script>
+    // ========== FIXED: Use relative API path (works on mobile & local) ==========
     const API_BASE = window.location.origin + '/api';
     let cart = [];
 
     async function loadHeroImage() {
         try {
-            const response = await fetch(`${API_BASE}/api/hero-image`);
+            const response = await fetch(`${API_BASE}/hero-image`);
             const data = await response.json();
             document.getElementById('heroImage').src = data.url || 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=800&h=1000&fit=crop';
         } catch(e) {
@@ -651,7 +657,7 @@
     async function loadProducts() {
         const grid = document.getElementById('productGrid');
         try {
-            const response = await fetch(`${API_BASE}/api/products`);
+            const response = await fetch(`${API_BASE}/products`);
             const products = await response.json();
             if (products.length === 0) {
                 grid.innerHTML = '<div class="empty-products"><h3>No Products Yet</h3><p>Check back soon for new drops!</p></div>';
@@ -709,7 +715,7 @@
         e.preventDefault();
         const customer = { name: document.getElementById('customerName').value, email: document.getElementById('customerEmail').value, phone: document.getElementById('customerPhone').value, address: document.getElementById('customerAddress').value };
         const total = cart.reduce((s,i)=>s+(i.price*i.quantity),0);
-        const response = await fetch(`${API_BASE}/api/orders`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ customer, items: cart, total }) });
+        const response = await fetch(`${API_BASE}/orders`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ customer, items: cart, total }) });
         const result = await response.json();
         if (result.success) {
             document.getElementById('orderError').style.color = '#00c853';
@@ -721,7 +727,15 @@
 
     function openCart() { document.getElementById('cartSidebar').style.right = '0px'; document.getElementById('cartOverlay').style.visibility = 'visible'; document.getElementById('cartOverlay').style.opacity = '1'; }
     function closeCart() { document.getElementById('cartSidebar').style.right = '-100%'; document.getElementById('cartOverlay').style.visibility = 'hidden'; document.getElementById('cartOverlay').style.opacity = '0'; }
-    function openOrderModal() { if (cart.length === 0) { showToast("Cart empty"); return; } document.getElementById('orderModal').style.display = 'flex'; }
+    
+    // FIXED: Added delay to help mobile browsers open modal reliably
+    function openOrderModal() { 
+        if (cart.length === 0) { showToast("Cart empty"); return; }
+        setTimeout(() => {
+            document.getElementById('orderModal').style.display = 'flex';
+        }, 100);
+    }
+    
     function closeOrderModal() { document.getElementById('orderModal').style.display = 'none'; document.getElementById('orderError').innerHTML = ''; }
 
     document.getElementById('cartIcon')?.addEventListener('click', openCart);
