@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>EXODUS | Admin Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: #000000; color: #ffffff; }
+        .container { max-width: 1600px; margin: 0 auto; padding: 0 16px; }
+        
+        /* Header */
+        .header { display: flex; justify-content: space-between; align-items: center; padding: 16px 0; border-bottom: 1px solid #222; flex-wrap: wrap; gap: 16px; }
+        .logo h1 { font-size: 1.5rem; font-weight: 800; letter-spacing: 2px; }
+        .logo p { font-size: 0.65rem; color: #888; letter-spacing: 2px; }
+        .header-buttons { display: flex; gap: 12px; }
+        .back-link { color: #fff; text-decoration: none; border: 1px solid #333; padding: 8px 16px; border-radius: 40px; font-size: 0.85rem; transition: 0.3s; }
+        .back-link:hover { background: #fff; color: #000; }
+        .logout-btn { background: #1a1a1a; color: #fff; border: 1px solid #333; padding: 8px 16px; border-radius: 40px; cursor: pointer; font-size: 0.85rem; transition: 0.3s; }
+        .logout-btn:hover { background: #ff4444; color: #fff; border-color: #ff4444; }
+        
+        /* Stats */
+        .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin: 24px 0; }
+        .stat-card { background: #111; border: 1px solid #222; border-radius: 20px; padding: 20px; transition: 0.3s; }
+        .stat-card:hover { border-color: #fff; }
+        .stat-card i { font-size: 1.8rem; color: #fff; margin-bottom: 12px; }
+        .stat-number { font-size: 1.8rem; font-weight: 800; }
+        .stat-label { color: #888; margin-top: 6px; font-size: 0.75rem; }
+        
+        /* Controls */
+        .controls { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-bottom: 24px; }
+        .search-box { background: #111; border: 1px solid #222; border-radius: 60px; padding: 8px 16px; display: flex; gap: 8px; flex: 1; min-width: 200px; }
+        .search-box input { background: none; border: none; color: white; width: 100%; }
+        .search-box input:focus { outline: none; }
+        .btn-white { background: #fff; color: #000; border: none; padding: 10px 20px; border-radius: 40px; font-weight: 600; cursor: pointer; font-size: 0.85rem; }
+        
+        /* Orders Table - Mobile Friendly */
+        .orders-container { background: #111; border-radius: 20px; border: 1px solid #222; overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; min-width: 800px; }
+        th { text-align: left; padding: 14px 12px; background: #0a0a0a; color: #fff; font-weight: 600; font-size: 0.8rem; border-bottom: 1px solid #222; }
+        td { padding: 14px 12px; border-bottom: 1px solid #1a1a1a; font-size: 0.8rem; }
+        tr:hover { background: #0f0f0f; }
+        
+        /* Status Badges */
+        .status { display: inline-block; padding: 4px 12px; border-radius: 40px; font-size: 0.7rem; font-weight: 600; }
+        .status-pending { background: rgba(255,255,255,0.1); color: #fff; border: 1px solid #333; }
+        .status-out-for-delivery { background: rgba(255,255,255,0.15); color: #fff; border: 1px solid #fff; }
+        .status-delivered { background: rgba(255,255,255,0.2); color: #fff; border: 1px solid #fff; }
+        
+        /* Buttons */
+        .action-btn { background: #1a1a1a; border: 1px solid #333; padding: 6px 10px; border-radius: 8px; color: white; cursor: pointer; margin: 2px; font-size: 0.7rem; transition: 0.2s; }
+        .action-btn:hover { background: #fff; color: #000; border-color: #fff; }
+        .delivery-btn { border-color: #fff; }
+        .photo-btn { border-color: #00c853; color: #00c853; }
+        .photo-btn:hover { background: #00c853; color: #000; }
+        select { background: #1a1a1a; color: white; border: 1px solid #333; border-radius: 8px; padding: 6px; font-size: 0.7rem; cursor: pointer; margin-top: 6px; width: 100%; }
+        select:hover { border-color: #fff; }
+        
+        /* Modal */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 1000; align-items: center; justify-content: center; padding: 16px; }
+        .modal-content { background: #111; border: 1px solid #222; border-radius: 24px; width: 100%; max-width: 500px; max-height: 85vh; overflow-y: auto; padding: 24px; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid #222; padding-bottom: 12px; }
+        .close-modal { font-size: 28px; cursor: pointer; color: #fff; }
+        .proof-photo { width: 100%; border-radius: 16px; margin: 16px 0; border: 1px solid #333; }
+        
+        .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #fff; color: #000; padding: 10px 20px; border-radius: 40px; opacity: 0; transition: 0.2s; z-index: 1100; font-weight: 600; font-size: 0.85rem; white-space: nowrap; }
+        
+        .loading { text-align: center; padding: 40px; color: #888; }
+        
+        @media (min-width: 768px) {
+            .container { padding: 0 32px; }
+            .stats-grid { grid-template-columns: repeat(4, 1fr); gap: 24px; }
+            .stat-card { padding: 28px; }
+            .stat-number { font-size: 2.5rem; }
+            .action-btn { padding: 8px 12px; font-size: 0.75rem; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ========== LOGIN CHECK ========== -->
+<script>
+    // Check if admin is logged in
+    const isLoggedIn = sessionStorage.getItem('admin_logged_in');
+    const loginTime = sessionStorage.getItem('admin_login_time');
+    const ONE_DAY = 24 * 60 * 60 * 1000; // 24 hours
+    
+    if (!isLoggedIn || !loginTime || (Date.now() - parseInt(loginTime)) > ONE_DAY) {
+        // Not logged in or session expired - redirect to login
+        window.location.href = 'login.html';
+    }
+</script>
+
+<div class="container">
+    <div class="header">
+        <div class="logo">
+            <h1>EXODUS</h1>
+            <p>ADMIN DASHBOARD</p>
+        </div>
+        <div class="header-buttons">
+            <a href="index.html" class="back-link"><i class="fas fa-arrow-left"></i> Store</a>
+            <button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
+        </div>
+    </div>
+
+    <div class="stats-grid" id="statsGrid">
+        <div class="stat-card"><i class="fas fa-shopping-bag"></i><div class="stat-number" id="totalOrders">0</div><div class="stat-label">TOTAL ORDERS</div></div>
+        <div class="stat-card"><i class="fas fa-money-bill"></i><div class="stat-number" id="totalRevenue">0</div><div class="stat-label">REVENUE (ETB)</div></div>
+        <div class="stat-card"><i class="fas fa-truck"></i><div class="stat-number" id="outForDelivery">0</div><div class="stat-label">OUT FOR DELIVERY</div></div>
+        <div class="stat-card"><i class="fas fa-check-circle"></i><div class="stat-number" id="deliveredCount">0</div><div class="stat-label">DELIVERED</div></div>
+    </div>
+
+    <div class="controls">
+        <div class="search-box"><i class="fas fa-search"></i><input type="text" id="searchInput" placeholder="Search by name, phone, order ID..."></div>
+        <button class="btn-white" id="refreshBtn"><i class="fas fa-sync-alt"></i> Refresh</button>
+    </div>
+
+    <div class="orders-container">
+        <div id="loading" class="loading">Loading orders...</div>
+        <table id="ordersTable" style="display:none;">
+            <thead><tr><th>ORDER ID</th><th>DATE</th><th>CUSTOMER</th><th>PHONE</th><th>ITEMS</th><th>TOTAL</th><th>STATUS</th><th>ACTIONS</th></tr></thead>
+            <tbody id="ordersTableBody"></tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Order Details Modal -->
+<div class="modal" id="orderModal">
+    <div class="modal-content">
+        <div class="modal-header"><h2>📋 Order Details</h2><span class="close-modal" id="closeModalBtn">&times;</span></div>
+        <div id="orderDetailContent"></div>
+    </div>
+</div>
+
+<!-- Photo Modal -->
+<div class="modal" id="photoModal">
+    <div class="modal-content">
+        <div class="modal-header"><h2>📸 Delivery Proof Photo</h2><span class="close-modal" id="closePhotoModalBtn">&times;</span></div>
+        <div id="photoContent"></div>
+    </div>
+</div>
+
+<div class="toast" id="toastMsg">Updated!</div>
+
+<script>
+    const API_BASE = window.location.origin + '/api';
+    let allOrders = [];
+
+    // Logout function
+    function logout() {
+        sessionStorage.removeItem('admin_logged_in');
+        sessionStorage.removeItem('admin_login_time');
+        window.location.href = 'login.html';
+    }
+
+    async function loadOrders() {
+        const loading = document.getElementById('loading');
+        const table = document.getElementById('ordersTable');
+        try {
+            const response = await fetch(`${API_BASE}/orders`);
+            allOrders = await response.json();
+            loading.style.display = 'none';
+            table.style.display = 'table';
+            updateStats();
+            renderOrdersTable();
+        } catch (error) {
+            loading.innerHTML = '❌ Server error. Make sure server is running.';
+        }
+    }
+
+    function updateStats() {
+        document.getElementById('totalOrders').textContent = allOrders.length;
+        document.getElementById('totalRevenue').textContent = allOrders.reduce((s,o) => s + (o.total || 0), 0).toLocaleString();
+        document.getElementById('outForDelivery').textContent = allOrders.filter(o => o.delivery_status === 'out_for_delivery').length;
+        document.getElementById('deliveredCount').textContent = allOrders.filter(o => o.delivery_status === 'delivered').length;
+    }
+
+    function renderOrdersTable() {
+        const tbody = document.getElementById('ordersTableBody');
+        const searchTerm = document.getElementById('searchInput')?.value.toLowerCase() || '';
+        let filtered = allOrders.filter(o => 
+            o.order_id?.toLowerCase().includes(searchTerm) ||
+            o.customer_name?.toLowerCase().includes(searchTerm) ||
+            o.customer_phone?.includes(searchTerm)
+        );
+        if (filtered.length === 0) { 
+            tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; color:#888;">No orders found</td></tr>'; 
+            return; 
+        }
+        
+        tbody.innerHTML = filtered.map(order => {
+            let statusClass = 'status-pending';
+            let statusText = 'Pending';
+            if (order.delivery_status === 'out_for_delivery') { statusClass = 'status-out-for-delivery'; statusText = 'Out for Delivery'; }
+            if (order.delivery_status === 'delivered') { statusClass = 'status-delivered'; statusText = '✓ Delivered'; }
+            
+            return `
+                <tr>
+                    <td><strong>${order.order_id}</strong></td>
+                    <td style="font-size:0.7rem;">${new Date(order.created_at).toLocaleDateString()}</td>
+                    <td>${order.customer_name}</td>
+                    <td>${order.customer_phone}</td>
+                    <td>${order.items?.length || 0} items</td>
+                    <td><strong>${(order.total || 0).toLocaleString()} ETB</strong></td>
+                    <td><span class="status ${statusClass}">${statusText}</span></td>
+                    <td>
+                        <button class="action-btn" onclick="viewOrder('${order.order_id}')"><i class="fas fa-eye"></i> View</button>
+                        ${order.delivery_status !== 'out_for_delivery' && order.delivery_status !== 'delivered' ? `<button class="action-btn delivery-btn" onclick="markOutForDelivery('${order.order_id}')"><i class="fas fa-truck"></i> Send</button>` : ''}
+                        ${order.delivery_photo ? `<button class="action-btn photo-btn" onclick="viewPhoto('${order.delivery_photo}')"><i class="fas fa-camera"></i> Proof</button>` : `<button class="action-btn" onclick="uploadPhoto('${order.order_id}')"><i class="fas fa-upload"></i> Add Photo</button>`}
+                        <select onchange="updateDeliveryStatus('${order.order_id}', this.value)" style="margin-top:6px;">
+                            <option value="pending" ${order.delivery_status === 'pending' ? 'selected' : ''}>Pending</option>
+                            <option value="out_for_delivery" ${order.delivery_status === 'out_for_delivery' ? 'selected' : ''}>Out for Delivery</option>
+                            <option value="delivered" ${order.delivery_status === 'delivered' ? 'selected' : ''}>Delivered</option>
+                        </select>
+                    </td>
+                </tr>
+            `;
+        }).join('');
+    }
+
+    async function markOutForDelivery(orderId) {
+        try {
+            await fetch(`${API_BASE}/orders/${orderId}/status`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ delivery_status: 'out_for_delivery' })
+            });
+            showToast(`📧 Order ${orderId} marked as Out for Delivery - Customer notified!`);
+            loadOrders();
+        } catch (error) {
+            showToast('Error updating status');
+        }
+    }
+
+    async function updateDeliveryStatus(orderId, status) {
+        try {
+            await fetch(`${API_BASE}/orders/${orderId}/status`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ delivery_status: status })
+            });
+            showToast(`Order ${orderId} status updated to ${status}`);
+            loadOrders();
+        } catch (error) {
+            showToast('Error updating status');
+        }
+    }
+
+    async function uploadPhoto(orderId) {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = 'image/*';
+        input.onchange = async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            const formData = new FormData();
+            formData.append('photo', file);
+            
+            showToast('Uploading photo...');
+            
+            try {
+                const response = await fetch(`${API_BASE}/upload-delivery-photo/${orderId}`, {
+                    method: 'POST',
+                    body: formData
+                });
+                const result = await response.json();
+                if (result.success) {
+                    showToast('✅ Delivery photo uploaded successfully!');
+                    loadOrders();
+                } else {
+                    showToast('❌ Upload failed. Try again.');
+                }
+            } catch (error) {
+                showToast('❌ Error uploading photo');
+            }
+        };
+        input.click();
+    }
+
+    function viewOrder(orderId) {
+        const order = allOrders.find(o => o.order_id === orderId);
+        if (!order) return;
+        
+        const itemsHtml = (order.items || []).map(item => `
+            <div style="display:flex; justify-content:space-between; padding:10px 0; border-bottom:1px solid #222;">
+                <span>${item.name} (${item.size}) x${item.quantity}</span>
+                <span>${(item.price * item.quantity).toLocaleString()} ETB</span>
+            </div>
+        `).join('');
+        
+        document.getElementById('orderDetailContent').innerHTML = `
+            <p><strong>Order ID:</strong> ${order.order_id}</p>
+            <p><strong>Date:</strong> ${new Date(order.created_at).toLocaleString()}</p>
+            <p><strong>Customer:</strong> ${order.customer_name}</p>
+            <p><strong>Email:</strong> ${order.customer_email}</p>
+            <p><strong>Phone:</strong> ${order.customer_phone}</p>
+            <p><strong>Address:</strong> ${order.customer_address}</p>
+            <h3 style="margin:16px 0 10px;">Items</h3>
+            ${itemsHtml}
+            <div style="display:flex; justify-content:space-between; font-weight:700; margin-top:16px; padding-top:16px; border-top:1px solid #222;">
+                <span>Total</span>
+                <span>${(order.total || 0).toLocaleString()} ETB</span>
+            </div>
+            ${order.delivery_photo ? `<p style="margin-top:16px;"><strong>📸 Delivery Proof:</strong> <a href="${order.delivery_photo}" target="_blank" style="color:#fff;">View Photo</a></p>` : '<p style="margin-top:16px; color:#888;">📸 No delivery photo uploaded yet</p>'}
+        `;
+        document.getElementById('orderModal').style.display = 'flex';
+    }
+
+    function viewPhoto(photoUrl) {
+        document.getElementById('photoContent').innerHTML = `
+            <img src="${photoUrl}" class="proof-photo" alt="Delivery Proof">
+            <p style="text-align:center; margin-top:16px;">✅ Delivery completed. Customer received product.</p>
+        `;
+        document.getElementById('photoModal').style.display = 'flex';
+    }
+
+    function showToast(msg) {
+        const toast = document.getElementById('toastMsg');
+        toast.textContent = msg;
+        toast.style.opacity = '1';
+        setTimeout(() => toast.style.opacity = '0', 3000);
+    }
+
+    // Event Listeners
+    document.getElementById('searchInput')?.addEventListener('input', () => renderOrdersTable());
+    document.getElementById('refreshBtn')?.addEventListener('click', loadOrders);
+    document.getElementById('closeModalBtn')?.addEventListener('click', () => document.getElementById('orderModal').style.display = 'none');
+    document.getElementById('closePhotoModalBtn')?.addEventListener('click', () => document.getElementById('photoModal').style.display = 'none');
+    
+    window.onclick = (e) => { 
+        if (e.target === document.getElementById('orderModal')) document.getElementById('orderModal').style.display = 'none'; 
+        if (e.target === document.getElementById('photoModal')) document.getElementById('photoModal').style.display = 'none'; 
+    };
+    
+    // Make functions global
+    window.viewOrder = viewOrder;
+    window.viewPhoto = viewPhoto;
+    window.markOutForDelivery = markOutForDelivery;
+    window.updateDeliveryStatus = updateDeliveryStatus;
+    window.uploadPhoto = uploadPhoto;
+    window.logout = logout;
+    
+    // Load orders on page load
+    loadOrders();
+</script>
+</body>
+</html>
