@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EXODUS - Product Manager</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: #0a0a0a; color: #ffffff; padding: 40px 20px; }
+        .container { max-width: 1400px; margin: 0 auto; }
+        h1 { margin-bottom: 8px; }
+        .subtitle { color: #888; margin-bottom: 32px; }
+        .tabs { display: flex; gap: 8px; margin-bottom: 32px; border-bottom: 1px solid #222; padding-bottom: 16px; }
+        .tab-btn { background: #111; border: 1px solid #333; padding: 12px 28px; border-radius: 40px; cursor: pointer; color: #aaa; transition: 0.2s; }
+        .tab-btn.active { background: white; color: black; border-color: white; }
+        .tab-pane { display: none; }
+        .tab-pane.active { display: block; }
+        .two-columns { display: grid; grid-template-columns: 1fr 2fr; gap: 32px; }
+        .form-card, .products-card, .hero-card { background: #111; border: 1px solid #222; border-radius: 24px; padding: 28px; }
+        .form-card h2, .products-card h2, .hero-card h2 { margin-bottom: 20px; font-size: 1.4rem; }
+        .form-group { margin-bottom: 16px; }
+        label { display: block; margin-bottom: 8px; color: #aaa; font-size: 0.85rem; }
+        input, select, textarea { width: 100%; padding: 12px; background: #1a1a1a; border: 1px solid #333; border-radius: 12px; color: white; font-family: inherit; }
+        input:focus { outline: none; border-color: #666; }
+        .sizes-container { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 8px; }
+        .size-checkbox { background: #1a1a1a; padding: 8px 16px; border-radius: 40px; cursor: pointer; border: 1px solid #333; }
+        .size-checkbox.selected { background: white; color: black; border-color: white; }
+        .stock-inputs { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 12px; margin-top: 12px; }
+        .stock-item { background: #1a1a1a; padding: 8px; border-radius: 12px; }
+        .stock-item label { font-size: 0.7rem; margin-bottom: 4px; }
+        .stock-item input { padding: 6px; font-size: 0.9rem; }
+        button { background: white; color: black; border: none; padding: 12px 24px; border-radius: 40px; font-weight: 600; cursor: pointer; transition: 0.2s; }
+        button:hover { background: #ddd; }
+        .btn-secondary { background: #222; color: white; }
+        .btn-secondary:hover { background: #333; }
+        .products-table { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #222; }
+        th { color: #888; font-weight: 500; }
+        .product-image { width: 50px; height: 60px; object-fit: cover; border-radius: 8px; }
+        .edit-btn, .delete-btn { padding: 6px 12px; margin: 0 4px; font-size: 0.8rem; }
+        .edit-btn { background: #333; color: white; }
+        .delete-btn { background: #ff444433; color: #ff4444; }
+        .hero-preview { margin-top: 20px; text-align: center; }
+        .hero-preview img { max-width: 100%; border-radius: 20px; max-height: 300px; object-fit: cover; }
+        .current-hero { background: #1a1a1a; padding: 16px; border-radius: 16px; margin-top: 16px; }
+        .toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: #00c853; padding: 12px 24px; border-radius: 40px; opacity: 0; transition: 0.2s; z-index: 1000; }
+        .imgbb-guide { background: #1a1a1a; padding: 16px; border-radius: 16px; margin-top: 20px; }
+        .imgbb-guide p { color: #aaa; font-size: 0.8rem; }
+        .back-link { display: inline-block; margin-top: 32px; color: #888; text-decoration: none; }
+        .loading { text-align: center; padding: 40px; color: #888; }
+        @media (max-width: 900px) { .two-columns { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>📦 EXODUS Admin Panel</h1>
+    <p class="subtitle">Manage your products, hero image, and store content</p>
+
+    <div class="tabs">
+        <button class="tab-btn active" data-tab="products">👕 Products</button>
+        <button class="tab-btn" data-tab="hero">🖼️ Hero Image</button>
+    </div>
+
+    <!-- Products Tab -->
+    <div id="productsTab" class="tab-pane active">
+        <div class="two-columns">
+            <div class="form-card">
+                <h2 id="formTitle">➕ Add New Product</h2>
+                <form id="productForm">
+                    <div class="form-group">
+                        <label>Product Name</label>
+                        <input type="text" id="productName" required placeholder="e.g., EXODUS SKULL HOODIE">
+                    </div>
+                    <div class="form-group">
+                        <label>Price (ETB)</label>
+                        <input type="number" id="productPrice" required placeholder="e.g., 2799">
+                    </div>
+                    <div class="form-group">
+                        <label>Image URL (from ImgBB)</label>
+                        <input type="url" id="productImage" required placeholder="https://i.ibb.co/xxxxx/image.jpg">
+                        <div class="imgbb-guide">
+                            <p>📸 <strong>How to get an image URL from ImgBB:</strong></p>
+                            <p>1. Go to <a href="https://imgbb.com" target="_blank" style="color:#00c853;">imgbb.com</a><br>
+                            2. Click "Start Uploading" → Select your product photo<br>
+                            3. After upload, click "Direct Link" and copy the URL<br>
+                            4. Paste it above ☝️</p>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Sizes Available</label>
+                        <div class="sizes-container" id="sizesContainer">
+                            <div class="size-checkbox" data-size="S">S</div>
+                            <div class="size-checkbox" data-size="M">M</div>
+                            <div class="size-checkbox" data-size="L">L</div>
+                            <div class="size-checkbox" data-size="XL">XL</div>
+                            <div class="size-checkbox" data-size="XXL">XXL</div>
+                            <div class="size-checkbox" data-size="One Size">One Size</div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Stock per Size</label>
+                        <div id="stockInputs" class="stock-inputs"></div>
+                    </div>
+                    <input type="hidden" id="editingId" value="">
+                    <button type="submit" id="submitBtn">➕ Add Product</button>
+                    <button type="button" id="cancelEditBtn" class="btn-secondary" style="display:none; margin-left:12px;">Cancel Edit</button>
+                </form>
+            </div>
+
+            <div class="products-card">
+                <h2>📋 Your Products</h2>
+                <div class="products-table">
+                    <div id="productsLoading" class="loading">Loading products...</div>
+                    <table id="productsTable" style="display: none;">
+                        <thead><tr><th>Image</th><th>Name</th><th>Price</th><th>Sizes</th><th>Stock</th><th>Actions</th></tr></thead>
+                        <tbody id="productsTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hero Image Tab -->
+    <div id="heroTab" class="tab-pane">
+        <div class="hero-card">
+            <h2>🖼️ Change Hero Image (Main Banner)</h2>
+            <p style="color: #888; margin-bottom: 24px;">This is the large image at the top of your store homepage.</p>
+            
+            <div class="form-group">
+                <label>Hero Image URL (from ImgBB)</label>
+                <input type="url" id="heroImageUrl" placeholder="https://i.ibb.co/xxxxx/hero-image.jpg">
+                <div class="imgbb-guide">
+                    <p>📸 <strong>How to get a hero image URL:</strong></p>
+                    <p>1. Go to <a href="https://imgbb.com" target="_blank" style="color:#00c853;">imgbb.com</a><br>
+                    2. Upload your hero image (recommended size: 1200x600px)<br>
+                    3. Click "Direct Link" and copy the URL<br>
+                    4. Paste it above and click "Save Hero Image"</p>
+                </div>
+            </div>
+            
+            <button id="saveHeroBtn">💾 Save Hero Image</button>
+            <button id="resetHeroBtn" class="btn-secondary" style="margin-left: 12px;">↺ Reset to Default</button>
+            
+            <div class="hero-preview">
+                <h3 style="margin: 24px 0 12px;">Current Preview:</h3>
+                <div class="current-hero">
+                    <img id="heroPreview" src="" alt="Hero Preview" style="max-width:100%; border-radius:16px;">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <a href="index.html" class="back-link">← Back to Store</a> | 
+    <a href="admin.html" class="back-link">📦 Order Dashboard</a>
+</div>
+<div class="toast" id="toastMsg">Saved!</div>
+
+<script>
+    const API_BASE = 'http://localhost:3000/api';
+    let selectedSizes = ['S', 'M', 'L', 'XL', 'XXL'];
+    let editingProductId = null;
+
+    function showToast(msg) {
+        const toast = document.getElementById('toastMsg');
+        toast.textContent = msg;
+        toast.style.opacity = '1';
+        setTimeout(() => toast.style.opacity = '0', 2000);
+    }
+
+    function renderSizeCheckboxes() {
+        const stockDiv = document.getElementById('stockInputs');
+        stockDiv.innerHTML = '';
+        selectedSizes.forEach(size => {
+            stockDiv.innerHTML += `
+                <div class="stock-item">
+                    <label>${size}</label>
+                    <input type="number" id="stock_${size}" value="0" min="0" class="stock-input">
+                </div>
+            `;
+        });
+    }
+
+    document.querySelectorAll('.size-checkbox').forEach(checkbox => {
+        checkbox.addEventListener('click', () => {
+            const size = checkbox.dataset.size;
+            if (selectedSizes.includes(size)) {
+                selectedSizes = selectedSizes.filter(s => s !== size);
+                checkbox.classList.remove('selected');
+            } else {
+                selectedSizes.push(size);
+                checkbox.classList.add('selected');
+            }
+            renderSizeCheckboxes();
+        });
+        if (['S','M','L','XL','XXL'].includes(checkbox.dataset.size)) {
+            checkbox.classList.add('selected');
+        }
+    });
+
+    function getStockObject() {
+        const stock = {};
+        selectedSizes.forEach(size => {
+            const input = document.getElementById(`stock_${size}`);
+            stock[size] = input ? parseInt(input.value) || 0 : 0;
+        });
+        return stock;
+    }
+
+    async function loadProducts() {
+        const loading = document.getElementById('productsLoading');
+        const table = document.getElementById('productsTable');
+        try {
+            const response = await fetch(`${API_BASE}/products`);
+            const products = await response.json();
+            loading.style.display = 'none';
+            table.style.display = 'table';
+            const tbody = document.getElementById('productsTableBody');
+            if (products.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:#888;">No products yet. Add your first product above!</td></tr>';
+                return;
+            }
+            tbody.innerHTML = products.map(product => `
+                <tr>
+                    <td><img src="${product.image}" class="product-image" onerror="this.src='https://placehold.co/400x500/333/white?text=No+Image'"></td>
+                    <td><strong>${product.name}</strong></td>
+                    <td>${product.price} ETB</td>
+                    <td>${product.sizes.join(', ')}</td>
+                    <td>${Object.entries(product.stock).map(([size, qty]) => `${size}:${qty}`).join(', ')}</td>
+                    <td>
+                        <button class="edit-btn" onclick="editProduct(${product.id})"><i class="fas fa-edit"></i> Edit</button>
+                        <button class="delete-btn" onclick="deleteProductById(${product.id})"><i class="fas fa-trash"></i> Delete</button>
+                    </td>
+                </tr>
+            `).join('');
+        } catch (error) {
+            loading.innerHTML = '❌ Error loading products. Make sure server is running (node server.js)';
+        }
+    }
+
+    async function editProduct(id) {
+        const response = await fetch(`${API_BASE}/products`);
+        const products = await response.json();
+        const product = products.find(p => p.id === id);
+        if (!product) return;
+        editingProductId = id;
+        document.getElementById('formTitle').innerHTML = '✏️ Edit Product';
+        document.getElementById('submitBtn').innerHTML = '💾 Save Changes';
+        document.getElementById('cancelEditBtn').style.display = 'inline-block';
+        document.getElementById('productName').value = product.name;
+        document.getElementById('productPrice').value = product.price;
+        document.getElementById('productImage').value = product.image;
+        
+        document.querySelectorAll('.size-checkbox').forEach(cb => cb.classList.remove('selected'));
+        selectedSizes = [...product.sizes];
+        document.querySelectorAll('.size-checkbox').forEach(cb => {
+            if (selectedSizes.includes(cb.dataset.size)) cb.classList.add('selected');
+        });
+        renderSizeCheckboxes();
+        
+        setTimeout(() => {
+            Object.entries(product.stock).forEach(([size, qty]) => {
+                const input = document.getElementById(`stock_${size}`);
+                if (input) input.value = qty;
+            });
+        }, 50);
+    }
+
+    async function deleteProductById(id) {
+        if (confirm('Are you sure you want to delete this product?')) {
+            await fetch(`${API_BASE}/products/${id}`, { method: 'DELETE' });
+            showToast('Product deleted');
+            loadProducts();
+        }
+    }
+
+    document.getElementById('productForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const product = {
+            name: document.getElementById('productName').value,
+            price: parseInt(document.getElementById('productPrice').value),
+            image: document.getElementById('productImage').value,
+            sizes: selectedSizes,
+            stock: getStockObject()
+        };
+        
+        if (editingProductId) {
+            await fetch(`${API_BASE}/products/${editingProductId}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(product)
+            });
+            showToast('Product updated!');
+        } else {
+            await fetch(`${API_BASE}/products`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(product)
+            });
+            showToast('Product added!');
+        }
+        
+        document.getElementById('productForm').reset();
+        editingProductId = null;
+        document.getElementById('formTitle').innerHTML = '➕ Add New Product';
+        document.getElementById('submitBtn').innerHTML = '➕ Add Product';
+        document.getElementById('cancelEditBtn').style.display = 'none';
+        selectedSizes = ['S', 'M', 'L', 'XL', 'XXL'];
+        document.querySelectorAll('.size-checkbox').forEach(cb => {
+            if (selectedSizes.includes(cb.dataset.size)) cb.classList.add('selected');
+            else cb.classList.remove('selected');
+        });
+        renderSizeCheckboxes();
+        loadProducts();
+    });
+
+    document.getElementById('cancelEditBtn').addEventListener('click', () => {
+        editingProductId = null;
+        document.getElementById('productForm').reset();
+        document.getElementById('formTitle').innerHTML = '➕ Add New Product';
+        document.getElementById('submitBtn').innerHTML = '➕ Add Product';
+        document.getElementById('cancelEditBtn').style.display = 'none';
+        selectedSizes = ['S', 'M', 'L', 'XL', 'XXL'];
+        document.querySelectorAll('.size-checkbox').forEach(cb => {
+            if (selectedSizes.includes(cb.dataset.size)) cb.classList.add('selected');
+            else cb.classList.remove('selected');
+        });
+        renderSizeCheckboxes();
+    });
+
+    // Hero Image functions
+    async function loadHeroImage() {
+        const response = await fetch(`${API_BASE}/hero-image`);
+        const data = await response.json();
+        const defaultHero = 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=800&h=1000&fit=crop';
+        const heroUrl = data.url || defaultHero;
+        document.getElementById('heroImageUrl').value = heroUrl;
+        document.getElementById('heroPreview').src = heroUrl;
+    }
+
+    async function saveHeroImage() {
+        const url = document.getElementById('heroImageUrl').value;
+        if (!url) { showToast('Please enter an image URL'); return; }
+        await fetch(`${API_BASE}/hero-image`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ url })
+        });
+        showToast('Hero image saved! Refresh your store to see it.');
+        document.getElementById('heroPreview').src = url;
+    }
+
+    async function resetHeroImage() {
+        const defaultHero = 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=800&h=1000&fit=crop';
+        await fetch(`${API_BASE}/hero-image`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ url: defaultHero })
+        });
+        document.getElementById('heroImageUrl').value = defaultHero;
+        document.getElementById('heroPreview').src = defaultHero;
+        showToast('Hero image reset to default');
+    }
+
+    // Tab switching
+    function setupTabs() {
+        const tabs = document.querySelectorAll('.tab-btn');
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                const tabName = tab.dataset.tab;
+                tabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                document.querySelectorAll('.tab-pane').forEach(pane => pane.classList.remove('active'));
+                if (tabName === 'products') {
+                    document.getElementById('productsTab').classList.add('active');
+                    loadProducts();
+                } else if (tabName === 'hero') {
+                    document.getElementById('heroTab').classList.add('active');
+                    loadHeroImage();
+                }
+            });
+        });
+    }
+
+    document.getElementById('saveHeroBtn')?.addEventListener('click', saveHeroImage);
+    document.getElementById('resetHeroBtn')?.addEventListener('click', resetHeroImage);
+
+    renderSizeCheckboxes();
+    loadProducts();
+    setupTabs();
+    loadHeroImage();
+    
+    window.editProduct = editProduct;
+    window.deleteProductById = deleteProductById;
+</script>
+</body>
+</html>
