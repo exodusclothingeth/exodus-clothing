@@ -1,6 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <script>
+    const isLoggedIn = sessionStorage.getItem('admin_logged_in');
+    const loginTime = sessionStorage.getItem('admin_login_time');
+    const ONE_DAY = 24 * 60 * 60 * 1000;
+    
+    if (!isLoggedIn || !loginTime || (Date.now() - parseInt(loginTime)) > ONE_DAY) {
+        window.location.href = 'login.html';
+    }
+</script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EXODUS - Product Manager</title>
