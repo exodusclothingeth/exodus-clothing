@@ -40,9 +40,9 @@
         th, td { padding: 12px; text-align: left; border-bottom: 1px solid #222; }
         th { color: #888; font-weight: 500; }
         .product-image { width: 50px; height: 60px; object-fit: cover; border-radius: 8px; }
-        .edit-btn, .delete-btn { padding: 6px 12px; margin: 0 4px; font-size: 0.8rem; }
-        .edit-btn { background: #333; color: white; }
-        .delete-btn { background: #ff444433; color: #ff4444; }
+        .edit-btn, .delete-btn { padding: 6px 12px; margin: 0 4px; font-size: 0.8rem; cursor: pointer; }
+        .edit-btn { background: #333; color: white; border: none; border-radius: 8px; }
+        .delete-btn { background: #ff444433; color: #ff4444; border: none; border-radius: 8px; }
         
         .alert-box { background: #1a1a1a; border-radius: 16px; padding: 16px; margin-bottom: 20px; display: none; }
         .alert-out { background: #ff444433; border-left: 4px solid #ff4444; padding: 12px; border-radius: 12px; margin-bottom: 8px; }
@@ -52,6 +52,7 @@
         .imgbb-guide { background: #1a1a1a; padding: 16px; border-radius: 16px; margin-top: 20px; }
         .imgbb-guide p { color: #aaa; font-size: 0.8rem; }
         .back-link { display: inline-block; margin-top: 32px; color: #888; text-decoration: none; }
+        .loading { text-align: center; padding: 40px; color: #888; }
         
         @media (max-width: 900px) { .two-columns { grid-template-columns: 1fr; } }
     </style>
@@ -123,7 +124,7 @@
             <div id="stockAlert" class="alert-box" style="display:none;"></div>
             
             <div class="products-table">
-                <div id="productsLoading" class="loading" style="text-align:center; padding:40px; color:#888;">Loading products...</div>
+                <div id="productsLoading" class="loading">Loading products...</div>
                 <table id="productsTable" style="display: none;">
                     <thead>
                         <tr><th>Image</th><th>Name</th><th>Price</th><th>Sizes</th><th>Stock</th><th>Actions</th></tr>
@@ -251,7 +252,7 @@
                         <button class="edit-btn" onclick="editProduct(${product.id})"><i class="fas fa-edit"></i> Edit</button>
                         <button class="delete-btn" onclick="deleteProductById(${product.id})"><i class="fas fa-trash"></i> Delete</button>
                     </td>
-                </tr>
+                 </tr>
             `).join('');
         } catch (error) {
             loading.innerHTML = '❌ Error loading products. Make sure server is running (node server.js)';
