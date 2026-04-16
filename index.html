@@ -46,7 +46,7 @@
         
         .section-title { font-size: 1.5rem; font-weight: 700; margin: 32px 0 16px; }
         .product-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
-        .product-card { background: #111; border-radius: 16px; overflow: hidden; border: 1px solid #222; transition: transform 0.2s; position: relative; cursor: pointer; }
+        .product-card { background: #111; border-radius: 16px; overflow: hidden; border: 1px solid #222; transition: transform 0.2s; position: relative; }
         .product-card:hover { transform: translateY(-4px); border-color: #444; }
         
         .image-container { position: relative; aspect-ratio: 3/4; overflow: hidden; background: #1a1a1a; cursor: pointer; }
@@ -68,11 +68,11 @@
         .lightbox.active { display: flex; }
         .lightbox-image { max-width: 90%; max-height: 80%; object-fit: contain; }
         .lightbox-close { position: absolute; top: 20px; right: 30px; font-size: 40px; color: white; cursor: pointer; z-index: 2001; }
-        .lightbox-prev, .lightbox-next { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,0.2); color: white; border: none; padding: 15px 20px; cursor: pointer; font-size: 24px; border-radius: 50%; transition: 0.2s; }
+        .lightbox-prev, .lightbox-next { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,0.2); color: white; border: none; padding: 15px 20px; cursor: pointer; font-size: 24px; border-radius: 50%; transition: 0.2s; z-index: 2001; }
         .lightbox-prev:hover, .lightbox-next:hover { background: rgba(255,255,255,0.4); }
         .lightbox-prev { left: 20px; }
         .lightbox-next { right: 20px; }
-        .lightbox-counter { position: absolute; bottom: 20px; left: 0; right: 0; text-align: center; color: #888; font-size: 14px; }
+        .lightbox-counter { position: absolute; bottom: 20px; left: 0; right: 0; text-align: center; color: #888; font-size: 14px; z-index: 2001; }
         
         .cart-sidebar { position: fixed; top: 0; right: -100%; width: 85%; max-width: 350px; height: 100%; background: #0f0f0f; z-index: 1001; transition: right 0.3s; display: flex; flex-direction: column; border-left: 1px solid #222; }
         .cart-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); visibility: hidden; opacity: 0; transition: 0.2s; z-index: 1000; }
@@ -107,6 +107,11 @@
             .footer-grid { flex-direction: row; justify-content: space-between; text-align: left; }
         }
         @media (min-width: 1024px) { .product-grid { grid-template-columns: repeat(4, 1fr); } }
+        
+        @media (max-width: 768px) {
+            .lightbox-prev, .lightbox-next { padding: 10px 15px; font-size: 18px; }
+            .lightbox-close { font-size: 30px; top: 10px; right: 15px; }
+        }
     </style>
 </head>
 <body id="appBody">
@@ -114,9 +119,9 @@
 <!-- Lightbox Modal -->
 <div id="lightbox" class="lightbox" onclick="closeLightbox(event)">
     <span class="lightbox-close" onclick="closeLightbox()">&times;</span>
-    <button class="lightbox-prev" onclick="prevLightboxImage(event)">‹</button>
+    <button class="lightbox-prev" onclick="event.stopPropagation(); prevLightboxImage()">‹</button>
     <img id="lightboxImage" class="lightbox-image" src="">
-    <button class="lightbox-next" onclick="nextLightboxImage(event)">›</button>
+    <button class="lightbox-next" onclick="event.stopPropagation(); nextLightboxImage()">›</button>
     <div id="lightboxCounter" class="lightbox-counter"></div>
 </div>
 
@@ -164,10 +169,13 @@
     let lightboxImages = [], lightboxIndex = 0;
     
     function openLightbox(images, index) {
+        if (!images || images.length === 0) return;
         lightboxImages = images;
         lightboxIndex = index;
-        document.getElementById('lightboxImage').src = images[index];
-        document.getElementById('lightboxCounter').innerText = `${index + 1} / ${images.length}`;
+        const lightboxImg = document.getElementById('lightboxImage');
+        const counter = document.getElementById('lightboxCounter');
+        if (lightboxImg) lightboxImg.src = images[index];
+        if (counter) counter.innerText = `${index + 1} / ${images.length}`;
         document.getElementById('lightbox').classList.add('active');
         document.body.style.overflow = 'hidden';
     }
@@ -178,15 +186,15 @@
         document.body.style.overflow = '';
     }
     
-    function nextLightboxImage(event) {
-        if (event) event.stopPropagation();
+    function nextLightboxImage() {
+        if (!lightboxImages.length) return;
         lightboxIndex = (lightboxIndex + 1) % lightboxImages.length;
         document.getElementById('lightboxImage').src = lightboxImages[lightboxIndex];
         document.getElementById('lightboxCounter').innerText = `${lightboxIndex + 1} / ${lightboxImages.length}`;
     }
     
-    function prevLightboxImage(event) {
-        if (event) event.stopPropagation();
+    function prevLightboxImage() {
+        if (!lightboxImages.length) return;
         lightboxIndex = (lightboxIndex - 1 + lightboxImages.length) % lightboxImages.length;
         document.getElementById('lightboxImage').src = lightboxImages[lightboxIndex];
         document.getElementById('lightboxCounter').innerText = `${lightboxIndex + 1} / ${lightboxImages.length}`;
@@ -194,38 +202,116 @@
     
     async function loadHeroImage() { try { let res = await fetch(`${API_BASE}/hero-image`); let data = await res.json(); document.getElementById('heroImage').src = data.url || 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=800&h=1000&fit=crop'; } catch(e) {} }
     
-    async function loadProducts() { try { let res = await fetch(`${API_BASE}/products`); allProducts = await res.json(); renderProducts(); } catch(e) { document.getElementById('productGrid').innerHTML = '<div class="empty-products">Error loading products</div>'; } }
+    async function loadProducts() { 
+        try { 
+            let res = await fetch(`${API_BASE}/products`); 
+            allProducts = await res.json(); 
+            renderProducts(); 
+        } catch(e) { 
+            document.getElementById('productGrid').innerHTML = '<div class="empty-products">Error loading products</div>'; 
+        } 
+    }
     
     function renderProducts() {
         let filtered = currentCategory === 'all' ? allProducts : allProducts.filter(p => p.category === currentCategory);
         let grid = document.getElementById('productGrid');
         if(!filtered.length) { grid.innerHTML = '<div class="empty-products">No products in this category</div>'; return; }
-        grid.innerHTML = filtered.map(p => {
+        
+        grid.innerHTML = filtered.map((p, productIdx) => {
             let totalStock = Object.values(p.stock).reduce((a,b)=>a+b,0);
             let isSoldOut = totalStock === 0;
-            let images = p.images && p.images.length ? p.images : [p.image || 'https://placehold.co/400x500/333/white?text=EXODUS'];
-            return `<div class="product-card">
-                <div class="image-container" onclick="openLightbox(${JSON.stringify(images)}, 0)">
+            let images = p.images && p.images.length ? p.images : (p.image ? [p.image] : ['https://placehold.co/400x500/333/white?text=EXODUS']);
+            let imagesJson = JSON.stringify(images).replace(/"/g, '&quot;');
+            
+            return `<div class="product-card" data-product-id="${p.id}">
+                <div class="image-container" onclick="openLightbox(${imagesJson}, 0)">
                     <img src="${images[0]}" alt="${p.name}" onerror="this.src='https://placehold.co/400x500/333/white?text=EXODUS'">
                     ${isSoldOut ? '<div class="sold-out-badge">SOLD OUT</div>' : ''}
                 </div>
                 <div class="product-info">
                     <div class="product-title">${p.name}</div>
                     <div class="product-price">${p.price.toLocaleString()} ETB</div>
-                    <div class="size-buttons">${p.sizes.map(s => { let stock = p.stock[s] || 0; return `<button class="size-btn ${stock === 0 ? 'sold-out' : ''}" ${stock === 0 ? 'disabled' : `onclick="event.stopPropagation(); addToCart(${p.id}, '${s}', '${p.name.replace(/'/g, "\\'")}', ${p.price}, '${images[0]}')"`}>${s}${stock === 0 ? ' (sold out)' : ''}</button>`; }).join('')}</div>
+                    <div class="size-buttons">${p.sizes.map(s => { 
+                        let stock = p.stock[s] || 0; 
+                        return `<button class="size-btn ${stock === 0 ? 'sold-out' : ''}" ${stock === 0 ? 'disabled' : `onclick="event.stopPropagation(); addToCart(${p.id}, '${s}', '${p.name.replace(/'/g, "\\'")}', ${p.price}, '${images[0]}')"`}>${s}${stock === 0 ? ' (sold out)' : ''}</button>`;
+                    }).join('')}</div>
                 </div>
             </div>`;
         }).join('');
     }
     
-    function addToCart(id, size, name, price, image) { let existing = cart.find(i => i.id === id && i.size === size); if(existing) existing.quantity++; else cart.push({ id, name, size, price, quantity: 1, image }); saveCart(); updateCartUI(); showToast(`${name} (${size}) added`); }
+    function addToCart(id, size, name, price, image) { 
+        let existing = cart.find(i => i.id === id && i.size === size); 
+        if(existing) existing.quantity++; 
+        else cart.push({ id, name, size, price, quantity: 1, image }); 
+        saveCart(); 
+        updateCartUI(); 
+        showToast(`${name} (${size}) added`); 
+    }
+    
     function saveCart() { localStorage.setItem('exodus_cart', JSON.stringify(cart)); updateCartCount(); }
     function updateCartCount() { document.getElementById('cartCount').innerText = cart.reduce((s,i)=>s+i.quantity,0); }
     function showToast(msg) { let t=document.getElementById('toastMsg'); t.innerText=msg; t.style.opacity='1'; setTimeout(()=>t.style.opacity='0',2000); }
-    function updateCartUI() { let container = document.getElementById('cartItemsContainer'); let footer = document.getElementById('cartFooter'); let totalSpan = document.getElementById('cartTotalPrice'); updateCartCount(); if(cart.length===0) { container.innerHTML='<div style="text-align:center; color:#888;">Your cart is empty.</div>'; footer.style.display='none'; return; } footer.style.display='block'; let total=0; container.innerHTML=cart.map(item=>{ total+=item.price*item.quantity; return `<div class="cart-item"><div><strong>${item.name}</strong> (${item.size})<br>${item.price} ETB x ${item.quantity}</div><div><button onclick="updateQty(${item.id},'${item.size}',-1)">-</button> ${item.quantity} <button onclick="updateQty(${item.id},'${item.size}',1)">+</button> <button onclick="removeItem(${item.id},'${item.size}')">🗑️</button></div></div>`; }).join(''); totalSpan.innerText=`${total} ETB`; }
-    function updateQty(id,size,delta) { let item=cart.find(i=>i.id===id&&i.size===size); if(item){ item.quantity+=delta; if(item.quantity<=0) cart=cart.filter(i=>!(i.id===id&&i.size===size)); saveCart(); updateCartUI(); } }
-    function removeItem(id,size) { cart=cart.filter(i=>!(i.id===id&&i.size===size)); saveCart(); updateCartUI(); showToast("Removed"); }
-    async function placeOrder(e) { e.preventDefault(); let customer={ name:document.getElementById('customerName').value, email:document.getElementById('customerEmail').value, phone:document.getElementById('customerPhone').value, address:document.getElementById('customerAddress').value }; let total=cart.reduce((s,i)=>s+(i.price*i.quantity),0); let res=await fetch(`${API_BASE}/orders`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({customer,items:cart,total})}); let result=await res.json(); if(result.success){ document.getElementById('orderError').style.color='#00c853'; document.getElementById('orderError').innerHTML=`✅ Order placed! ID: ${result.orderId}<br>📞 We'll contact you within 24 hours.`; cart=[]; saveCart(); updateCartUI(); setTimeout(()=>{ closeOrderModal(); document.getElementById('orderForm').reset(); document.getElementById('orderError').innerHTML=''; showToast(`Order placed!`); },3000); } else { document.getElementById('orderError').innerHTML='❌ Error. Try again.'; } }
+    
+    function updateCartUI() { 
+        let container = document.getElementById('cartItemsContainer'); 
+        let footer = document.getElementById('cartFooter'); 
+        let totalSpan = document.getElementById('cartTotalPrice'); 
+        updateCartCount(); 
+        if(cart.length===0) { 
+            container.innerHTML='<div style="text-align:center; color:#888;">Your cart is empty.</div>'; 
+            footer.style.display='none'; 
+            return; 
+        } 
+        footer.style.display='block'; 
+        let total=0; 
+        container.innerHTML=cart.map(item=>{ 
+            total+=item.price*item.quantity; 
+            return `<div class="cart-item"><div><strong>${item.name}</strong> (${item.size})<br>${item.price} ETB x ${item.quantity}</div><div><button onclick="updateQty(${item.id},'${item.size}',-1)">-</button> ${item.quantity} <button onclick="updateQty(${item.id},'${item.size}',1)">+</button> <button onclick="removeItem(${item.id},'${item.size}')">🗑️</button></div></div>`; 
+        }).join(''); 
+        totalSpan.innerText=`${total} ETB`; 
+    }
+    
+    function updateQty(id,size,delta) { 
+        let item=cart.find(i=>i.id===id&&i.size===size); 
+        if(item){ 
+            item.quantity+=delta; 
+            if(item.quantity<=0) cart=cart.filter(i=>!(i.id===id&&i.size===size)); 
+            saveCart(); 
+            updateCartUI(); 
+        } 
+    }
+    
+    function removeItem(id,size) { 
+        cart=cart.filter(i=>!(i.id===id&&i.size===size)); 
+        saveCart(); 
+        updateCartUI(); 
+        showToast("Removed"); 
+    }
+    
+    async function placeOrder(e) { 
+        e.preventDefault(); 
+        let customer={ name:document.getElementById('customerName').value, email:document.getElementById('customerEmail').value, phone:document.getElementById('customerPhone').value, address:document.getElementById('customerAddress').value }; 
+        let total=cart.reduce((s,i)=>s+(i.price*i.quantity),0); 
+        let res=await fetch(`${API_BASE}/orders`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({customer,items:cart,total})}); 
+        let result=await res.json(); 
+        if(result.success){ 
+            document.getElementById('orderError').style.color='#00c853'; 
+            document.getElementById('orderError').innerHTML=`✅ Order placed! ID: ${result.orderId}<br>📞 We'll contact you within 24 hours.`; 
+            cart=[]; 
+            saveCart(); 
+            updateCartUI(); 
+            setTimeout(()=>{ 
+                closeOrderModal(); 
+                document.getElementById('orderForm').reset(); 
+                document.getElementById('orderError').innerHTML=''; 
+                showToast(`Order placed!`); 
+            },3000); 
+        } else { 
+            document.getElementById('orderError').innerHTML='❌ Error. Try again.'; 
+        } 
+    }
+    
     function openCart() { document.getElementById('cartSidebar').style.right='0px'; document.getElementById('cartOverlay').style.visibility='visible'; document.getElementById('cartOverlay').style.opacity='1'; }
     function closeCart() { document.getElementById('cartSidebar').style.right='-100%'; document.getElementById('cartOverlay').style.visibility='hidden'; document.getElementById('cartOverlay').style.opacity='0'; }
     function openOrderModal() { if(cart.length===0) { showToast("Cart empty"); return; } document.getElementById('orderModal').style.display='flex'; }
