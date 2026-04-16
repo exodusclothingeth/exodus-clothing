@@ -9,27 +9,40 @@
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Inter', sans-serif; background: #000000; color: #ffffff; font-size: 14px; }
-        .container { max-width: 600px; margin: 0 auto; padding: 16px; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 16px; }
         
         .header { display: flex; justify-content: space-between; align-items: center; padding-bottom: 16px; border-bottom: 1px solid #222; margin-bottom: 20px; flex-wrap: wrap; gap: 12px; }
         .logo h1 { font-size: 1.5rem; font-weight: 800; }
         .logo p { color: #888; font-size: 0.6rem; }
-        .logout-btn { background: #1a1a1a; color: #fff; border: 1px solid #333; padding: 10px 18px; border-radius: 40px; cursor: pointer; font-size: 0.8rem; }
+        .logout-btn { background: #1a1a1a; color: #fff; border: 1px solid #333; padding: 10px 18px; border-radius: 40px; cursor: pointer; }
         
+        /* Stats Cards */
         .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 24px; }
         .stat-card { background: #111; border: 1px solid #222; border-radius: 20px; padding: 16px; text-align: center; }
         .stat-number { font-size: 1.8rem; font-weight: 800; }
         .stat-label { color: #888; font-size: 0.7rem; margin-top: 4px; }
         
-        .search-box { display: flex; gap: 10px; margin-bottom: 20px; }
-        .search-box input { flex: 1; padding: 14px 16px; background: #1a1a1a; border: 1px solid #333; border-radius: 40px; color: white; font-size: 0.9rem; }
-        .refresh-btn { background: #fff; color: #000; border: none; padding: 0 20px; border-radius: 40px; font-weight: 600; cursor: pointer; }
+        /* Stock Chart */
+        .chart-card { background: #111; border: 1px solid #222; border-radius: 20px; padding: 20px; margin-bottom: 24px; }
+        .chart-title { font-size: 1.1rem; font-weight: 600; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
+        .stock-bars { display: flex; flex-direction: column; gap: 12px; max-height: 300px; overflow-y: auto; }
+        .stock-item { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+        .stock-name { width: 120px; font-size: 0.8rem; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .stock-bar-container { flex: 1; background: #1a1a1a; border-radius: 20px; height: 30px; overflow: hidden; }
+        .stock-bar { height: 100%; background: linear-gradient(90deg, #fff, #aaa); border-radius: 20px; display: flex; align-items: center; justify-content: flex-end; padding-right: 10px; color: #000; font-size: 0.7rem; font-weight: bold; }
+        .stock-bar.low { background: linear-gradient(90deg, #ffaa00, #ff8800); }
+        .stock-bar.critical { background: linear-gradient(90deg, #ff4444, #cc0000); }
+        .stock-value { width: 60px; text-align: right; font-size: 0.8rem; font-weight: 600; }
         
         .alert-box { background: #1a1a1a; border-radius: 16px; padding: 16px; margin-bottom: 20px; display: none; }
-        .alert-out { background: #ff444433; border-left: 4px solid #ff4444; }
-        .alert-low { background: #ffaa0044; border-left: 4px solid #ffaa00; }
+        .alert-out { background: #ff444433; border-left: 4px solid #ff4444; padding: 12px; border-radius: 12px; margin-bottom: 8px; }
+        .alert-low { background: #ffaa0044; border-left: 4px solid #ffaa00; padding: 12px; border-radius: 12px; margin-bottom: 8px; }
         
-        .orders-list { display: flex; flex-direction: column; gap: 16px; }
+        .search-box { display: flex; gap: 10px; margin-bottom: 20px; }
+        .search-box input { flex: 1; padding: 14px 16px; background: #1a1a1a; border: 1px solid #333; border-radius: 40px; color: white; }
+        .refresh-btn { background: #fff; color: #000; border: none; padding: 0 20px; border-radius: 40px; font-weight: 600; cursor: pointer; }
+        
+        .orders-list { display: flex; flex-direction: column; gap: 16px; max-height: 500px; overflow-y: auto; }
         .order-card { background: #111; border: 1px solid #222; border-radius: 20px; padding: 16px; }
         .order-header { display: flex; justify-content: space-between; margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid #222; }
         .order-id { font-weight: 700; font-size: 0.85rem; }
@@ -55,11 +68,11 @@
         
         .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #fff; color: #000; padding: 10px 20px; border-radius: 40px; opacity: 0; transition: 0.2s; z-index: 1100; font-size: 0.8rem; white-space: nowrap; }
         .loading { text-align: center; padding: 40px; color: #888; }
-        .empty-state { text-align: center; padding: 60px 20px; color: #888; }
         
         @media (min-width: 768px) {
-            .container { max-width: 800px; }
+            .container { max-width: 1000px; }
             .stats-grid { grid-template-columns: repeat(4, 1fr); gap: 16px; }
+            .stock-name { width: 150px; }
         }
     </style>
 </head>
@@ -93,12 +106,23 @@
         <div class="stat-card"><div class="stat-number" id="deliveredCount">0</div><div class="stat-label">Delivered</div></div>
     </div>
 
+    <!-- Stock Level Chart -->
+    <div class="chart-card" id="stockChartCard" style="display:none;">
+        <div class="chart-title">
+            <span><i class="fas fa-chart-simple"></i> Stock Levels</span>
+            <span style="font-size:0.7rem; color:#888;"><span style="color:#ff4444;">🔴 Critical (0)</span> | <span style="color:#ffaa00;">🟡 Low (1-3)</span> | <span style="color:#fff;">⚪ Good (4+)</span></span>
+        </div>
+        <div id="stockBars" class="stock-bars">
+            <div class="loading">Loading stock data...</div>
+        </div>
+    </div>
+
     <!-- Low Stock Alerts Section -->
     <div id="stockAlerts" class="alert-box" style="display:none;"></div>
 
     <div class="search-box">
         <input type="text" id="searchInput" placeholder="Search by name, phone, or order ID...">
-        <button class="refresh-btn" onclick="loadOrders()"><i class="fas fa-sync-alt"></i></button>
+        <button class="refresh-btn" onclick="loadAllData()"><i class="fas fa-sync-alt"></i></button>
     </div>
 
     <div id="ordersContainer" class="orders-list">
@@ -133,6 +157,11 @@
 <script>
     const API_BASE = window.location.origin + '/api';
     let allOrders = [];
+    let allProducts = [];
+
+    async function loadAllData() {
+        await Promise.all([loadOrders(), loadProducts()]);
+    }
 
     async function loadOrders() {
         const container = document.getElementById('ordersContainer');
@@ -143,47 +172,99 @@
             allOrders = await response.json();
             updateStats();
             renderOrders();
-            checkStockAlerts();
         } catch (error) {
             container.innerHTML = '<div class="empty-state">❌ Error loading orders</div>';
         }
     }
 
-    async function checkStockAlerts() {
+    async function loadProducts() {
         try {
             const response = await fetch(`${API_BASE}/products`);
-            const products = await response.json();
+            allProducts = await response.json();
+            renderStockChart();
+            checkStockAlerts();
+        } catch (error) {
+            console.log('Error loading products');
+        }
+    }
+
+    function renderStockChart() {
+        const chartCard = document.getElementById('stockChartCard');
+        const stockBars = document.getElementById('stockBars');
+        
+        if (!allProducts.length) {
+            chartCard.style.display = 'none';
+            return;
+        }
+        
+        chartCard.style.display = 'block';
+        
+        // Calculate total stock per product
+        const productsWithStock = allProducts.map(product => {
+            const totalStock = Object.values(product.stock).reduce((sum, qty) => sum + qty, 0);
+            return { ...product, totalStock };
+        }).sort((a, b) => a.totalStock - b.totalStock);
+        
+        const maxStock = Math.max(...productsWithStock.map(p => p.totalStock), 1);
+        
+        stockBars.innerHTML = productsWithStock.map(product => {
+            const totalStock = product.totalStock;
+            const percentage = (totalStock / maxStock) * 100;
+            let barClass = '';
+            let statusIcon = '';
             
-            const outOfStock = products.filter(p => {
-                return Object.values(p.stock).every(qty => qty === 0);
-            });
-            
-            const lowStock = products.filter(p => {
-                return Object.values(p.stock).some(qty => qty <= 3 && qty > 0);
-            });
-            
-            const alertContainer = document.getElementById('stockAlerts');
-            let alerts = [];
-            
-            if (outOfStock.length > 0) {
-                alerts.push(`<div class="alert-out" style="padding:12px; border-radius:12px; margin-bottom:8px;">
-                    <strong>⚠️ OUT OF STOCK:</strong> ${outOfStock.map(p => p.name).join(', ')}
-                </div>`);
-            }
-            if (lowStock.length > 0) {
-                alerts.push(`<div class="alert-low" style="padding:12px; border-radius:12px; margin-bottom:8px;">
-                    <strong>📦 LOW STOCK (≤3 left):</strong> ${lowStock.map(p => p.name).join(', ')}
-                </div>`);
-            }
-            
-            if (alerts.length > 0) {
-                alertContainer.innerHTML = alerts.join('');
-                alertContainer.style.display = 'block';
+            if (totalStock === 0) {
+                barClass = 'critical';
+                statusIcon = '🔴';
+            } else if (totalStock <= 3) {
+                barClass = 'low';
+                statusIcon = '🟡';
             } else {
-                alertContainer.style.display = 'none';
+                statusIcon = '⚪';
             }
-        } catch(e) {
-            console.log('Stock check failed');
+            
+            return `
+                <div class="stock-item">
+                    <div class="stock-name" title="${product.name}">${statusIcon} ${product.name.length > 20 ? product.name.substring(0, 20) + '...' : product.name}</div>
+                    <div class="stock-bar-container">
+                        <div class="stock-bar ${barClass}" style="width: ${percentage}%;">
+                            ${percentage > 15 ? totalStock : ''}
+                        </div>
+                    </div>
+                    <div class="stock-value">${totalStock} left</div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    function checkStockAlerts() {
+        const outOfStock = allProducts.filter(p => {
+            return Object.values(p.stock).every(qty => qty === 0);
+        });
+        
+        const lowStock = allProducts.filter(p => {
+            return Object.values(p.stock).some(qty => qty <= 3 && qty > 0);
+        });
+        
+        const alertContainer = document.getElementById('stockAlerts');
+        let alerts = [];
+        
+        if (outOfStock.length > 0) {
+            alerts.push(`<div class="alert-out">
+                <strong>⚠️ OUT OF STOCK:</strong> ${outOfStock.map(p => p.name).join(', ')}
+            </div>`);
+        }
+        if (lowStock.length > 0) {
+            alerts.push(`<div class="alert-low">
+                <strong>📦 LOW STOCK (≤3 left):</strong> ${lowStock.map(p => p.name).join(', ')}
+            </div>`);
+        }
+        
+        if (alerts.length > 0) {
+            alertContainer.innerHTML = alerts.join('');
+            alertContainer.style.display = 'block';
+        } else {
+            alertContainer.style.display = 'none';
         }
     }
 
@@ -261,7 +342,7 @@
                 body: JSON.stringify({ delivery_status: status })
             });
             showToast(`✅ Order ${orderId} updated to ${status}`);
-            loadOrders();
+            loadAllData();
         } catch (error) {
             showToast('❌ Error updating status');
         }
@@ -287,7 +368,7 @@
                 const result = await response.json();
                 if (result.success) {
                     showToast('✅ Photo uploaded!');
-                    loadOrders();
+                    loadAllData();
                 } else {
                     showToast('❌ Upload failed');
                 }
@@ -352,7 +433,7 @@
     window.updateStatus = updateStatus;
     window.uploadPhoto = uploadPhoto;
     
-    loadOrders();
+    loadAllData();
 </script>
 </body>
 </html>
