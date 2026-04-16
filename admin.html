@@ -5,148 +5,353 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>EXODUS - Admin Dashboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Inter', sans-serif; background: #000000; color: #ffffff; }
-        .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
-        .header { display: flex; justify-content: space-between; align-items: center; padding-bottom: 20px; border-bottom: 1px solid #222; margin-bottom: 30px; flex-wrap: wrap; gap: 15px; }
-        .logo h1 { font-size: 1.8rem; font-weight: 800; }
-        .logout-btn { background: #1a1a1a; color: #fff; border: 1px solid #333; padding: 10px 20px; border-radius: 40px; cursor: pointer; }
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px; }
-        .stat-card { background: #111; border: 1px solid #222; border-radius: 20px; padding: 20px; text-align: center; }
-        .stat-number { font-size: 2rem; font-weight: 800; }
-        .stat-label { color: #888; margin-top: 8px; }
+        body { font-family: 'Inter', sans-serif; background: #000000; color: #ffffff; font-size: 14px; }
+        .container { max-width: 600px; margin: 0 auto; padding: 16px; }
+        
+        .header { display: flex; justify-content: space-between; align-items: center; padding-bottom: 16px; border-bottom: 1px solid #222; margin-bottom: 20px; flex-wrap: wrap; gap: 12px; }
+        .logo h1 { font-size: 1.5rem; font-weight: 800; }
+        .logo p { color: #888; font-size: 0.6rem; }
+        .logout-btn { background: #1a1a1a; color: #fff; border: 1px solid #333; padding: 10px 18px; border-radius: 40px; cursor: pointer; font-size: 0.8rem; }
+        
+        .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 24px; }
+        .stat-card { background: #111; border: 1px solid #222; border-radius: 20px; padding: 16px; text-align: center; }
+        .stat-number { font-size: 1.8rem; font-weight: 800; }
+        .stat-label { color: #888; font-size: 0.7rem; margin-top: 4px; }
+        
         .search-box { display: flex; gap: 10px; margin-bottom: 20px; }
-        .search-box input { flex: 1; padding: 12px; background: #1a1a1a; border: 1px solid #333; border-radius: 40px; color: white; }
-        button { background: #1a1a1a; border: 1px solid #333; padding: 8px 16px; border-radius: 8px; color: white; cursor: pointer; }
-        .orders-table { width: 100%; border-collapse: collapse; background: #111; border-radius: 16px; overflow: hidden; }
-        .orders-table th, .orders-table td { padding: 12px; text-align: left; border-bottom: 1px solid #222; }
-        .orders-table th { background: #0a0a0a; color: #888; }
-        .status { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; }
+        .search-box input { flex: 1; padding: 14px 16px; background: #1a1a1a; border: 1px solid #333; border-radius: 40px; color: white; font-size: 0.9rem; }
+        .refresh-btn { background: #fff; color: #000; border: none; padding: 0 20px; border-radius: 40px; font-weight: 600; cursor: pointer; }
+        
+        .alert-box { background: #1a1a1a; border-radius: 16px; padding: 16px; margin-bottom: 20px; display: none; }
+        .alert-out { background: #ff444433; border-left: 4px solid #ff4444; }
+        .alert-low { background: #ffaa0044; border-left: 4px solid #ffaa00; }
+        
+        .orders-list { display: flex; flex-direction: column; gap: 16px; }
+        .order-card { background: #111; border: 1px solid #222; border-radius: 20px; padding: 16px; }
+        .order-header { display: flex; justify-content: space-between; margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid #222; }
+        .order-id { font-weight: 700; font-size: 0.85rem; }
+        .order-date { color: #666; font-size: 0.7rem; }
+        .customer-name { font-weight: 600; margin-bottom: 4px; }
+        .customer-phone { color: #aaa; font-size: 0.8rem; }
+        .order-details { display: flex; justify-content: space-between; padding: 12px 0; border-top: 1px solid #1a1a1a; border-bottom: 1px solid #1a1a1a; margin: 12px 0; }
+        .order-total { font-weight: 700; font-size: 1.1rem; }
+        .status-badge { display: inline-block; padding: 6px 12px; border-radius: 40px; font-size: 0.7rem; font-weight: 600; margin-bottom: 12px; }
         .status-pending { background: rgba(255,255,255,0.1); border: 1px solid #333; }
         .status-out_for_delivery { background: rgba(255,255,255,0.15); border: 1px solid #fff; }
         .status-delivered { background: rgba(0,200,83,0.2); border: 1px solid #00c853; color: #00c853; }
-        .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #fff; color: #000; padding: 10px 20px; border-radius: 40px; opacity: 0; transition: 0.2s; }
-        @media (max-width: 768px) { .orders-table { font-size: 0.7rem; } .orders-table th, .orders-table td { padding: 8px; } }
+        
+        .action-buttons { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 12px; }
+        .action-btn { flex: 1; background: #1a1a1a; border: 1px solid #333; padding: 10px 12px; border-radius: 40px; color: white; cursor: pointer; font-size: 0.75rem; text-align: center; }
+        .status-select { background: #1a1a1a; color: white; border: 1px solid #333; border-radius: 40px; padding: 10px 12px; font-size: 0.75rem; width: 100%; margin-top: 8px; }
+        
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 1000; align-items: center; justify-content: center; padding: 16px; }
+        .modal-content { background: #111; border: 1px solid #222; border-radius: 24px; width: 100%; max-width: 500px; max-height: 85vh; overflow-y: auto; padding: 20px; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; border-bottom: 1px solid #222; padding-bottom: 12px; }
+        .close-modal { font-size: 28px; cursor: pointer; background: none; border: none; color: #fff; }
+        .proof-photo { width: 100%; border-radius: 16px; margin-top: 16px; }
+        
+        .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #fff; color: #000; padding: 10px 20px; border-radius: 40px; opacity: 0; transition: 0.2s; z-index: 1100; font-size: 0.8rem; white-space: nowrap; }
+        .loading { text-align: center; padding: 40px; color: #888; }
+        .empty-state { text-align: center; padding: 60px 20px; color: #888; }
+        
+        @media (min-width: 768px) {
+            .container { max-width: 800px; }
+            .stats-grid { grid-template-columns: repeat(4, 1fr); gap: 16px; }
+        }
     </style>
 </head>
 <body>
 
 <script>
-    // CHECK IF LOGGED IN
     const isLoggedIn = sessionStorage.getItem('admin_logged_in');
     if (!isLoggedIn) {
-        window.location.href = 'login.html';
+        window.location.href = 'verify.html';
     }
     
     function logout() {
         sessionStorage.clear();
-        window.location.href = 'login.html';
+        window.location.href = 'verify.html';
     }
 </script>
 
 <div class="container">
     <div class="header">
-        <div class="logo"><h1>EXODUS</h1><p style="color:#888; font-size:0.7rem;">ADMIN DASHBOARD</p></div>
-        <button class="logout-btn" onclick="logout()">🚪 Logout</button>
+        <div class="logo">
+            <h1>EXODUS</h1>
+            <p>ADMIN DASHBOARD</p>
+        </div>
+        <button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
     </div>
 
-    <div class="stats-grid">
-        <div class="stat-card"><div class="stat-number" id="totalOrders">0</div><div class="stat-label">Total Orders</div></div>
+    <div class="stats-grid" id="statsGrid">
+        <div class="stat-card"><div class="stat-number" id="totalOrders">0</div><div class="stat-label">Orders</div></div>
         <div class="stat-card"><div class="stat-number" id="totalRevenue">0</div><div class="stat-label">Revenue (ETB)</div></div>
-        <div class="stat-card"><div class="stat-number" id="pendingOrders">0</div><div class="stat-label">Pending</div></div>
-        <div class="stat-card"><div class="stat-number" id="deliveredOrders">0</div><div class="stat-label">Delivered</div></div>
+        <div class="stat-card"><div class="stat-number" id="outForDelivery">0</div><div class="stat-label">Out for Delivery</div></div>
+        <div class="stat-card"><div class="stat-number" id="deliveredCount">0</div><div class="stat-label">Delivered</div></div>
     </div>
+
+    <!-- Low Stock Alerts Section -->
+    <div id="stockAlerts" class="alert-box" style="display:none;"></div>
 
     <div class="search-box">
-        <input type="text" id="searchInput" placeholder="Search by name, phone, order ID...">
-        <button onclick="loadOrders()">Refresh</button>
+        <input type="text" id="searchInput" placeholder="Search by name, phone, or order ID...">
+        <button class="refresh-btn" onclick="loadOrders()"><i class="fas fa-sync-alt"></i></button>
     </div>
 
-    <div style="overflow-x: auto;">
-        <table class="orders-table">
-            <thead><tr><th>Order ID</th><th>Date</th><th>Customer</th><th>Phone</th><th>Items</th><th>Total</th><th>Status</th><th>Actions</th></tr></thead>
-            <tbody id="ordersBody"><tr><td colspan="8" style="text-align:center;">Loading orders...</td></tr></tbody>
-        </table>
+    <div id="ordersContainer" class="orders-list">
+        <div class="loading">Loading orders...</div>
     </div>
 </div>
 
-<div class="toast" id="toastMsg">Updated</div>
+<!-- Order Detail Modal -->
+<div class="modal" id="orderModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Order Details</h2>
+            <button class="close-modal" id="closeModalBtn">&times;</button>
+        </div>
+        <div id="orderDetailContent"></div>
+    </div>
+</div>
+
+<!-- Photo Modal -->
+<div class="modal" id="photoModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Delivery Proof</h2>
+            <button class="close-modal" id="closePhotoModalBtn">&times;</button>
+        </div>
+        <div id="photoContent"></div>
+    </div>
+</div>
+
+<div class="toast" id="toastMsg">Updated!</div>
 
 <script>
     const API_BASE = window.location.origin + '/api';
     let allOrders = [];
 
     async function loadOrders() {
+        const container = document.getElementById('ordersContainer');
+        container.innerHTML = '<div class="loading">Loading orders...</div>';
+        
         try {
-            const res = await fetch(`${API_BASE}/orders`);
-            allOrders = await res.json();
+            const response = await fetch(`${API_BASE}/orders`);
+            allOrders = await response.json();
             updateStats();
-            renderTable();
-        } catch(err) {
-            document.getElementById('ordersBody').innerHTML = '<tr><td colspan="8" style="text-align:center;">Error loading orders</td></tr>';
+            renderOrders();
+            checkStockAlerts();
+        } catch (error) {
+            container.innerHTML = '<div class="empty-state">❌ Error loading orders</div>';
+        }
+    }
+
+    async function checkStockAlerts() {
+        try {
+            const response = await fetch(`${API_BASE}/products`);
+            const products = await response.json();
+            
+            const outOfStock = products.filter(p => {
+                return Object.values(p.stock).every(qty => qty === 0);
+            });
+            
+            const lowStock = products.filter(p => {
+                return Object.values(p.stock).some(qty => qty <= 3 && qty > 0);
+            });
+            
+            const alertContainer = document.getElementById('stockAlerts');
+            let alerts = [];
+            
+            if (outOfStock.length > 0) {
+                alerts.push(`<div class="alert-out" style="padding:12px; border-radius:12px; margin-bottom:8px;">
+                    <strong>⚠️ OUT OF STOCK:</strong> ${outOfStock.map(p => p.name).join(', ')}
+                </div>`);
+            }
+            if (lowStock.length > 0) {
+                alerts.push(`<div class="alert-low" style="padding:12px; border-radius:12px; margin-bottom:8px;">
+                    <strong>📦 LOW STOCK (≤3 left):</strong> ${lowStock.map(p => p.name).join(', ')}
+                </div>`);
+            }
+            
+            if (alerts.length > 0) {
+                alertContainer.innerHTML = alerts.join('');
+                alertContainer.style.display = 'block';
+            } else {
+                alertContainer.style.display = 'none';
+            }
+        } catch(e) {
+            console.log('Stock check failed');
         }
     }
 
     function updateStats() {
         const total = allOrders.length;
         const revenue = allOrders.reduce((s, o) => s + (o.total || 0), 0);
-        const pending = allOrders.filter(o => o.delivery_status === 'pending').length;
+        const outForDelivery = allOrders.filter(o => o.delivery_status === 'out_for_delivery').length;
         const delivered = allOrders.filter(o => o.delivery_status === 'delivered').length;
+        
         document.getElementById('totalOrders').innerText = total;
         document.getElementById('totalRevenue').innerText = revenue.toLocaleString();
-        document.getElementById('pendingOrders').innerText = pending;
-        document.getElementById('deliveredOrders').innerText = delivered;
+        document.getElementById('outForDelivery').innerText = outForDelivery;
+        document.getElementById('deliveredCount').innerText = delivered;
     }
 
-    function renderTable() {
-        const search = document.getElementById('searchInput').value.toLowerCase();
+    function renderOrders() {
+        const container = document.getElementById('ordersContainer');
+        const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+        
         let filtered = allOrders.filter(o => 
-            o.order_id?.toLowerCase().includes(search) ||
-            o.customer_name?.toLowerCase().includes(search) ||
-            o.customer_phone?.includes(search)
+            o.order_id?.toLowerCase().includes(searchTerm) ||
+            o.customer_name?.toLowerCase().includes(searchTerm) ||
+            o.customer_phone?.includes(searchTerm)
         );
         
         if (filtered.length === 0) {
-            document.getElementById('ordersBody').innerHTML = '<tr><td colspan="8" style="text-align:center;">No orders found</td></tr>';
+            container.innerHTML = '<div class="empty-state">📭 No orders found</div>';
             return;
         }
         
-        document.getElementById('ordersBody').innerHTML = filtered.map(order => `
-            <tr>
-                <td><strong>${order.order_id}</strong></td>
-                <td>${new Date(order.created_at).toLocaleDateString()}</td>
-                <td>${order.customer_name}</td>
-                <td>${order.customer_phone}</td>
-                <td>${order.items?.length || 0} items</td>
-                <td><strong>${(order.total || 0).toLocaleString()} ETB</strong></td>
-                <td><span class="status status-${order.delivery_status || 'pending'}">${order.delivery_status || 'pending'}</span></td>
-                <td>
-                    <button onclick="updateStatus('${order.order_id}', 'out_for_delivery')">📦 Send</button>
-                    <button onclick="updateStatus('${order.order_id}', 'delivered')">✅ Deliver</button>
-                </td>
-            </tr>
-        `).join('');
+        container.innerHTML = filtered.map(order => {
+            let statusClass = 'status-pending';
+            let statusText = 'Pending';
+            if (order.delivery_status === 'out_for_delivery') {
+                statusClass = 'status-out_for_delivery';
+                statusText = 'Out for Delivery';
+            }
+            if (order.delivery_status === 'delivered') {
+                statusClass = 'status-delivered';
+                statusText = 'Delivered';
+            }
+            
+            return `
+                <div class="order-card">
+                    <div class="order-header">
+                        <span class="order-id">${order.order_id}</span>
+                        <span class="order-date">${new Date(order.created_at).toLocaleDateString()}</span>
+                    </div>
+                    <div class="customer-name">${order.customer_name}</div>
+                    <div class="customer-phone"><i class="fas fa-phone-alt"></i> ${order.customer_phone}</div>
+                    <div class="order-details">
+                        <span>📦 ${order.items?.length || 0} items</span>
+                        <span class="order-total">${(order.total || 0).toLocaleString()} ETB</span>
+                    </div>
+                    <div class="status-badge ${statusClass}">${statusText}</div>
+                    <div class="action-buttons">
+                        <button class="action-btn" onclick="viewOrder('${order.order_id}')"><i class="fas fa-eye"></i> View</button>
+                        ${!order.delivery_photo ? `<button class="action-btn" onclick="uploadPhoto('${order.order_id}')"><i class="fas fa-camera"></i> Add Photo</button>` : `<button class="action-btn" onclick="viewPhoto('${order.delivery_photo}')"><i class="fas fa-image"></i> View Photo</button>`}
+                    </div>
+                    <select class="status-select" onchange="updateStatus('${order.order_id}', this.value)">
+                        <option value="pending" ${order.delivery_status === 'pending' ? 'selected' : ''}>Pending</option>
+                        <option value="out_for_delivery" ${order.delivery_status === 'out_for_delivery' ? 'selected' : ''}>Out for Delivery</option>
+                        <option value="delivered" ${order.delivery_status === 'delivered' ? 'selected' : ''}>Delivered</option>
+                    </select>
+                </div>
+            `;
+        }).join('');
     }
 
     async function updateStatus(orderId, status) {
-        await fetch(`${API_BASE}/orders/${orderId}/status`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ delivery_status: status })
-        });
-        showToast(`Order ${orderId} updated to ${status}`);
-        loadOrders();
+        try {
+            await fetch(`${API_BASE}/orders/${orderId}/status`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ delivery_status: status })
+            });
+            showToast(`✅ Order ${orderId} updated to ${status}`);
+            loadOrders();
+        } catch (error) {
+            showToast('❌ Error updating status');
+        }
+    }
+
+    async function uploadPhoto(orderId) {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = 'image/*';
+        input.onchange = async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            const formData = new FormData();
+            formData.append('photo', file);
+            showToast('📸 Uploading...');
+            
+            try {
+                const response = await fetch(`${API_BASE}/upload-delivery-photo/${orderId}`, {
+                    method: 'POST',
+                    body: formData
+                });
+                const result = await response.json();
+                if (result.success) {
+                    showToast('✅ Photo uploaded!');
+                    loadOrders();
+                } else {
+                    showToast('❌ Upload failed');
+                }
+            } catch (error) {
+                showToast('❌ Error uploading');
+            }
+        };
+        input.click();
+    }
+
+    function viewOrder(orderId) {
+        const order = allOrders.find(o => o.order_id === orderId);
+        if (!order) return;
+        
+        const itemsHtml = (order.items || []).map(item => `
+            <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid #222;">
+                <span>${item.name} (${item.size}) x${item.quantity}</span>
+                <span>${(item.price * item.quantity).toLocaleString()} ETB</span>
+            </div>
+        `).join('');
+        
+        document.getElementById('orderDetailContent').innerHTML = `
+            <div style="padding:8px 0; border-bottom:1px solid #222;"><strong>Order ID:</strong> ${order.order_id}</div>
+            <div style="padding:8px 0; border-bottom:1px solid #222;"><strong>Date:</strong> ${new Date(order.created_at).toLocaleString()}</div>
+            <div style="padding:8px 0; border-bottom:1px solid #222;"><strong>Customer:</strong> ${order.customer_name}</div>
+            <div style="padding:8px 0; border-bottom:1px solid #222;"><strong>Email:</strong> ${order.customer_email}</div>
+            <div style="padding:8px 0; border-bottom:1px solid #222;"><strong>Phone:</strong> ${order.customer_phone}</div>
+            <div style="padding:8px 0; border-bottom:1px solid #222;"><strong>Address:</strong> ${order.customer_address}</div>
+            <div style="padding:8px 0; border-bottom:1px solid #222;"><strong>Total:</strong> ${(order.total || 0).toLocaleString()} ETB</div>
+            <div style="margin:16px 0;"><strong>Items:</strong>${itemsHtml}</div>
+            ${order.delivery_photo ? `<img src="${order.delivery_photo}" class="proof-photo" alt="Delivery Proof">` : '<p style="color:#888;">📸 No delivery photo yet</p>'}
+        `;
+        document.getElementById('orderModal').style.display = 'flex';
+    }
+
+    function viewPhoto(photoUrl) {
+        document.getElementById('photoContent').innerHTML = `
+            <img src="${photoUrl}" class="proof-photo" alt="Delivery Proof">
+            <p style="text-align:center; margin-top:16px;">✅ Delivery proof photo</p>
+        `;
+        document.getElementById('photoModal').style.display = 'flex';
     }
 
     function showToast(msg) {
         const toast = document.getElementById('toastMsg');
         toast.innerText = msg;
         toast.style.opacity = '1';
-        setTimeout(() => toast.style.opacity = '0', 2000);
+        setTimeout(() => toast.style.opacity = '0', 2500);
     }
 
-    document.getElementById('searchInput').addEventListener('input', renderTable);
+    document.getElementById('searchInput').addEventListener('input', () => renderOrders());
+    document.getElementById('closeModalBtn').addEventListener('click', () => document.getElementById('orderModal').style.display = 'none');
+    document.getElementById('closePhotoModalBtn').addEventListener('click', () => document.getElementById('photoModal').style.display = 'none');
+    
+    window.onclick = (e) => {
+        if (e.target === document.getElementById('orderModal')) document.getElementById('orderModal').style.display = 'none';
+        if (e.target === document.getElementById('photoModal')) document.getElementById('photoModal').style.display = 'none';
+    };
+    
+    window.viewOrder = viewOrder;
+    window.viewPhoto = viewPhoto;
+    window.updateStatus = updateStatus;
+    window.uploadPhoto = uploadPhoto;
+    
     loadOrders();
 </script>
 </body>
