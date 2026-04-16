@@ -2,10 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EXODUS - Admin Login</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -28,9 +26,7 @@
         .logo { text-align: center; margin-bottom: 32px; }
         .logo img { height: 70px; width: auto; }
         h1 { font-size: 1.5rem; text-align: center; margin-bottom: 8px; }
-        .subtitle { text-align: center; color: #888; font-size: 0.8rem; margin-bottom: 32px; }
-        .form-group { margin-bottom: 20px; }
-        label { display: block; margin-bottom: 8px; color: #aaa; font-size: 0.85rem; }
+        .subtitle { text-align: center; color: #888; margin-bottom: 32px; }
         input {
             width: 100%;
             padding: 14px;
@@ -38,17 +34,9 @@
             border: 1px solid #333;
             border-radius: 16px;
             color: white;
+            margin-bottom: 16px;
             font-size: 1rem;
         }
-        input:focus { outline: none; border-color: #fff; }
-        .checkbox-group {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin: 16px 0;
-        }
-        .checkbox-group input { width: auto; margin: 0; }
-        .checkbox-group label { margin: 0; font-size: 0.8rem; }
         button {
             width: 100%;
             background: white;
@@ -57,48 +45,16 @@
             border: none;
             border-radius: 40px;
             font-weight: 600;
-            font-size: 1rem;
             cursor: pointer;
-            transition: 0.2s;
-            margin-top: 8px;
         }
-        button:hover { background: #ddd; }
-        button:disabled { opacity: 0.5; cursor: not-allowed; }
         .error {
-            background: rgba(255,68,68,0.2);
             color: #ff4444;
-            padding: 12px;
-            border-radius: 12px;
             text-align: center;
             margin-top: 16px;
-            font-size: 0.85rem;
-            display: none;
-        }
-        .success {
-            background: rgba(0,200,83,0.2);
-            color: #00c853;
-            padding: 12px;
-            border-radius: 12px;
-            text-align: center;
-            margin-top: 16px;
-            font-size: 0.85rem;
             display: none;
         }
         .back-link { text-align: center; margin-top: 24px; }
-        .back-link a { color: #888; text-decoration: none; font-size: 0.8rem; }
-        .forgot-link { text-align: center; margin-top: 12px; }
-        .forgot-link a { color: #555; text-decoration: none; font-size: 0.7rem; }
-        .loading-spinner {
-            display: inline-block;
-            width: 16px;
-            height: 16px;
-            border: 2px solid #000;
-            border-top-color: transparent;
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-            margin-right: 8px;
-        }
-        @keyframes spin { to { transform: rotate(360deg); } }
+        .back-link a { color: #888; text-decoration: none; }
     </style>
 </head>
 <body>
@@ -107,30 +63,15 @@
             <img src="images/exodus-logo.png" alt="EXODUS">
         </div>
         <h1>Admin Access</h1>
-        <p class="subtitle">Enter your email and password</p>
+        <p class="subtitle">Enter your credentials</p>
         
         <form id="loginForm">
-            <div class="form-group">
-                <label>Email Address</label>
-                <input type="email" id="email" required placeholder="exodusclothingeth@gmail.com" value="exodusclothingeth@gmail.com">
-            </div>
-            <div class="form-group">
-                <label>Password</label>
-                <input type="password" id="password" required placeholder="Enter your password">
-            </div>
-            <div class="checkbox-group">
-                <input type="checkbox" id="rememberMe">
-                <label>Remember me for 7 days</label>
-            </div>
-            <button type="submit" id="loginBtn">Login →</button>
+            <input type="email" id="email" placeholder="Email" value="exodusclothingeth@gmail.com">
+            <input type="password" id="password" placeholder="Password">
+            <button type="submit">Login →</button>
         </form>
         
-        <div class="forgot-link">
-            <a href="#" id="forgotPasswordLink">Forgot password? Contact support</a>
-        </div>
-        
         <div id="errorMsg" class="error"></div>
-        <div id="successMsg" class="success"></div>
         
         <div class="back-link">
             <a href="index.html">← Back to Store</a>
@@ -138,77 +79,25 @@
     </div>
 
     <script>
-        const API_BASE = window.location.origin + '/api';
+        // HARDCODED LOGIN (Temporary - works without database)
+        const VALID_EMAIL = 'exodusclothingeth@gmail.com';
+        const VALID_PASSWORD = 'ExodusAdmin2025';
         
-        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+        document.getElementById('loginForm').addEventListener('submit', (e) => {
             e.preventDefault();
             
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
-            const rememberMe = document.getElementById('rememberMe').checked;
-            const loginBtn = document.getElementById('loginBtn');
             const errorDiv = document.getElementById('errorMsg');
-            const successDiv = document.getElementById('successMsg');
             
-            errorDiv.style.display = 'none';
-            successDiv.style.display = 'none';
-            
-            loginBtn.disabled = true;
-            loginBtn.innerHTML = '<span class="loading-spinner"></span> Verifying...';
-            
-            try {
-                const response = await fetch(`${API_BASE}/admin/login`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email, password, rememberMe })
-                });
-                
-                const result = await response.json();
-                
-                if (result.success) {
-                    sessionStorage.setItem('admin_logged_in', 'true');
-                    sessionStorage.setItem('admin_email', email);
-                    sessionStorage.setItem('admin_login_time', Date.now());
-                    
-                    if (rememberMe) {
-                        localStorage.setItem('admin_remembered', 'true');
-                        localStorage.setItem('admin_email', email);
-                        localStorage.setItem('admin_remember_time', Date.now());
-                    }
-                    
-                    successDiv.style.display = 'block';
-                    successDiv.textContent = '✅ Login successful! Redirecting...';
-                    
-                    setTimeout(() => {
-                        window.location.href = 'admin.html';
-                    }, 1000);
-                } else {
-                    errorDiv.style.display = 'block';
-                    errorDiv.textContent = '❌ ' + (result.error || 'Invalid email or password');
-                    loginBtn.disabled = false;
-                    loginBtn.innerHTML = 'Login →';
-                }
-            } catch (err) {
+            if (email === VALID_EMAIL && password === VALID_PASSWORD) {
+                sessionStorage.setItem('admin_logged_in', 'true');
+                sessionStorage.setItem('admin_login_time', Date.now());
+                window.location.href = 'admin.html';
+            } else {
                 errorDiv.style.display = 'block';
-                errorDiv.textContent = '❌ Connection error. Please try again.';
-                loginBtn.disabled = false;
-                loginBtn.innerHTML = 'Login →';
+                errorDiv.textContent = '❌ Invalid email or password';
             }
-        });
-        
-        if (localStorage.getItem('admin_remembered') === 'true') {
-            const savedEmail = localStorage.getItem('admin_email');
-            if (savedEmail) document.getElementById('email').value = savedEmail;
-        }
-        
-        document.getElementById('forgotPasswordLink').addEventListener('click', (e) => {
-            e.preventDefault();
-            const errorDiv = document.getElementById('errorMsg');
-            errorDiv.style.display = 'block';
-            errorDiv.style.color = '#888';
-            errorDiv.style.background = 'rgba(255,255,255,0.1)';
-            errorDiv.innerHTML = '📧 Contact exodusclothingeth@gmail.com to reset your password.';
-            setTimeout(() => { errorDiv.style.display = 'none'; }, 5000);
         });
     </script>
 </body>
