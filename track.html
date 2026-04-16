@@ -10,7 +10,6 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Inter', sans-serif; background: #000000; color: #ffffff; min-height: 100vh; }
         
-        /* Navigation */
         .navbar { display: flex; justify-content: space-between; align-items: center; padding: 20px 16px; border-bottom: 1px solid #222; flex-wrap: wrap; gap: 12px; }
         .logo img { height: 45px; width: auto; }
         .nav-links { display: flex; gap: 20px; list-style: none; }
@@ -19,7 +18,6 @@
         
         .container { max-width: 600px; margin: 0 auto; padding: 40px 16px; }
         
-        /* Tracking Form */
         .track-card { background: #111; border: 1px solid #222; border-radius: 24px; padding: 32px; margin-bottom: 30px; }
         h1 { font-size: 1.8rem; text-align: center; margin-bottom: 8px; }
         .subtitle { text-align: center; color: #888; margin-bottom: 32px; }
@@ -29,33 +27,29 @@
         input:focus { outline: none; border-color: #fff; }
         button { width: 100%; background: white; color: black; padding: 14px; border: none; border-radius: 40px; font-weight: 600; font-size: 1rem; cursor: pointer; transition: 0.2s; margin-top: 8px; }
         button:hover { background: #ddd; }
-        button:disabled { opacity: 0.5; cursor: not-allowed; }
         
-        /* Result Card */
         .result-card { background: #111; border: 1px solid #222; border-radius: 24px; padding: 32px; display: none; }
         .status-header { text-align: center; margin-bottom: 24px; }
         .status-icon { font-size: 60px; margin-bottom: 16px; }
         .status-title { font-size: 1.5rem; font-weight: 700; margin-bottom: 8px; }
         .status-message { color: #888; font-size: 0.9rem; }
         
-        /* Timeline */
         .timeline { margin: 32px 0; position: relative; }
         .timeline-item { display: flex; align-items: flex-start; margin-bottom: 24px; position: relative; }
-        .timeline-icon { width: 40px; height: 40px; background: #1a1a1a; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 16px; z-index: 2; border: 1px solid #333; }
+        .timeline-icon { width: 40px; height: 40px; background: #1a1a1a; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 16px; border: 1px solid #333; }
         .timeline-icon.active { background: #fff; color: #000; border-color: #fff; }
         .timeline-icon.completed { background: #00c853; color: #fff; border-color: #00c853; }
         .timeline-content { flex: 1; }
         .timeline-title { font-weight: 600; margin-bottom: 4px; }
         .timeline-date { color: #666; font-size: 0.7rem; }
-        .timeline-line { position: absolute; left: 19px; top: 40px; width: 2px; height: calc(100% - 40px); background: #222; z-index: 1; }
         
-        /* Order Details */
         .order-details { background: #1a1a1a; border-radius: 16px; padding: 20px; margin: 24px 0; }
         .detail-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #222; }
         .detail-row:last-child { border-bottom: none; }
-        .items-list { margin-top: 16px; }
-        .item-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #222; font-size: 0.85rem; }
         .proof-photo { width: 100%; border-radius: 16px; margin-top: 16px; border: 1px solid #333; }
+        
+        .whatsapp-btn { background: #25D366; color: white; display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 20px; }
+        .whatsapp-btn:hover { background: #20b859; }
         
         .error-msg { background: rgba(255,68,68,0.2); color: #ff4444; padding: 12px; border-radius: 12px; text-align: center; margin-top: 16px; display: none; }
         .back-link { text-align: center; margin-top: 24px; }
@@ -117,7 +111,6 @@
                     <div class="timeline-title">Order Placed</div>
                     <div id="datePending" class="timeline-date"></div>
                 </div>
-                <div class="timeline-line"></div>
             </div>
             <div class="timeline-item">
                 <div class="timeline-icon" id="iconProcessing"><i class="fas fa-box"></i></div>
@@ -125,7 +118,6 @@
                     <div class="timeline-title">Order Confirmed</div>
                     <div id="dateProcessing" class="timeline-date"></div>
                 </div>
-                <div class="timeline-line"></div>
             </div>
             <div class="timeline-item">
                 <div class="timeline-icon" id="iconOutForDelivery"><i class="fas fa-truck"></i></div>
@@ -133,7 +125,6 @@
                     <div class="timeline-title">Out for Delivery</div>
                     <div id="dateOutForDelivery" class="timeline-date"></div>
                 </div>
-                <div class="timeline-line"></div>
             </div>
             <div class="timeline-item">
                 <div class="timeline-icon" id="iconDelivered"><i class="fas fa-check-circle"></i></div>
@@ -153,6 +144,11 @@
             <div class="items-list"><strong>Items:</strong><div id="resultItems"></div></div>
             <div id="resultPhoto"></div>
         </div>
+        
+        <!-- WhatsApp Support Button -->
+        <a href="https://wa.me/251968621548" target="_blank" class="whatsapp-btn" style="display: flex; align-items: center; justify-content: center; gap: 10px; background: #25D366; color: white; text-decoration: none; padding: 14px; border-radius: 40px; margin-top: 20px; font-weight: 600;">
+            <i class="fab fa-whatsapp" style="font-size: 20px;"></i> Chat with Support on WhatsApp
+        </a>
         
         <div class="back-link">
             <a href="index.html">← Continue Shopping</a>
@@ -197,7 +193,6 @@
                 return;
             }
             
-            // Display order details
             displayOrder(order);
             
             trackBtn.disabled = false;
@@ -215,7 +210,6 @@
         const resultCard = document.getElementById('resultCard');
         const status = order.delivery_status || 'pending';
         
-        // Update status header
         const statusIcon = document.getElementById('statusIcon');
         const statusTitle = document.getElementById('statusTitle');
         const statusMessage = document.getElementById('statusMessage');
@@ -234,18 +228,15 @@
             statusMessage.textContent = 'Your order has been delivered. Thank you for shopping with EXODUS!';
         }
         
-        // Update timeline icons
         const iconPending = document.getElementById('iconPending');
         const iconProcessing = document.getElementById('iconProcessing');
         const iconOutForDelivery = document.getElementById('iconOutForDelivery');
         const iconDelivered = document.getElementById('iconDelivered');
         
-        // Reset all
         [iconPending, iconProcessing, iconOutForDelivery, iconDelivered].forEach(icon => {
             icon.classList.remove('active', 'completed');
         });
         
-        // Set based on status
         iconPending.classList.add('completed');
         iconProcessing.classList.add('completed');
         
@@ -256,7 +247,6 @@
             iconDelivered.classList.add('completed');
         }
         
-        // Set dates
         const orderDate = new Date(order.created_at);
         document.getElementById('datePending').textContent = orderDate.toLocaleDateString();
         document.getElementById('dateProcessing').textContent = orderDate.toLocaleDateString();
@@ -268,23 +258,20 @@
             document.getElementById('dateDelivered').textContent = order.delivered_at ? new Date(order.delivered_at).toLocaleDateString() : orderDate.toLocaleDateString();
         }
         
-        // Order details
         document.getElementById('resultOrderId').textContent = order.order_id;
         document.getElementById('resultCustomerName').textContent = order.customer_name;
         document.getElementById('resultCustomerPhone').textContent = order.customer_phone;
         document.getElementById('resultCustomerAddress').textContent = order.customer_address;
         document.getElementById('resultTotal').textContent = `${(order.total || 0).toLocaleString()} ETB`;
         
-        // Items
         const itemsHtml = (order.items || []).map(item => `
-            <div class="item-row">
+            <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid #222;">
                 <span>${item.name} (${item.size}) x${item.quantity}</span>
                 <span>${(item.price * item.quantity).toLocaleString()} ETB</span>
             </div>
         `).join('');
         document.getElementById('resultItems').innerHTML = itemsHtml;
         
-        // Photo
         const photoDiv = document.getElementById('resultPhoto');
         if (order.delivery_photo) {
             photoDiv.innerHTML = `<img src="${order.delivery_photo}" class="proof-photo" alt="Delivery Proof"><p style="color:#888; font-size:0.7rem; text-align:center; margin-top:8px;">📸 Delivery proof photo</p>`;
