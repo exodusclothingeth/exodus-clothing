@@ -1,4 +1,4 @@
-// EXODUS CLOTHING - With Customer Delivery Notifications
+// EXODUS CLOTHING - Complete Backend with Email Verification
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
@@ -13,8 +13,10 @@ app.use(express.json());
 app.use(express.static('.'));
 app.use('/uploads', express.static('uploads'));
 
+// Create uploads folder
 if (!fs.existsSync('./uploads')) fs.mkdirSync('./uploads');
 
+// Multer setup for photo uploads
 const storage = multer.diskStorage({
     destination: './uploads/',
     filename: (req, file, cb) => {
@@ -23,11 +25,12 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage, limits: { fileSize: 5 * 1024 * 1024 } });
 
+// Supabase connection
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_ANON_KEY;
 const supabase = createClient(supabaseUrl, supabaseKey);
 
-// YOUR CONTACT INFO
+// Your contact info
 const YOUR_EMAIL = 'exodusclothingeth@gmail.com';
 const YOUR_PHONE = '+251968621548';
 
@@ -40,6 +43,95 @@ if (process.env.EMAIL_PASS) {
     });
     console.log('✅ Email notifications ready');
 }
+
+// ========== EMAIL VERIFICATION STORAGE ==========
+const verificationCodes = {};
+
+function generateCode() {
+    return Math.floor(100000 + Math.random() * 900000).toString();
+}
+
+console.log('✅ Connected to Supabase');
+
+// ========== EMAIL VERIFICATION API ==========
+app.post('/api/send-verification', async (req, res) => {
+    try {
+        const { email } = req.body;
+        
+        // Only allow your email address
+        if (email !== YOUR_EMAIL) {
+            return res.json({ success: false, error: 'Unauthorized email address' });
+        }
+        
+        const code = generateCode();
+        
+        // Store code with 5 minute expiration
+        verificationCodes[email] = {
+            code: code,
+            expires: Date.now() + 5 * 60 * 1000
+        };
+        
+        console.log(`📧 Verification code for ${email}: ${code}`);
+        
+        // Send email if configured, otherwise return code for testing
+        if (transporter) {
+            await transporter.sendMail({
+                from: `"EXODUS CLOTHING" <${YOUR_EMAIL}>`,
+                to: email,
+                subject: '🔐 EXODUS - Admin Login Code',
+                html: `
+                    <div style="font-family: Arial, sans-serif; max-width: 500px; margin: 0 auto; padding: 20px;">
+                        <h2>EXODUS CLOTHING</h2>
+                        <h3>Your Login Code</h3>
+                        <div style="font-size: 32px; font-weight: bold; padding: 20px; background: #f0f0f0; text-align: center; border-radius: 12px;">
+                            ${code}
+                        </div>
+                        <p>This code expires in 5 minutes.</p>
+                        <p>If you didn't request this, please ignore this email.</p>
+                    </div>
+                `
+            });
+            res.json({ success: true, message: 'Verification code sent to your email' });
+        } else {
+            // Email not configured - return code for testing
+            res.json({ success: true, code: code, message: 'Test mode - Use code: ' + code });
+        }
+    } catch (error) {
+        console.error('Error sending verification:', error);
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
+app.post('/api/verify-code', async (req, res) => {
+    try {
+        const { email, code } = req.body;
+        
+        if (email !== YOUR_EMAIL) {
+            return res.json({ success: false, error: 'Unauthorized email address' });
+        }
+        
+        const stored = verificationCodes[email];
+        
+        if (!stored) {
+            return res.json({ success: false, error: 'No verification code found. Request a new one.' });
+        }
+        
+        if (Date.now() > stored.expires) {
+            delete verificationCodes[email];
+            return res.json({ success: false, error: 'Verification code has expired. Request a new one.' });
+        }
+        
+        if (stored.code !== code) {
+            return res.json({ success: false, error: 'Invalid verification code. Please try again.' });
+        }
+        
+        // Code is valid
+        delete verificationCodes[email];
+        res.json({ success: true, message: 'Verification successful' });
+    } catch (error) {
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
 
 // ========== PRODUCT APIS ==========
 app.get('/api/products', async (req, res) => {
@@ -98,34 +190,18 @@ app.post('/api/orders', async (req, res) => {
         if (error) throw error;
         
         if (transporter) {
-            // Send confirmation to customer
             await transporter.sendMail({
                 from: `"EXODUS CLOTHING" <${YOUR_EMAIL}>`,
                 to: customer.email,
                 subject: `EXODUS - Order Confirmation ${orderId}`,
-                html: `
-                    <div style="font-family: Arial, sans-serif; max-width: 500px; margin: 0 auto;">
-                        <h2 style="color: #000;">Thank you for your order!</h2>
-                        <p><strong>Order ID:</strong> ${orderId}</p>
-                        <p><strong>Total:</strong> ${total} ETB</p>
-                        <h3>Items Ordered:</h3>
-                        <ul>${items.map(i => `<li>${i.name} (${i.size}) x${i.quantity} = ${i.price * i.quantity} ETB</li>`).join('')}</ul>
-                        <p><strong>Shipping Address:</strong> ${customer.address}</p>
-                        <hr>
-                        <p>📞 <strong>Questions?</strong> Call us: ${YOUR_PHONE}</p>
-                        <p>✉️ Email: ${YOUR_EMAIL}</p>
-                        <p>💵 <strong>Payment:</strong> Cash on delivery only</p>
-                        <p>📦 We will contact you within 24 hours to schedule delivery.</p>
-                    </div>
-                `
+                html: `<h2>Thank you for your order!</h2><p>Order ID: ${orderId}</p><p>Total: ${total} ETB</p><p>We will contact you within 24 hours.</p>`
             });
             
-            // Send notification to you
             await transporter.sendMail({
                 from: `"EXODUS CLOTHING" <${YOUR_EMAIL}>`,
                 to: YOUR_EMAIL,
                 subject: `🔥 NEW ORDER: ${orderId}`,
-                html: `<h2>New Order!</h2><p><strong>Order ID:</strong> ${orderId}</p><p><strong>Customer:</strong> ${customer.name}</p><p><strong>Phone:</strong> ${customer.phone}</p><p><strong>Address:</strong> ${customer.address}</p><p><strong>Total:</strong> ${total} ETB</p><h3>Items:</h3><ul>${items.map(i => `<li>${i.name} (${i.size}) x${i.quantity}</li>`).join('')}</ul>`
+                html: `<h2>New Order!</h2><p>Order ID: ${orderId}</p><p>Customer: ${customer.name}</p><p>Phone: ${customer.phone}</p><p>Total: ${total} ETB</p>`
             });
         }
         
@@ -141,87 +217,24 @@ app.get('/api/orders', async (req, res) => {
     } catch (error) { res.json([]); }
 });
 
-// UPDATED: When you mark "Out for Delivery", customer gets notified!
 app.put('/api/orders/:orderId/status', async (req, res) => {
     try {
         const { orderId } = req.params;
-        const { status, delivery_status } = req.body;
-        const updateData = {};
-        if (status) updateData.status = status;
-        if (delivery_status) updateData.delivery_status = delivery_status;
+        const { delivery_status } = req.body;
         
-        const { data, error } = await supabase.from('orders').update(updateData).eq('order_id', orderId).select();
+        const { data, error } = await supabase.from('orders').update({ delivery_status }).eq('order_id', orderId).select();
         if (error) throw error;
-        
-        const order = data[0];
-        
-        // If marked as "out_for_delivery", send notification to customer
-        if (delivery_status === 'out_for_delivery' && order && transporter) {
-            await transporter.sendMail({
-                from: `"EXODUS CLOTHING" <${YOUR_EMAIL}>`,
-                to: order.customer_email,
-                subject: `📦 EXODUS - Your Order #${orderId} is Out for Delivery!`,
-                html: `
-                    <div style="font-family: Arial, sans-serif; max-width: 500px; margin: 0 auto;">
-                        <h2 style="color: #000;">Your Order is Out for Delivery! 🚚</h2>
-                        <p><strong>Order ID:</strong> ${orderId}</p>
-                        <p>Your EXODUS order is on its way to you today!</p>
-                        <h3>What to expect:</h3>
-                        <ul>
-                            <li>💰 <strong>Payment:</strong> Cash on delivery only</li>
-                            <li>📸 Delivery person will take a photo with you as proof of delivery</li>
-                            <li>📞 Delivery person will call you before arriving</li>
-                        </ul>
-                        <p><strong>Total to pay:</strong> ${order.total} ETB</p>
-                        <hr>
-                        <p>Questions? Call us: ${YOUR_PHONE}</p>
-                        <p>Thank you for shopping with EXODUS CLOTHING! 🇪🇹</p>
-                    </div>
-                `
-            });
-            
-            console.log(`📧 Delivery notification sent to ${order.customer_email}`);
-        }
-        
-        // If marked as "delivered", send thank you email
-        if (delivery_status === 'delivered' && order && transporter) {
-            await transporter.sendMail({
-                from: `"EXODUS CLOTHING" <${YOUR_EMAIL}>`,
-                to: order.customer_email,
-                subject: `✅ EXODUS - Order #${orderId} Delivered!`,
-                html: `
-                    <div style="font-family: Arial, sans-serif; max-width: 500px; margin: 0 auto;">
-                        <h2 style="color: #000;">Order Delivered! ✅</h2>
-                        <p><strong>Order ID:</strong> ${orderId}</p>
-                        <p>Thank you for shopping with EXODUS CLOTHING!</p>
-                        <p>We hope you love your new EXODUS pieces.</p>
-                        <hr>
-                        <p>📸 Follow us on Instagram: <strong>@exodusclothing</strong></p>
-                        <p>Share your style with #ExodusClothing</p>
-                        <p>✉️ ${YOUR_EMAIL} | 📞 ${YOUR_PHONE}</p>
-                    </div>
-                `
-            });
-        }
-        
         res.json({ success: true, order: data[0] });
     } catch (error) { res.status(500).json({ error: error.message }); }
 });
 
-// ========== DELIVERY PHOTO UPLOAD (For Admin to add photos manually) ==========
+// ========== DELIVERY PHOTO UPLOAD ==========
 app.post('/api/upload-delivery-photo/:orderId', upload.single('photo'), async (req, res) => {
     try {
         const { orderId } = req.params;
         const photoUrl = `/uploads/${req.file.filename}`;
         
-        const { data, error } = await supabase
-            .from('orders')
-            .update({ delivery_photo: photoUrl })
-            .eq('order_id', orderId)
-            .select();
-        
-        if (error) throw error;
-        
+        await supabase.from('orders').update({ delivery_photo: photoUrl }).eq('order_id', orderId);
         res.json({ success: true, photoUrl });
     } catch (error) { res.status(500).json({ error: error.message }); }
 });
@@ -247,15 +260,10 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`
 ╔═══════════════════════════════════════════════════════════════╗
-║     🖤 EXODUS CLOTHING - COMPLETE STORE                      ║
-║                                                              ║
+║     🖤 EXODUS CLOTHING - COMPLETE STORE RUNNING              ║
 ║     URL: http://localhost:${PORT}                              ║
 ║     Email: ${YOUR_EMAIL}                                      ║
-║     Phone: ${YOUR_PHONE}                                      ║
-║                                                              ║
-║     ✅ Customer gets email when order is Out for Delivery    ║
-║     ✅ Customer gets email when order is Delivered           ║
-║     ✅ Admin can upload delivery photos manually             ║
+║     ✅ Email verification login ready                        ║
 ╚═══════════════════════════════════════════════════════════════╝
     `);
 });
