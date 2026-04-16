@@ -36,12 +36,16 @@
 <body>
 
 <script>
-    // LOGIN CHECK
     const isLoggedIn = sessionStorage.getItem('admin_logged_in');
     if (!isLoggedIn) {
         window.location.href = 'login.html';
     }
     
+    function logout() {
+        sessionStorage.clear();
+        window.location.href = 'login.html';
+    }
+</script>
     function logout() {
         sessionStorage.clear();
         window.location.href = 'login.html';
