@@ -1,4 +1,4 @@
-// EXODUS CLOTHING - With Customer Delivery Notifications
+// EXODUS CLOTHING - Complete Backend with Email Login
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
@@ -13,8 +13,10 @@ app.use(express.json());
 app.use(express.static('.'));
 app.use('/uploads', express.static('uploads'));
 
+// Create uploads folder if it doesn't exist
 if (!fs.existsSync('./uploads')) fs.mkdirSync('./uploads');
 
+// Configure multer for photo uploads
 const storage = multer.diskStorage({
     destination: './uploads/',
     filename: (req, file, cb) => {
@@ -23,11 +25,12 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage, limits: { fileSize: 5 * 1024 * 1024 } });
 
+// Supabase connection
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_ANON_KEY;
 const supabase = createClient(supabaseUrl, supabaseKey);
 
-// YOUR CONTACT INFO
+// Your contact info
 const YOUR_EMAIL = 'exodusclothingeth@gmail.com';
 const YOUR_PHONE = '+251968621548';
 
@@ -40,6 +43,8 @@ if (process.env.EMAIL_PASS) {
     });
     console.log('✅ Email notifications ready');
 }
+
+console.log('✅ Connected to Supabase');
 
 // ========== PRODUCT APIS ==========
 app.get('/api/products', async (req, res) => {
@@ -103,21 +108,7 @@ app.post('/api/orders', async (req, res) => {
                 from: `"EXODUS CLOTHING" <${YOUR_EMAIL}>`,
                 to: customer.email,
                 subject: `EXODUS - Order Confirmation ${orderId}`,
-                html: `
-                    <div style="font-family: Arial, sans-serif; max-width: 500px; margin: 0 auto;">
-                        <h2 style="color: #000;">Thank you for your order!</h2>
-                        <p><strong>Order ID:</strong> ${orderId}</p>
-                        <p><strong>Total:</strong> ${total} ETB</p>
-                        <h3>Items Ordered:</h3>
-                        <ul>${items.map(i => `<li>${i.name} (${i.size}) x${i.quantity} = ${i.price * i.quantity} ETB</li>`).join('')}</ul>
-                        <p><strong>Shipping Address:</strong> ${customer.address}</p>
-                        <hr>
-                        <p>📞 <strong>Questions?</strong> Call us: ${YOUR_PHONE}</p>
-                        <p>✉️ Email: ${YOUR_EMAIL}</p>
-                        <p>💵 <strong>Payment:</strong> Cash on delivery only</p>
-                        <p>📦 We will contact you within 24 hours to schedule delivery.</p>
-                    </div>
-                `
+                html: `<div style="font-family: Arial, sans-serif;"><h2>Thank you for your order!</h2><p>Order ID: ${orderId}</p><p>Total: ${total} ETB</p><p>We will contact you within 24 hours for delivery.</p><p>Questions? Call: ${YOUR_PHONE}</p></div>`
             });
             
             // Send notification to you
@@ -125,7 +116,7 @@ app.post('/api/orders', async (req, res) => {
                 from: `"EXODUS CLOTHING" <${YOUR_EMAIL}>`,
                 to: YOUR_EMAIL,
                 subject: `🔥 NEW ORDER: ${orderId}`,
-                html: `<h2>New Order!</h2><p><strong>Order ID:</strong> ${orderId}</p><p><strong>Customer:</strong> ${customer.name}</p><p><strong>Phone:</strong> ${customer.phone}</p><p><strong>Address:</strong> ${customer.address}</p><p><strong>Total:</strong> ${total} ETB</p><h3>Items:</h3><ul>${items.map(i => `<li>${i.name} (${i.size}) x${i.quantity}</li>`).join('')}</ul>`
+                html: `<h2>New Order!</h2><p>Order ID: ${orderId}</p><p>Customer: ${customer.name}</p><p>Phone: ${customer.phone}</p><p>Total: ${total} ETB</p><p>Address: ${customer.address}</p>`
             });
         }
         
@@ -141,7 +132,6 @@ app.get('/api/orders', async (req, res) => {
     } catch (error) { res.json([]); }
 });
 
-// UPDATED: When you mark "Out for Delivery", customer gets notified!
 app.put('/api/orders/:orderId/status', async (req, res) => {
     try {
         const { orderId } = req.params;
@@ -155,52 +145,23 @@ app.put('/api/orders/:orderId/status', async (req, res) => {
         
         const order = data[0];
         
-        // If marked as "out_for_delivery", send notification to customer
+        // Send notification when out for delivery
         if (delivery_status === 'out_for_delivery' && order && transporter) {
             await transporter.sendMail({
                 from: `"EXODUS CLOTHING" <${YOUR_EMAIL}>`,
                 to: order.customer_email,
                 subject: `📦 EXODUS - Your Order #${orderId} is Out for Delivery!`,
-                html: `
-                    <div style="font-family: Arial, sans-serif; max-width: 500px; margin: 0 auto;">
-                        <h2 style="color: #000;">Your Order is Out for Delivery! 🚚</h2>
-                        <p><strong>Order ID:</strong> ${orderId}</p>
-                        <p>Your EXODUS order is on its way to you today!</p>
-                        <h3>What to expect:</h3>
-                        <ul>
-                            <li>💰 <strong>Payment:</strong> Cash on delivery only</li>
-                            <li>📸 Delivery person will take a photo with you as proof of delivery</li>
-                            <li>📞 Delivery person will call you before arriving</li>
-                        </ul>
-                        <p><strong>Total to pay:</strong> ${order.total} ETB</p>
-                        <hr>
-                        <p>Questions? Call us: ${YOUR_PHONE}</p>
-                        <p>Thank you for shopping with EXODUS CLOTHING! 🇪🇹</p>
-                    </div>
-                `
+                html: `<div><h2>Your Order is Out for Delivery!</h2><p>Order ID: ${orderId}</p><p>Total to pay: ${order.total} ETB (Cash on delivery)</p><p>Delivery person will call before arriving.</p></div>`
             });
-            
-            console.log(`📧 Delivery notification sent to ${order.customer_email}`);
         }
         
-        // If marked as "delivered", send thank you email
+        // Send thank you when delivered
         if (delivery_status === 'delivered' && order && transporter) {
             await transporter.sendMail({
                 from: `"EXODUS CLOTHING" <${YOUR_EMAIL}>`,
                 to: order.customer_email,
                 subject: `✅ EXODUS - Order #${orderId} Delivered!`,
-                html: `
-                    <div style="font-family: Arial, sans-serif; max-width: 500px; margin: 0 auto;">
-                        <h2 style="color: #000;">Order Delivered! ✅</h2>
-                        <p><strong>Order ID:</strong> ${orderId}</p>
-                        <p>Thank you for shopping with EXODUS CLOTHING!</p>
-                        <p>We hope you love your new EXODUS pieces.</p>
-                        <hr>
-                        <p>📸 Follow us on Instagram: <strong>@exodusclothing</strong></p>
-                        <p>Share your style with #ExodusClothing</p>
-                        <p>✉️ ${YOUR_EMAIL} | 📞 ${YOUR_PHONE}</p>
-                    </div>
-                `
+                html: `<div><h2>Order Delivered!</h2><p>Thank you for shopping with EXODUS CLOTHING!</p><p>Follow us on Instagram: @exodus_stw</p></div>`
             });
         }
         
@@ -208,7 +169,7 @@ app.put('/api/orders/:orderId/status', async (req, res) => {
     } catch (error) { res.status(500).json({ error: error.message }); }
 });
 
-// ========== DELIVERY PHOTO UPLOAD (For Admin to add photos manually) ==========
+// ========== DELIVERY PHOTO UPLOAD ==========
 app.post('/api/upload-delivery-photo/:orderId', upload.single('photo'), async (req, res) => {
     try {
         const { orderId } = req.params;
@@ -221,7 +182,6 @@ app.post('/api/upload-delivery-photo/:orderId', upload.single('photo'), async (r
             .select();
         
         if (error) throw error;
-        
         res.json({ success: true, photoUrl });
     } catch (error) { res.status(500).json({ error: error.message }); }
 });
@@ -243,19 +203,76 @@ app.post('/api/hero-image', async (req, res) => {
     } catch (error) { res.status(500).json({ error: error.message }); }
 });
 
+// ========== ADMIN LOGIN API (Email + Password from Database) ==========
+app.post('/api/admin/login', async (req, res) => {
+    try {
+        const { email, password } = req.body;
+        
+        // Query the database for the admin user
+        const { data, error } = await supabase
+            .from('admin_users')
+            .select('email, password_hash')
+            .eq('email', email)
+            .single();
+        
+        if (error || !data) {
+            return res.json({ success: false, error: 'Invalid email or password' });
+        }
+        
+        // Compare password
+        if (data.password_hash === password) {
+            res.json({ success: true });
+        } else {
+            res.json({ success: false, error: 'Invalid email or password' });
+        }
+    } catch (error) {
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
+// ========== CHANGE ADMIN PASSWORD ==========
+app.post('/api/admin/change-password', async (req, res) => {
+    try {
+        const { email, oldPassword, newPassword } = req.body;
+        
+        const { data, error } = await supabase
+            .from('admin_users')
+            .select('password_hash')
+            .eq('email', email)
+            .single();
+        
+        if (error || !data || data.password_hash !== oldPassword) {
+            return res.json({ success: false, error: 'Current password is incorrect' });
+        }
+        
+        const { error: updateError } = await supabase
+            .from('admin_users')
+            .update({ password_hash: newPassword })
+            .eq('email', email);
+        
+        if (updateError) {
+            return res.json({ success: false, error: updateError.message });
+        }
+        
+        res.json({ success: true, message: 'Password updated successfully' });
+    } catch (error) {
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`
 ╔═══════════════════════════════════════════════════════════════╗
-║     🖤 EXODUS CLOTHING - COMPLETE STORE                      ║
+║     🖤 EXODUS CLOTHING - COMPLETE STORE RUNNING              ║
 ║                                                              ║
 ║     URL: http://localhost:${PORT}                              ║
 ║     Email: ${YOUR_EMAIL}                                      ║
 ║     Phone: ${YOUR_PHONE}                                      ║
 ║                                                              ║
-║     ✅ Customer gets email when order is Out for Delivery    ║
-║     ✅ Customer gets email when order is Delivered           ║
-║     ✅ Admin can upload delivery photos manually             ║
+║     ✅ Email notifications ready                             ║
+║     ✅ Admin login with email/password                       ║
+║     ✅ Delivery photo upload ready                           ║
 ╚═══════════════════════════════════════════════════════════════╝
     `);
 });

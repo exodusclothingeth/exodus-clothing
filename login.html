@@ -7,11 +7,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Inter', sans-serif;
             background: #000000;
@@ -29,34 +25,12 @@
             width: 100%;
             max-width: 400px;
         }
-        .logo {
-            text-align: center;
-            margin-bottom: 32px;
-        }
-        .logo img {
-            height: 70px;
-            width: auto;
-        }
-        h1 {
-            font-size: 1.5rem;
-            text-align: center;
-            margin-bottom: 8px;
-        }
-        .subtitle {
-            text-align: center;
-            color: #888;
-            font-size: 0.8rem;
-            margin-bottom: 32px;
-        }
-        .form-group {
-            margin-bottom: 20px;
-        }
-        label {
-            display: block;
-            margin-bottom: 8px;
-            color: #aaa;
-            font-size: 0.85rem;
-        }
+        .logo { text-align: center; margin-bottom: 32px; }
+        .logo img { height: 70px; width: auto; }
+        h1 { font-size: 1.5rem; text-align: center; margin-bottom: 8px; }
+        .subtitle { text-align: center; color: #888; font-size: 0.8rem; margin-bottom: 32px; }
+        .form-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 8px; color: #aaa; font-size: 0.85rem; }
         input {
             width: 100%;
             padding: 14px;
@@ -66,10 +40,15 @@
             color: white;
             font-size: 1rem;
         }
-        input:focus {
-            outline: none;
-            border-color: #fff;
+        input:focus { outline: none; border-color: #fff; }
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 16px 0;
         }
+        .checkbox-group input { width: auto; margin: 0; }
+        .checkbox-group label { margin: 0; font-size: 0.8rem; }
         button {
             width: 100%;
             background: white;
@@ -83,9 +62,8 @@
             transition: 0.2s;
             margin-top: 8px;
         }
-        button:hover {
-            background: #ddd;
-        }
+        button:hover { background: #ddd; }
+        button:disabled { opacity: 0.5; cursor: not-allowed; }
         .error {
             background: rgba(255,68,68,0.2);
             color: #ff4444;
@@ -94,43 +72,65 @@
             text-align: center;
             margin-top: 16px;
             font-size: 0.85rem;
+            display: none;
         }
-        .back-link {
+        .success {
+            background: rgba(0,200,83,0.2);
+            color: #00c853;
+            padding: 12px;
+            border-radius: 12px;
             text-align: center;
-            margin-top: 24px;
+            margin-top: 16px;
+            font-size: 0.85rem;
+            display: none;
         }
-        .back-link a {
-            color: #888;
-            text-decoration: none;
-            font-size: 0.8rem;
+        .back-link { text-align: center; margin-top: 24px; }
+        .back-link a { color: #888; text-decoration: none; font-size: 0.8rem; }
+        .forgot-link { text-align: center; margin-top: 12px; }
+        .forgot-link a { color: #555; text-decoration: none; font-size: 0.7rem; }
+        .loading-spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid #000;
+            border-top-color: transparent;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-right: 8px;
         }
-        .back-link a:hover {
-            color: white;
-        }
+        @keyframes spin { to { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
     <div class="login-container">
         <div class="logo">
-            <img src="images/exodus-logo.png" alt="EXODUS" onerror="this.style.display='none'; this.nextSibling.style.display='block';">
-            <span style="display: none; font-size: 1.8rem; font-weight: 800;">EXODUS</span>
+            <img src="images/exodus-logo.png" alt="EXODUS">
         </div>
         <h1>Admin Access</h1>
-        <p class="subtitle">Enter your credentials to continue</p>
+        <p class="subtitle">Enter your email and password</p>
         
         <form id="loginForm">
             <div class="form-group">
-                <label>Username</label>
-                <input type="text" id="username" required placeholder="exodus">
+                <label>Email Address</label>
+                <input type="email" id="email" required placeholder="exodusclothingeth@gmail.com" value="exodusclothingeth@gmail.com">
             </div>
             <div class="form-group">
                 <label>Password</label>
-                <input type="password" id="password" required placeholder="••••••••">
+                <input type="password" id="password" required placeholder="Enter your password">
             </div>
-            <button type="submit">Login →</button>
+            <div class="checkbox-group">
+                <input type="checkbox" id="rememberMe">
+                <label>Remember me for 7 days</label>
+            </div>
+            <button type="submit" id="loginBtn">Login →</button>
         </form>
         
-        <div id="errorMsg" class="error" style="display: none;"></div>
+        <div class="forgot-link">
+            <a href="#" id="forgotPasswordLink">Forgot password? Contact support</a>
+        </div>
+        
+        <div id="errorMsg" class="error"></div>
+        <div id="successMsg" class="success"></div>
         
         <div class="back-link">
             <a href="index.html">← Back to Store</a>
@@ -138,28 +138,77 @@
     </div>
 
     <script>
-        // Admin credentials (YOU CAN CHANGE THESE)
-        const ADMIN_USERNAME = 'exodus';
-        const ADMIN_PASSWORD = 'exodus123';
+        const API_BASE = window.location.origin + '/api';
         
-        document.getElementById('loginForm').addEventListener('submit', (e) => {
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             
-            const username = document.getElementById('username').value;
+            const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
+            const rememberMe = document.getElementById('rememberMe').checked;
+            const loginBtn = document.getElementById('loginBtn');
             const errorDiv = document.getElementById('errorMsg');
+            const successDiv = document.getElementById('successMsg');
             
-            if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
-                // Store login in sessionStorage (expires when browser closes)
-                sessionStorage.setItem('admin_logged_in', 'true');
-                sessionStorage.setItem('admin_login_time', Date.now());
+            errorDiv.style.display = 'none';
+            successDiv.style.display = 'none';
+            
+            loginBtn.disabled = true;
+            loginBtn.innerHTML = '<span class="loading-spinner"></span> Verifying...';
+            
+            try {
+                const response = await fetch(`${API_BASE}/admin/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password, rememberMe })
+                });
                 
-                // Redirect to admin dashboard
-                window.location.href = 'admin.html';
-            } else {
+                const result = await response.json();
+                
+                if (result.success) {
+                    sessionStorage.setItem('admin_logged_in', 'true');
+                    sessionStorage.setItem('admin_email', email);
+                    sessionStorage.setItem('admin_login_time', Date.now());
+                    
+                    if (rememberMe) {
+                        localStorage.setItem('admin_remembered', 'true');
+                        localStorage.setItem('admin_email', email);
+                        localStorage.setItem('admin_remember_time', Date.now());
+                    }
+                    
+                    successDiv.style.display = 'block';
+                    successDiv.textContent = '✅ Login successful! Redirecting...';
+                    
+                    setTimeout(() => {
+                        window.location.href = 'admin.html';
+                    }, 1000);
+                } else {
+                    errorDiv.style.display = 'block';
+                    errorDiv.textContent = '❌ ' + (result.error || 'Invalid email or password');
+                    loginBtn.disabled = false;
+                    loginBtn.innerHTML = 'Login →';
+                }
+            } catch (err) {
                 errorDiv.style.display = 'block';
-                errorDiv.textContent = '❌ Invalid username or password';
+                errorDiv.textContent = '❌ Connection error. Please try again.';
+                loginBtn.disabled = false;
+                loginBtn.innerHTML = 'Login →';
             }
+        });
+        
+        if (localStorage.getItem('admin_remembered') === 'true') {
+            const savedEmail = localStorage.getItem('admin_email');
+            if (savedEmail) document.getElementById('email').value = savedEmail;
+        }
+        
+        document.getElementById('forgotPasswordLink').addEventListener('click', (e) => {
+            e.preventDefault();
+            const errorDiv = document.getElementById('errorMsg');
+            errorDiv.style.display = 'block';
+            errorDiv.style.color = '#888';
+            errorDiv.style.background = 'rgba(255,255,255,0.1)';
+            errorDiv.innerHTML = '📧 Contact exodusclothingeth@gmail.com to reset your password.';
+            setTimeout(() => { errorDiv.style.display = 'none'; }, 5000);
         });
     </script>
 </body>
