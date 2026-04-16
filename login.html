@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>EXODUS - Admin Login</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -22,12 +23,14 @@
             border-radius: 32px;
             padding: 40px;
             width: 100%;
-            max-width: 400px;
+            max-width: 420px;
         }
         .logo { text-align: center; margin-bottom: 32px; }
         .logo img { height: 70px; width: auto; }
         h1 { font-size: 1.5rem; text-align: center; margin-bottom: 8px; }
-        .subtitle { text-align: center; color: #888; margin-bottom: 32px; }
+        .subtitle { text-align: center; color: #888; font-size: 0.85rem; margin-bottom: 32px; }
+        .form-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 8px; color: #aaa; font-size: 0.85rem; }
         input {
             width: 100%;
             padding: 14px;
@@ -35,9 +38,10 @@
             border: 1px solid #333;
             border-radius: 16px;
             color: white;
-            margin-bottom: 16px;
             font-size: 1rem;
         }
+        input:focus { outline: none; border-color: #fff; }
+        input:disabled { opacity: 0.5; }
         button {
             width: 100%;
             background: white;
@@ -48,11 +52,17 @@
             font-weight: 600;
             font-size: 1rem;
             cursor: pointer;
+            transition: 0.2s;
+            margin-top: 8px;
         }
         button:hover { background: #ddd; }
-        .error {
-            background: rgba(255,68,68,0.2);
-            color: #ff4444;
+        button:disabled { opacity: 0.5; cursor: not-allowed; }
+        .code-input {
+            text-align: center;
+            font-size: 1.5rem;
+            letter-spacing: 8px;
+        }
+        .message {
             padding: 12px;
             border-radius: 12px;
             text-align: center;
@@ -60,37 +70,48 @@
             font-size: 0.85rem;
             display: none;
         }
-        .debug {
-            background: rgba(255,255,255,0.1);
-            color: #888;
-            padding: 12px;
-            border-radius: 12px;
-            text-align: center;
-            margin-top: 16px;
-            font-size: 0.7rem;
-            font-family: monospace;
-            display: none;
-        }
+        .message-success { background: rgba(0,200,83,0.2); color: #00c853; }
+        .message-error { background: rgba(255,68,68,0.2); color: #ff4444; }
+        .message-info { background: rgba(33,150,243,0.2); color: #2196f3; }
         .back-link { text-align: center; margin-top: 24px; }
-        .back-link a { color: #888; text-decoration: none; }
+        .back-link a { color: #888; text-decoration: none; font-size: 0.8rem; }
+        .timer { text-align: center; margin-top: 12px; font-size: 0.7rem; color: #555; }
+        .resend-link { text-align: center; margin-top: 12px; }
+        .resend-link a { color: #888; text-decoration: none; font-size: 0.75rem; cursor: pointer; }
+        .resend-link a:hover { color: white; }
     </style>
 </head>
 <body>
     <div class="login-container">
         <div class="logo">
-            <img src="images/exodus-logo.png" alt="EXODUS" onerror="this.style.display='none'">
+            <img src="images/exodus-logo.png" alt="EXODUS">
         </div>
         <h1>Admin Access</h1>
-        <p class="subtitle">Enter your credentials</p>
+        <p class="subtitle">Secure email verification login</p>
         
-        <form id="loginForm">
-            <input type="text" id="email" placeholder="Email" value="exodusclothingeth@gmail.com">
-            <input type="password" id="password" placeholder="Password" value="ExodusAdmin2025">
-            <button type="submit">Login →</button>
-        </form>
+        <!-- Step 1: Email Input -->
+        <div id="step1">
+            <div class="form-group">
+                <label>Email Address</label>
+                <input type="email" id="email" placeholder="exodusclothingeth@gmail.com" value="exodusclothingeth@gmail.com">
+            </div>
+            <button id="sendCodeBtn">Send Verification Code →</button>
+        </div>
         
-        <div id="errorMsg" class="error"></div>
-        <div id="debugMsg" class="debug"></div>
+        <!-- Step 2: Code Verification (hidden initially) -->
+        <div id="step2" style="display: none;">
+            <div class="form-group">
+                <label>Enter 6-Digit Code</label>
+                <input type="text" id="code" class="code-input" placeholder="000000" maxlength="6">
+            </div>
+            <button id="verifyBtn">Verify & Login →</button>
+            <div class="resend-link">
+                <a id="resendLink">Didn't receive code? Send again</a>
+            </div>
+        </div>
+        
+        <div id="message" class="message"></div>
+        <div id="timer" class="timer"></div>
         
         <div class="back-link">
             <a href="index.html">← Back to Store</a>
@@ -98,43 +119,165 @@
     </div>
 
     <script>
-        // CORRECT CREDENTIALS - Copy exactly these values
-        const VALID_EMAIL = 'exodusclothingeth@gmail.com';
-        const VALID_PASSWORD = 'ExodusAdmin2025';
+        const API_BASE = window.location.origin + '/api';
+        let countdownInterval;
+        let resendDisabled = false;
         
-        // Pre-fill the form with the exact credentials for testing
-        document.getElementById('email').value = VALID_EMAIL;
-        document.getElementById('password').value = VALID_PASSWORD;
+        function showMessage(text, type) {
+            const msgDiv = document.getElementById('message');
+            msgDiv.textContent = text;
+            msgDiv.className = `message message-${type}`;
+            msgDiv.style.display = 'block';
+            
+            setTimeout(() => {
+                msgDiv.style.display = 'none';
+            }, 5000);
+        }
         
-        document.getElementById('loginForm').addEventListener('submit', (e) => {
-            e.preventDefault();
+        function startCountdown(seconds) {
+            const timerDiv = document.getElementById('timer');
+            let remaining = seconds;
+            
+            if (countdownInterval) clearInterval(countdownInterval);
+            
+            countdownInterval = setInterval(() => {
+                if (remaining <= 0) {
+                    clearInterval(countdownInterval);
+                    timerDiv.innerHTML = '';
+                    resendDisabled = false;
+                } else {
+                    timerDiv.innerHTML = `⏰ Resend available in ${remaining} seconds`;
+                    remaining--;
+                }
+            }, 1000);
+        }
+        
+        // Send verification code
+        document.getElementById('sendCodeBtn').addEventListener('click', async () => {
+            const email = document.getElementById('email').value;
+            const sendBtn = document.getElementById('sendCodeBtn');
+            
+            if (!email) {
+                showMessage('Please enter your email address', 'error');
+                return;
+            }
+            
+            sendBtn.disabled = true;
+            sendBtn.innerHTML = '⏳ Sending code...';
+            
+            try {
+                const response = await fetch(`${API_BASE}/send-verification`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showMessage('✅ Verification code sent to your email! Check your inbox.', 'success');
+                    
+                    // Switch to step 2
+                    document.getElementById('step1').style.display = 'none';
+                    document.getElementById('step2').style.display = 'block';
+                    
+                    // Start 60 second countdown for resend
+                    resendDisabled = true;
+                    startCountdown(60);
+                    
+                    // If email not configured, show code in console
+                    if (result.code) {
+                        showMessage(`⚠️ Test mode. Use code: ${result.code}`, 'info');
+                    }
+                } else {
+                    showMessage('❌ ' + (result.error || 'Failed to send code'), 'error');
+                    sendBtn.disabled = false;
+                    sendBtn.innerHTML = 'Send Verification Code →';
+                }
+            } catch (err) {
+                showMessage('❌ Connection error. Please try again.', 'error');
+                sendBtn.disabled = false;
+                sendBtn.innerHTML = 'Send Verification Code →';
+            }
+        });
+        
+        // Verify code and login
+        document.getElementById('verifyBtn').addEventListener('click', async () => {
+            const email = document.getElementById('email').value;
+            const code = document.getElementById('code').value;
+            const verifyBtn = document.getElementById('verifyBtn');
+            
+            if (!code || code.length !== 6) {
+                showMessage('Please enter the 6-digit verification code', 'error');
+                return;
+            }
+            
+            verifyBtn.disabled = true;
+            verifyBtn.innerHTML = '⏳ Verifying...';
+            
+            try {
+                const response = await fetch(`${API_BASE}/verify-code`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, code })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    // Login successful
+                    sessionStorage.setItem('admin_logged_in', 'true');
+                    sessionStorage.setItem('admin_email', email);
+                    sessionStorage.setItem('admin_login_time', Date.now());
+                    
+                    showMessage('✅ Login successful! Redirecting...', 'success');
+                    
+                    setTimeout(() => {
+                        window.location.href = 'admin.html';
+                    }, 1000);
+                } else {
+                    showMessage('❌ ' + (result.error || 'Invalid verification code'), 'error');
+                    verifyBtn.disabled = false;
+                    verifyBtn.innerHTML = 'Verify & Login →';
+                }
+            } catch (err) {
+                showMessage('❌ Connection error. Please try again.', 'error');
+                verifyBtn.disabled = false;
+                verifyBtn.innerHTML = 'Verify & Login →';
+            }
+        });
+        
+        // Resend code
+        document.getElementById('resendLink').addEventListener('click', async () => {
+            if (resendDisabled) {
+                showMessage('Please wait before requesting another code', 'error');
+                return;
+            }
             
             const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            const errorDiv = document.getElementById('errorMsg');
-            const debugDiv = document.getElementById('debugMsg');
             
-            // Hide previous messages
-            errorDiv.style.display = 'none';
-            debugDiv.style.display = 'none';
-            
-            // Debug: Show what you entered vs what's expected
-            debugDiv.style.display = 'block';
-            debugDiv.innerHTML = `
-                <strong>Debug Info:</strong><br>
-                You entered: "${email}"<br>
-                Expected: "${VALID_EMAIL}"<br>
-                Email match: ${email === VALID_EMAIL ? '✅ YES' : '❌ NO'}<br>
-                Password match: ${password === VALID_PASSWORD ? '✅ YES' : '❌ NO'}
-            `;
-            
-            if (email === VALID_EMAIL && password === VALID_PASSWORD) {
-                sessionStorage.setItem('admin_logged_in', 'true');
-                sessionStorage.setItem('admin_login_time', Date.now());
-                window.location.href = 'admin.html';
-            } else {
-                errorDiv.style.display = 'block';
-                errorDiv.textContent = '❌ Invalid email or password - check debug info above';
+            try {
+                const response = await fetch(`${API_BASE}/send-verification`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showMessage('✅ New verification code sent!', 'success');
+                    resendDisabled = true;
+                    startCountdown(60);
+                    
+                    if (result.code) {
+                        showMessage(`⚠️ Test mode. Use code: ${result.code}`, 'info');
+                    }
+                } else {
+                    showMessage('❌ Failed to resend code', 'error');
+                }
+            } catch (err) {
+                showMessage('❌ Connection error', 'error');
             }
         });
     </script>
