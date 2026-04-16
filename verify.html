@@ -119,7 +119,7 @@
                 if (data.success) {
                     sessionStorage.setItem('admin_logged_in', 'true');
                     sessionStorage.setItem('admin_login_time', Date.now());
-                    window.location.href = 'admin.html';
+                    window.location.href = 'product-manager.html';
                 } else {
                     msgDiv.className = 'message error';
                     msgDiv.innerHTML = '❌ ' + data.error;
