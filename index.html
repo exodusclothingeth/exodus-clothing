@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
-    <title>EXODUS CLOTHING | Luxury Ethiopian Streetwear</title>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <title>EXODUS CLOTHING | Cyberpunk Streetwear</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Ethiopic:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
-        /* ========== RESET & BASE ========== */
+        /* ========== CYBERPUNK RESET ========== */
         * {
             margin: 0;
             padding: 0;
@@ -18,12 +18,16 @@
         }
         
         :root {
-            --bg-dark: #000000;
-            --bg-card: rgba(17, 17, 17, 0.7);
-            --border-light: rgba(255, 255, 255, 0.08);
+            --bg-dark: #0a0a0f;
+            --bg-card: rgba(10, 10, 15, 0.85);
+            --border-cyber: rgba(0, 255, 255, 0.25);
+            --neon-cyan: #00ffff;
+            --neon-pink: #ff00ff;
+            --neon-green: #00ff66;
             --text-primary: #ffffff;
             --text-secondary: #aaaaaa;
-            --transition-smooth: all 0.4s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+            --glow-cyan: 0 0 10px rgba(0, 255, 255, 0.3);
+            --glow-pink: 0 0 10px rgba(255, 0, 255, 0.3);
         }
         
         body {
@@ -31,47 +35,69 @@
             background: var(--bg-dark);
             color: var(--text-primary);
             overflow-x: hidden;
-            line-height: 1.5;
+            position: relative;
         }
         
         body.lang-am { font-family: 'Noto Sans Ethiopic', 'Inter', sans-serif; }
         body.lang-ar { font-family: 'Cairo', 'Inter', sans-serif; direction: rtl; }
         
-        /* ========== ANIMATED BACKGROUND ========== */
-        .bg-animation {
+        /* ========== CYBERPUNK GRID BACKGROUND ========== */
+        .cyber-bg {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
             z-index: -2;
-            background: #000000;
+            background: #0a0a0f;
         }
         
-        .bg-animation::before {
+        .cyber-bg::before {
+            content: '';
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            top: -50%;
+            left: -50%;
+            background-image: 
+                repeating-linear-gradient(0deg, rgba(0, 255, 255, 0.03) 0px, rgba(0, 255, 255, 0.03) 2px, transparent 2px, transparent 8px),
+                repeating-linear-gradient(90deg, rgba(255, 0, 255, 0.03) 0px, rgba(255, 0, 255, 0.03) 2px, transparent 2px, transparent 8px);
+            animation: gridMove 20s linear infinite;
+            pointer-events: none;
+        }
+        
+        .cyber-bg::after {
             content: '';
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: radial-gradient(circle at 30% 50%, rgba(255,255,255,0.03) 0%, transparent 60%);
-            animation: pulse 10s ease-in-out infinite;
+            background: radial-gradient(circle at 50% 50%, rgba(0, 255, 255, 0.02) 0%, transparent 70%);
+            animation: pulseGlow 6s ease-in-out infinite;
         }
         
-        .bg-animation::after {
-            content: '';
-            position: absolute;
+        @keyframes gridMove {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(20px, 20px); }
+        }
+        
+        @keyframes pulseGlow {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
+        
+        /* ========== SCANLINE EFFECT ========== */
+        .scanline {
+            position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: repeating-linear-gradient(45deg, rgba(255,255,255,0.008) 0px, rgba(255,255,255,0.008) 2px, transparent 2px, transparent 12px);
-        }
-        
-        @keyframes pulse {
-            0%, 100% { opacity: 0.4; transform: scale(1); }
-            50% { opacity: 0.7; transform: scale(1.02); }
+            background: repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.1) 0px, rgba(0, 0, 0, 0.1) 2px, transparent 2px, transparent 6px);
+            pointer-events: none;
+            z-index: 999;
+            opacity: 0.3;
         }
         
         /* ========== CONTAINER ========== */
@@ -83,25 +109,48 @@
             z-index: 1;
         }
         
-        /* ========== NAVIGATION ========== */
+        /* ========== NAVIGATION - CYBERPUNK ========== */
         .navbar {
             display: flex;
             justify-content: space-between;
             align-items: center;
             padding: 24px 0;
             flex-wrap: wrap;
-            gap: 16px;
-            border-bottom: 1px solid var(--border-light);
+            gap: 20px;
+            border-bottom: 1px solid var(--border-cyber);
+            position: relative;
+        }
+        
+        .navbar::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            width: 100%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--neon-cyan), var(--neon-pink), transparent);
+            animation: borderFlow 3s linear infinite;
+        }
+        
+        @keyframes borderFlow {
+            0% { background-position: -100%; }
+            100% { background-position: 200%; }
+        }
+        
+        .logo {
+            position: relative;
         }
         
         .logo img {
-            height: 48px;
+            height: 75px;
             width: auto;
-            transition: transform 0.4s ease;
+            transition: all 0.3s ease;
+            filter: drop-shadow(0 0 5px rgba(0, 255, 255, 0.5));
         }
         
         .logo:hover img {
-            transform: scale(1.03);
+            filter: drop-shadow(0 0 15px rgba(0, 255, 255, 0.8));
+            transform: scale(1.02);
         }
         
         .nav-links {
@@ -117,29 +166,31 @@
             font-weight: 500;
             font-size: 0.85rem;
             letter-spacing: 1px;
-            transition: var(--transition-smooth);
+            transition: all 0.3s ease;
             position: relative;
-            padding-bottom: 4px;
+            font-family: 'Space Mono', monospace;
+        }
+        
+        .nav-links a::before {
+            content: '[';
+            opacity: 0;
+            transition: 0.2s;
         }
         
         .nav-links a::after {
-            content: '';
-            position: absolute;
-            bottom: -2px;
-            left: 0;
-            width: 0;
-            height: 1.5px;
-            background: white;
-            transition: width 0.3s ease;
+            content: ']';
+            opacity: 0;
+            transition: 0.2s;
         }
         
-        .nav-links a:hover::after,
-        .nav-links a.active::after {
-            width: 100%;
+        .nav-links a:hover::before,
+        .nav-links a:hover::after {
+            opacity: 1;
         }
         
         .nav-links a:hover {
-            color: white;
+            color: var(--neon-cyan);
+            text-shadow: var(--glow-cyan);
         }
         
         .header-icons {
@@ -151,13 +202,20 @@
         .cart-icon-wrapper {
             position: relative;
             cursor: pointer;
+            transition: 0.3s;
+        }
+        
+        .cart-icon-wrapper:hover {
+            transform: scale(1.05);
+            color: var(--neon-cyan);
+            text-shadow: var(--glow-cyan);
         }
         
         .cart-count {
             position: absolute;
             top: -8px;
             right: -12px;
-            background: white;
+            background: var(--neon-cyan);
             color: black;
             font-size: 0.6rem;
             padding: 2px 6px;
@@ -165,6 +223,7 @@
             font-weight: 700;
             min-width: 18px;
             text-align: center;
+            box-shadow: var(--glow-cyan);
         }
         
         /* ========== LANGUAGE SWITCHER ========== */
@@ -175,25 +234,28 @@
         
         .lang-btn {
             background: transparent;
-            border: 1px solid rgba(255,255,255,0.2);
+            border: 1px solid rgba(0, 255, 255, 0.3);
             color: var(--text-secondary);
             padding: 6px 14px;
-            border-radius: 40px;
+            border-radius: 4px;
             cursor: pointer;
             font-size: 0.7rem;
             font-weight: 500;
-            transition: var(--transition-smooth);
+            font-family: 'Space Mono', monospace;
+            transition: all 0.3s ease;
         }
         
         .lang-btn:hover {
-            border-color: white;
-            color: white;
+            border-color: var(--neon-cyan);
+            color: var(--neon-cyan);
+            box-shadow: var(--glow-cyan);
         }
         
         .lang-btn.active {
-            background: white;
+            background: var(--neon-cyan);
             color: black;
-            border-color: white;
+            border-color: var(--neon-cyan);
+            box-shadow: var(--glow-cyan);
         }
         
         /* ========== HERO SECTION ========== */
@@ -213,11 +275,13 @@
         }
         
         .hero-badge {
-            color: var(--text-secondary);
+            color: var(--neon-cyan);
             letter-spacing: 4px;
             font-size: 0.7rem;
             margin-bottom: 20px;
             text-transform: uppercase;
+            font-family: 'Space Mono', monospace;
+            text-shadow: var(--glow-cyan);
         }
         
         .hero-content h1 {
@@ -226,7 +290,10 @@
             line-height: 1.1;
             margin-bottom: 20px;
             font-family: 'Playfair Display', serif;
-            letter-spacing: -0.02em;
+            background: linear-gradient(135deg, #fff, var(--neon-cyan));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
         }
         
         .hero-content p {
@@ -234,7 +301,6 @@
             margin-bottom: 32px;
             font-size: clamp(0.9rem, 2vw, 1rem);
             line-height: 1.6;
-            max-width: 90%;
         }
         
         .hero-image {
@@ -249,58 +315,66 @@
             left: -15px;
             right: -15px;
             bottom: -15px;
-            background: radial-gradient(ellipse, rgba(255,255,255,0.04) 0%, transparent 70%);
-            border-radius: 30px;
-            z-index: -1;
+            border: 1px solid rgba(0, 255, 255, 0.3);
+            border-radius: 20px;
+            animation: borderPulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes borderPulse {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.8; }
         }
         
         .hero-image img {
             width: 100%;
-            border-radius: 24px;
+            border-radius: 20px;
             height: auto;
-            object-fit: cover;
-            transition: transform 0.6s ease;
+            filter: grayscale(20%) contrast(1.1);
+            transition: all 0.5s ease;
         }
         
         .hero-image:hover img {
             transform: scale(1.02);
+            filter: grayscale(0%) contrast(1.2);
         }
         
-        /* ========== BUTTONS ========== */
+        /* ========== BUTTONS - CYBERPUNK ========== */
         .btn-primary {
-            background: white;
+            background: linear-gradient(135deg, var(--neon-cyan), var(--neon-pink));
             color: black;
             padding: 12px 32px;
-            border-radius: 50px;
+            border-radius: 4px;
             text-decoration: none;
-            font-weight: 600;
+            font-weight: 700;
             display: inline-block;
             font-size: 0.85rem;
             border: none;
             cursor: pointer;
-            transition: var(--transition-smooth);
-            letter-spacing: 0.5px;
+            transition: all 0.3s ease;
+            letter-spacing: 1px;
+            font-family: 'Space Mono', monospace;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: left 0.5s ease;
+        }
+        
+        .btn-primary:hover::before {
+            left: 100%;
         }
         
         .btn-primary:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(255,255,255,0.12);
-        }
-        
-        .btn-outline {
-            background: transparent;
-            border: 1.5px solid white;
-            color: white;
-            padding: 10px 24px;
-            border-radius: 50px;
-            cursor: pointer;
-            font-size: 0.7rem;
-            transition: var(--transition-smooth);
-        }
-        
-        .btn-outline:hover {
-            background: white;
-            color: black;
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
         }
         
         /* ========== CATEGORIES ========== */
@@ -313,55 +387,38 @@
         
         .category-item {
             background: var(--bg-card);
-            backdrop-filter: blur(12px);
+            backdrop-filter: blur(10px);
             padding: 28px 16px;
             text-align: center;
-            border-radius: 20px;
-            border: 1px solid var(--border-light);
+            border-radius: 8px;
+            border: 1px solid rgba(0, 255, 255, 0.2);
             cursor: pointer;
-            transition: var(--transition-smooth);
+            transition: all 0.3s ease;
             position: relative;
-            overflow: hidden;
-        }
-        
-        .category-item::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.04), transparent);
-            transition: left 0.5s ease;
-        }
-        
-        .category-item:hover::before {
-            left: 100%;
         }
         
         .category-item:hover {
-            border-color: rgba(255,255,255,0.25);
+            border-color: var(--neon-cyan);
             transform: translateY(-4px);
+            box-shadow: var(--glow-cyan);
         }
         
         .category-item.active {
-            border-color: white;
-            background: rgba(26, 26, 26, 0.9);
+            border-color: var(--neon-cyan);
+            background: rgba(0, 255, 255, 0.05);
+            box-shadow: var(--glow-cyan);
         }
         
         .category-item i {
             font-size: 1.8rem;
             margin-bottom: 12px;
+            color: var(--neon-cyan);
         }
         
         .category-item h4 {
             font-size: 0.9rem;
             margin-bottom: 4px;
-        }
-        
-        .category-item p {
-            color: var(--text-secondary);
-            font-size: 0.7rem;
+            font-family: 'Space Mono', monospace;
         }
         
         /* ========== SECTION TITLE ========== */
@@ -369,10 +426,12 @@
             font-size: clamp(1.6rem, 4vw, 2rem);
             font-weight: 700;
             margin: 60px 0 32px;
-            font-family: 'Playfair Display', serif;
+            font-family: 'Space Mono', monospace;
             letter-spacing: -0.02em;
             position: relative;
             display: inline-block;
+            color: var(--neon-cyan);
+            text-shadow: var(--glow-cyan);
         }
         
         .section-title::after {
@@ -382,7 +441,7 @@
             left: 0;
             width: 50px;
             height: 2px;
-            background: white;
+            background: linear-gradient(90deg, var(--neon-cyan), var(--neon-pink));
         }
         
         /* ========== PRODUCT GRID ========== */
@@ -394,18 +453,18 @@
         
         .product-card {
             background: var(--bg-card);
-            backdrop-filter: blur(12px);
-            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
             overflow: hidden;
-            border: 1px solid var(--border-light);
-            transition: var(--transition-smooth);
+            border: 1px solid rgba(0, 255, 255, 0.15);
+            transition: all 0.4s ease;
             cursor: pointer;
         }
         
         .product-card:hover {
-            transform: translateY(-6px);
-            border-color: rgba(255,255,255,0.2);
-            box-shadow: 0 20px 35px rgba(0,0,0,0.4);
+            transform: translateY(-8px);
+            border-color: var(--neon-cyan);
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.2);
         }
         
         .image-container {
@@ -429,14 +488,16 @@
             position: absolute;
             top: 12px;
             right: 12px;
-            background: rgba(0,0,0,0.75);
-            backdrop-filter: blur(6px);
-            color: white;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(5px);
+            color: var(--neon-pink);
+            border: 1px solid var(--neon-pink);
             padding: 4px 10px;
-            border-radius: 30px;
+            border-radius: 4px;
             font-size: 0.65rem;
-            font-weight: 600;
+            font-weight: 700;
             letter-spacing: 0.5px;
+            font-family: 'Space Mono', monospace;
             z-index: 2;
         }
         
@@ -448,13 +509,15 @@
             font-weight: 600;
             font-size: 0.85rem;
             margin-bottom: 4px;
-            letter-spacing: 0.3px;
+            letter-spacing: 0.5px;
+            font-family: 'Space Mono', monospace;
         }
         
         .product-price {
-            color: var(--text-secondary);
+            color: var(--neon-cyan);
             margin-bottom: 12px;
             font-size: 0.85rem;
+            font-family: 'Space Mono', monospace;
         }
         
         .size-buttons {
@@ -464,20 +527,22 @@
         }
         
         .size-btn {
-            background: rgba(26, 26, 26, 0.8);
-            border: 1px solid rgba(255,255,255,0.15);
+            background: rgba(0, 255, 255, 0.1);
+            border: 1px solid rgba(0, 255, 255, 0.3);
             color: white;
             padding: 5px 10px;
-            border-radius: 30px;
+            border-radius: 4px;
             font-size: 0.6rem;
+            font-family: 'Space Mono', monospace;
             cursor: pointer;
-            transition: 0.25s ease;
+            transition: 0.2s ease;
         }
         
         .size-btn:hover:not(.sold-out) {
-            background: white;
+            background: var(--neon-cyan);
             color: black;
-            border-color: white;
+            border-color: var(--neon-cyan);
+            box-shadow: var(--glow-cyan);
         }
         
         .size-btn.sold-out {
@@ -494,7 +559,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.98);
+            background: rgba(0, 0, 0, 0.98);
             backdrop-filter: blur(20px);
             z-index: 2000;
             align-items: center;
@@ -504,14 +569,14 @@
         
         .lightbox.active {
             display: flex;
-            animation: fadeIn 0.25s ease;
         }
         
         .lightbox-image {
             max-width: 90%;
             max-height: 75%;
             object-fit: contain;
-            border-radius: 12px;
+            border: 1px solid var(--neon-cyan);
+            border-radius: 8px;
         }
         
         .lightbox-close {
@@ -519,34 +584,34 @@
             top: 20px;
             right: 25px;
             font-size: 35px;
-            color: white;
+            color: var(--neon-cyan);
             cursor: pointer;
-            transition: transform 0.25s ease;
-            z-index: 2001;
+            transition: 0.2s;
         }
         
         .lightbox-close:hover {
             transform: rotate(90deg);
+            text-shadow: var(--glow-cyan);
         }
         
         .lightbox-prev, .lightbox-next {
             position: absolute;
             top: 50%;
             transform: translateY(-50%);
-            background: rgba(255,255,255,0.08);
-            backdrop-filter: blur(10px);
-            color: white;
-            border: 1px solid rgba(255,255,255,0.15);
+            background: rgba(0, 255, 255, 0.1);
+            border: 1px solid var(--neon-cyan);
+            color: var(--neon-cyan);
             padding: 14px 20px;
             cursor: pointer;
             font-size: 22px;
             border-radius: 50%;
-            transition: 0.25s;
-            z-index: 2001;
+            transition: 0.2s;
         }
         
         .lightbox-prev:hover, .lightbox-next:hover {
-            background: rgba(255,255,255,0.2);
+            background: var(--neon-cyan);
+            color: black;
+            box-shadow: var(--glow-cyan);
         }
         
         .lightbox-prev { left: 20px; }
@@ -555,12 +620,9 @@
         .lightbox-counter {
             position: absolute;
             bottom: 25px;
-            left: 0;
-            right: 0;
-            text-align: center;
-            color: #888;
+            color: var(--neon-cyan);
+            font-family: 'Space Mono', monospace;
             font-size: 13px;
-            z-index: 2001;
         }
         
         /* ========== CART SIDEBAR ========== */
@@ -571,13 +633,13 @@
             width: 450px;
             max-width: 90vw;
             height: 100%;
-            background: rgba(12, 12, 12, 0.98);
+            background: rgba(10, 10, 15, 0.98);
             backdrop-filter: blur(20px);
             z-index: 1001;
             transition: right 0.35s ease;
             display: flex;
             flex-direction: column;
-            border-left: 1px solid var(--border-light);
+            border-left: 1px solid var(--neon-cyan);
         }
         
         .cart-sidebar.open {
@@ -590,7 +652,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.6);
+            background: rgba(0, 0, 0, 0.7);
             backdrop-filter: blur(5px);
             visibility: hidden;
             opacity: 0;
@@ -607,21 +669,23 @@
             padding: 24px;
             display: flex;
             justify-content: space-between;
-            border-bottom: 1px solid var(--border-light);
+            border-bottom: 1px solid var(--neon-cyan);
         }
         
         .cart-header h2 {
             font-size: 1.3rem;
             font-weight: 600;
+            font-family: 'Space Mono', monospace;
+            color: var(--neon-cyan);
         }
         
         .close-cart {
             background: none;
             border: none;
-            color: white;
+            color: var(--neon-cyan);
             font-size: 1.4rem;
             cursor: pointer;
-            transition: transform 0.2s;
+            transition: 0.2s;
         }
         
         .close-cart:hover {
@@ -638,27 +702,14 @@
             display: flex;
             justify-content: space-between;
             padding: 14px 0;
-            border-bottom: 1px solid var(--border-light);
+            border-bottom: 1px solid rgba(0, 255, 255, 0.15);
             gap: 12px;
-        }
-        
-        .cart-item-info {
-            flex: 1;
         }
         
         .cart-item-title {
             font-weight: 600;
             font-size: 0.85rem;
-        }
-        
-        .cart-item-size {
-            color: #888;
-            font-size: 0.7rem;
-        }
-        
-        .cart-item-price {
-            color: #aaa;
-            font-size: 0.75rem;
+            font-family: 'Space Mono', monospace;
         }
         
         .cart-item-quantity {
@@ -668,24 +719,24 @@
         }
         
         .cart-item-quantity button {
-            background: rgba(255,255,255,0.1);
-            border: none;
-            color: white;
+            background: rgba(0, 255, 255, 0.1);
+            border: 1px solid var(--neon-cyan);
+            color: var(--neon-cyan);
             width: 28px;
             height: 28px;
-            border-radius: 30px;
+            border-radius: 4px;
             cursor: pointer;
             transition: 0.2s;
         }
         
         .cart-item-quantity button:hover {
-            background: white;
+            background: var(--neon-cyan);
             color: black;
         }
         
         .cart-footer {
             padding: 20px;
-            border-top: 1px solid var(--border-light);
+            border-top: 1px solid var(--neon-cyan);
         }
         
         .cart-total {
@@ -693,24 +744,26 @@
             justify-content: space-between;
             font-weight: 700;
             margin-bottom: 16px;
-            font-size: 1rem;
+            font-family: 'Space Mono', monospace;
+            color: var(--neon-cyan);
         }
         
         .checkout-btn {
             width: 100%;
-            background: white;
+            background: linear-gradient(135deg, var(--neon-cyan), var(--neon-pink));
             color: black;
             padding: 14px;
             border: none;
-            border-radius: 50px;
-            font-weight: 600;
+            border-radius: 4px;
+            font-weight: 700;
+            font-family: 'Space Mono', monospace;
             cursor: pointer;
-            transition: 0.25s;
+            transition: 0.2s;
         }
         
         .checkout-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 5px 20px rgba(255,255,255,0.15);
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
         }
         
         /* ========== MODAL ========== */
@@ -721,7 +774,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.96);
+            background: rgba(0, 0, 0, 0.96);
             backdrop-filter: blur(15px);
             z-index: 1100;
             align-items: center;
@@ -732,15 +785,17 @@
         .modal-content {
             background: #111;
             padding: 32px;
-            border-radius: 28px;
+            border-radius: 12px;
             width: 100%;
             max-width: 480px;
-            border: 1px solid var(--border-light);
+            border: 1px solid var(--neon-cyan);
         }
         
         .modal-content h2 {
             margin-bottom: 20px;
             font-size: 1.4rem;
+            font-family: 'Space Mono', monospace;
+            color: var(--neon-cyan);
         }
         
         .modal-content input,
@@ -751,20 +806,16 @@
             background: #1a1a1a;
             border: 1px solid #333;
             color: white;
-            border-radius: 14px;
+            border-radius: 8px;
             font-size: 0.9rem;
-        }
-        
-        .modal-content textarea {
-            min-height: 90px;
-            resize: vertical;
         }
         
         .close-modal {
             float: right;
             font-size: 26px;
             cursor: pointer;
-            transition: transform 0.2s;
+            color: var(--neon-cyan);
+            transition: 0.2s;
         }
         
         .close-modal:hover {
@@ -777,24 +828,26 @@
             bottom: 30px;
             left: 50%;
             transform: translateX(-50%);
-            background: rgba(34,34,34,0.95);
-            backdrop-filter: blur(12px);
+            background: rgba(0, 255, 255, 0.9);
+            color: black;
             padding: 12px 28px;
-            border-radius: 50px;
+            border-radius: 4px;
             opacity: 0;
             transition: 0.25s;
             z-index: 1200;
             font-size: 0.85rem;
+            font-family: 'Space Mono', monospace;
+            font-weight: bold;
             white-space: nowrap;
-            border: 1px solid var(--border-light);
             pointer-events: none;
+            box-shadow: var(--glow-cyan);
         }
         
         /* ========== FOOTER ========== */
         footer {
             margin-top: 100px;
             padding: 60px 0 40px;
-            border-top: 1px solid var(--border-light);
+            border-top: 1px solid var(--neon-cyan);
         }
         
         .footer-grid {
@@ -808,6 +861,8 @@
             margin-bottom: 16px;
             font-size: 1rem;
             font-weight: 600;
+            font-family: 'Space Mono', monospace;
+            color: var(--neon-cyan);
         }
         
         .footer-col p {
@@ -819,11 +874,11 @@
         .footer-col a {
             color: white;
             text-decoration: none;
-            transition: opacity 0.2s;
+            transition: 0.2s;
         }
         
         .footer-col a:hover {
-            opacity: 0.7;
+            color: var(--neon-cyan);
         }
         
         .social-icons {
@@ -836,31 +891,15 @@
             font-size: 1.2rem;
         }
         
-        /* ========== ANIMATIONS ========== */
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        .social-icons a:hover {
+            color: var(--neon-cyan);
+            text-shadow: var(--glow-cyan);
         }
         
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-        
-        /* ========== RESPONSIVE BREAKPOINTS ========== */
+        /* ========== RESPONSIVE ========== */
         @media (max-width: 1024px) {
             .product-grid {
                 grid-template-columns: repeat(3, 1fr);
-                gap: 20px;
-            }
-            .hero-grid {
-                gap: 40px;
             }
         }
         
@@ -872,46 +911,27 @@
             .nav-links {
                 justify-content: center;
             }
-            .header-icons {
-                justify-content: center;
-            }
         }
         
         @media (max-width: 768px) {
             .container {
                 padding: 0 20px;
             }
-            .hero {
-                margin: 40px 0 50px;
-            }
             .hero-grid {
                 grid-template-columns: 1fr;
                 gap: 30px;
                 text-align: center;
             }
-            .hero-content p {
-                max-width: 100%;
-            }
-            .hero-badge {
-                letter-spacing: 3px;
-            }
             .categories {
                 grid-template-columns: repeat(2, 1fr);
                 gap: 14px;
-                margin: 35px 0;
-            }
-            .category-item {
-                padding: 20px 12px;
             }
             .product-grid {
                 grid-template-columns: repeat(2, 1fr);
                 gap: 16px;
             }
-            .section-title {
-                margin: 40px 0 24px;
-            }
-            .section-title::after {
-                width: 40px;
+            .logo img {
+                height: 55px;
             }
             .footer-grid {
                 flex-direction: column;
@@ -925,32 +945,16 @@
                 width: 100%;
                 right: -100%;
             }
-            .lightbox-prev, .lightbox-next {
-                padding: 10px 15px;
-                font-size: 18px;
-            }
-            .lightbox-close {
-                font-size: 30px;
-                top: 15px;
-                right: 18px;
-            }
             .toast-notify {
                 white-space: normal;
                 text-align: center;
                 max-width: 85vw;
-                font-size: 0.75rem;
             }
         }
         
         @media (max-width: 480px) {
             .logo img {
-                height: 40px;
-            }
-            .nav-links {
-                gap: 20px;
-            }
-            .nav-links a {
-                font-size: 0.75rem;
+                height: 50px;
             }
             .hero-content h1 {
                 font-size: 1.8rem;
@@ -962,40 +966,35 @@
             .product-title {
                 font-size: 0.75rem;
             }
-            .product-price {
-                font-size: 0.75rem;
-            }
             .size-btn {
                 padding: 3px 8px;
                 font-size: 0.55rem;
-            }
-            .product-info {
-                padding: 12px;
-            }
-            .category-item h4 {
-                font-size: 0.8rem;
-            }
-            .category-item i {
-                font-size: 1.5rem;
             }
         }
         
         .loading {
             text-align: center;
             padding: 60px;
-            color: #888;
+            color: var(--neon-cyan);
+            font-family: 'Space Mono', monospace;
         }
         
-        .empty-cart-msg {
-            text-align: center;
-            color: #888;
-            padding: 40px 0;
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
     </style>
 </head>
 <body id="appBody">
 
-<div class="bg-animation"></div>
+<div class="cyber-bg"></div>
+<div class="scanline"></div>
 
 <!-- Lightbox Modal -->
 <div id="lightbox" class="lightbox" onclick="closeLightbox(event)">
@@ -1010,18 +1009,18 @@
 <div class="cart-overlay" id="cartOverlay"></div>
 <div class="cart-sidebar" id="cartSidebar">
     <div class="cart-header">
-        <h2 id="cartTitle">Your Cart</h2>
+        <h2 id="cartTitle">YOUR CART</h2>
         <button class="close-cart" id="closeCartBtn"><i class="fas fa-times"></i></button>
     </div>
     <div class="cart-items" id="cartItemsContainer">
-        <div class="empty-cart-msg">Your cart is empty.</div>
+        <div class="empty-cart-msg" style="text-align:center; color:#888; padding:40px;">Your cart is empty.</div>
     </div>
     <div class="cart-footer" id="cartFooter" style="display:none;">
         <div class="cart-total">
-            <span id="totalLabel">Total</span>
+            <span id="totalLabel">TOTAL</span>
             <span id="cartTotalPrice">0 ETB</span>
         </div>
-        <button class="checkout-btn" id="checkoutBtn">Place Order</button>
+        <button class="checkout-btn" id="checkoutBtn">PLACE ORDER</button>
     </div>
 </div>
 
@@ -1029,22 +1028,22 @@
 <div class="modal" id="orderModal">
     <div class="modal-content">
         <span class="close-modal" id="closeModalBtn">&times;</span>
-        <h2 id="orderTitle">Complete Your Order</h2>
+        <h2 id="orderTitle">COMPLETE ORDER</h2>
         <form id="orderForm">
             <input type="text" id="customerName" placeholder="Full Name" required>
             <input type="email" id="customerEmail" placeholder="Email" required>
             <input type="text" id="customerPhone" placeholder="Phone" required>
             <textarea id="customerAddress" placeholder="Address" required></textarea>
-            <div style="background:#1a1a1a; padding:12px; border-radius:14px; margin:12px 0;">
-                <p id="codMessage" style="color:#aaa; font-size:0.8rem;">📌 Cash on delivery only. We'll contact you within 24 hours.</p>
+            <div style="background:#1a1a1a; padding:12px; border-radius:8px; margin:12px 0;">
+                <p id="codMessage" style="color:var(--neon-cyan); font-size:0.8rem;">📌 CASH ON DELIVERY ONLY. WE WILL CONTACT YOU WITHIN 24 HOURS.</p>
             </div>
-            <button type="submit" class="btn-primary" style="width:100%;" id="submitOrderBtn">Place Order</button>
+            <button type="submit" class="btn-primary" style="width:100%;" id="submitOrderBtn">PLACE ORDER</button>
         </form>
         <div id="orderError" style="color:#ff4444; margin-top:12px; font-size:0.8rem;"></div>
     </div>
 </div>
 
-<div class="toast-notify" id="toastMsg">Item added</div>
+<div class="toast-notify" id="toastMsg">ITEM ADDED</div>
 
 <!-- Navigation -->
 <header>
@@ -1054,10 +1053,10 @@
                 <img src="images/exodus-logo.png" alt="EXODUS">
             </a>
             <ul class="nav-links">
-                <li><a href="index.html" id="navHome">Home</a></li>
-                <li><a href="#" id="navShop">Shop</a></li>
-                <li><a href="#" id="navDrops">Drops</a></li>
-                <li><a href="track.html" id="navTrack">Track Order</a></li>
+                <li><a href="index.html" id="navHome">HOME</a></li>
+                <li><a href="#" id="navShop">SHOP</a></li>
+                <li><a href="#" id="navDrops">DROPS</a></li>
+                <li><a href="track.html" id="navTrack">TRACK</a></li>
             </ul>
             <div class="header-icons">
                 <div class="language-switcher">
@@ -1079,10 +1078,10 @@
         <div class="hero">
             <div class="hero-grid">
                 <div class="hero-content">
-                    <div class="hero-badge" id="heroBadge">🇪🇹 MADE IN ETHIOPIA</div>
+                    <div class="hero-badge" id="heroBadge">[ MADE IN ETHIOPIA ]</div>
                     <h1 id="heroTitle">Leave the old.<br>Embrace EXODUS.</h1>
-                    <p id="heroSubtitle">Premium Ethiopian streetwear. Cash on delivery. Free shipping on orders over 5,000 ETB.</p>
-                    <a href="#" class="btn-primary" id="shopNowBtn">Shop Now →</a>
+                    <p id="heroSubtitle">Premium Ethiopian streetwear. Cash on delivery. Cyberpunk aesthetic. Limited drops.</p>
+                    <a href="#" class="btn-primary" id="shopNowBtn">ACCESS THE GRID →</a>
                 </div>
                 <div class="hero-image">
                     <img id="heroImage" src="" alt="EXODUS">
@@ -1093,29 +1092,29 @@
         <div class="categories" id="categoryFilters">
             <div class="category-item" data-category="all">
                 <i class="fas fa-th-large"></i>
-                <h4 id="catAll">All</h4>
+                <h4 id="catAll">ALL</h4>
             </div>
             <div class="category-item" data-category="hoodies">
                 <i class="fas fa-tshirt"></i>
-                <h4 id="catHoodies">Hoodies</h4>
+                <h4 id="catHoodies">HOODIES</h4>
             </div>
             <div class="category-item" data-category="mens">
                 <i class="fas fa-male"></i>
-                <h4 id="catMens">Men's</h4>
+                <h4 id="catMens">MEN'S</h4>
             </div>
             <div class="category-item" data-category="womens">
                 <i class="fas fa-female"></i>
-                <h4 id="catWomens">Women's</h4>
+                <h4 id="catWomens">WOMEN'S</h4>
             </div>
             <div class="category-item" data-category="accessories">
                 <i class="fas fa-hat-cowboy"></i>
-                <h4 id="catAccessories">Accessories</h4>
+                <h4 id="catAccessories">ACCESSORIES</h4>
             </div>
         </div>
 
-        <div class="section-title" id="latestDrops">🔥 Latest Drops</div>
+        <div class="section-title" id="latestDrops">// LATEST DROPS</div>
         <div id="productGrid" class="product-grid">
-            <div class="loading">Loading products...</div>
+            <div class="loading">LOADING DATA...</div>
         </div>
     </div>
 </main>
@@ -1125,22 +1124,22 @@
         <div class="footer-grid">
             <div class="footer-col">
                 <h3>EXODUS</h3>
-                <p>Streetwear for the rebellion.<br>Made in Ethiopia 🇪🇹</p>
+                <p>Streetwear for the rebellion.<br>Made in Ethiopia 🇪🇹<br>// ENTER THE GRID //</p>
             </div>
             <div class="footer-col">
-                <h4 id="footerSupport">Support</h4>
-                <p id="footerFaq">FAQ<br><span id="footerShipping">Shipping</span><br><span id="footerReturns">Returns</span><br><span id="footerSizeGuide">Size Guide</span></p>
+                <h4 id="footerSupport">SUPPORT</h4>
+                <p id="footerFaq">FAQ<br><span id="footerShipping">SHIPPING</span><br><span id="footerReturns">RETURNS</span><br><span id="footerSizeGuide">SIZE GUIDE</span></p>
             </div>
             <div class="footer-col">
-                <h4 id="footerContact">Contact</h4>
+                <h4 id="footerContact">CONTACT</h4>
                 <p>📞 +251968621548<br>✉️ exodusclothingeth@gmail.com</p>
             </div>
             <div class="footer-col">
-                <h4 id="footerQuickLinks">Quick Links</h4>
-                <p><a href="track.html" id="footerTrackLink">📦 Track Your Order</a></p>
+                <h4 id="footerQuickLinks">LINKS</h4>
+                <p><a href="track.html" id="footerTrackLink">📡 TRACK ORDER</a></p>
             </div>
             <div class="footer-col">
-                <h4>Follow Us</h4>
+                <h4>FOLLOW</h4>
                 <div class="social-icons">
                     <a href="https://www.instagram.com/exodus_stw" target="_blank"><i class="fab fa-instagram"></i></a>
                     <a href="#"><i class="fab fa-telegram"></i></a>
@@ -1148,7 +1147,7 @@
                 </div>
             </div>
         </div>
-        <p style="text-align:center; margin-top:48px; color:#444; font-size:0.7rem;">EXODUS CLOTHING — Ethiopian Streetwear</p>
+        <p style="text-align:center; margin-top:48px; color:#444; font-size:0.7rem; font-family:'Space Mono',monospace;">EXODUS CLOTHING — CYBERPUNK EDITION // 2025</p>
     </div>
 </footer>
 
@@ -1156,27 +1155,27 @@
     // ========== COMPLETE LANGUAGE TRANSLATIONS ==========
     const translations = {
         en: {
-            home: "Home", shop: "Shop", drops: "Drops", trackOrder: "Track Order",
-            madeInEthiopia: "🇪🇹 MADE IN ETHIOPIA",
+            home: "HOME", shop: "SHOP", drops: "DROPS", trackOrder: "TRACK",
+            madeInEthiopia: "[ MADE IN ETHIOPIA ]",
             heroTitle: "Leave the old.<br>Embrace EXODUS.",
-            heroSubtitle: "Premium Ethiopian streetwear. Cash on delivery. Free shipping on orders over 5,000 ETB.",
-            shopNow: "Shop Now →",
-            catAll: "All", catHoodies: "Hoodies", catMens: "Men's", catWomens: "Women's", catAccessories: "Accessories",
-            latestDrops: "🔥 Latest Drops",
-            yourCart: "Your Cart", cartEmpty: "Your cart is empty.", total: "Total", placeOrder: "Place Order",
-            completeOrder: "Complete Your Order", fullName: "Full Name", email: "Email", phone: "Phone",
-            address: "Address", codMessage: "📌 Cash on delivery only. We'll contact you within 24 hours.",
-            submitOrder: "Place Order", support: "Support", faq: "FAQ", shipping: "Shipping", returns: "Returns",
-            sizeGuide: "Size Guide", contact: "Contact", quickLinks: "Quick Links", trackYourOrder: "📦 Track Your Order"
+            heroSubtitle: "Premium Ethiopian streetwear. Cash on delivery. Cyberpunk aesthetic. Limited drops.",
+            shopNow: "ACCESS THE GRID →",
+            catAll: "ALL", catHoodies: "HOODIES", catMens: "MEN'S", catWomens: "WOMEN'S", catAccessories: "ACCESSORIES",
+            latestDrops: "// LATEST DROPS",
+            yourCart: "YOUR CART", cartEmpty: "Your cart is empty.", total: "TOTAL", placeOrder: "PLACE ORDER",
+            completeOrder: "COMPLETE ORDER", fullName: "Full Name", email: "Email", phone: "Phone",
+            address: "Address", codMessage: "📌 CASH ON DELIVERY ONLY. WE WILL CONTACT YOU WITHIN 24 HOURS.",
+            submitOrder: "PLACE ORDER", support: "SUPPORT", faq: "FAQ", shipping: "SHIPPING", returns: "RETURNS",
+            sizeGuide: "SIZE GUIDE", contact: "CONTACT", quickLinks: "LINKS", trackYourOrder: "📡 TRACK ORDER"
         },
         am: {
-            home: "መነሻ", shop: "ግዢ", drops: "አዲስ", trackOrder: "ትዕዛዝ ይከታተሉ",
-            madeInEthiopia: "🇪🇹 በኢትዮጵያ ተሠራ",
+            home: "መነሻ", shop: "ግዢ", drops: "አዲስ", trackOrder: "ክትትል",
+            madeInEthiopia: "[ በኢትዮጵያ ተሠራ ]",
             heroTitle: "አሮጌውን ትተህ።<br>EXODUS ን ተቀበል።",
             heroSubtitle: "ፕሪሚየም ኢትዮጵያዊ የጎዳና ልብሶች። በደረሰ ጊዜ ክፍያ",
-            shopNow: "አሁን ግዙ →",
+            shopNow: "ወደ ግሪድ ግባ →",
             catAll: "ሁሉም", catHoodies: "ሁዲዎች", catMens: "የወንዶች", catWomens: "የሴቶች", catAccessories: "መለዋወጫዎች",
-            latestDrops: "🔥 አዲስ ዕቃዎች",
+            latestDrops: "// አዲስ ዕቃዎች",
             yourCart: "የእርስዎ ጋሪ", cartEmpty: "ጋሪዎ ባዶ ነው።", total: "ጠቅላላ", placeOrder: "ትዕዛዝ አስገባ",
             completeOrder: "ትዕዛዝዎን ያሟሉ", fullName: "ሙሉ ስም", email: "ኢሜይል", phone: "ስልክ ቁጥር",
             address: "አድራሻ", codMessage: "📌 በደረሰ ጊዜ ክፍያ ብቻ።", submitOrder: "ትዕዛዝ አስገባ",
@@ -1184,13 +1183,13 @@
             contact: "አግኙን", quickLinks: "ፈጣን አገናኞች", trackYourOrder: "ትዕዛዝ ይከታተሉ"
         },
         ar: {
-            home: "الرئيسية", shop: "تسوق", drops: "إصدارات جديدة", trackOrder: "تتبع الطلب",
-            madeInEthiopia: "🇪🇹 صنع في إثيوبيا",
+            home: "الرئيسية", shop: "تسوق", drops: "إصدارات", trackOrder: "تتبع",
+            madeInEthiopia: "[ صنع في إثيوبيا ]",
             heroTitle: "اترك القديم.<br>احتضن EXODUS.",
             heroSubtitle: "ملابس الشارع الإثيوبية الفاخرة. الدفع عند الاستلام",
-            shopNow: "تسوق الآن →",
+            shopNow: "دخول الشبكة →",
             catAll: "الكل", catHoodies: "هوديز", catMens: "رجالي", catWomens: "نسائي", catAccessories: "إكسسوارات",
-            latestDrops: "🔥 أحدث الإصدارات",
+            latestDrops: "// أحدث الإصدارات",
             yourCart: "سلتك", cartEmpty: "سلتك فارغة.", total: "المجموع", placeOrder: "تقديم الطلب",
             completeOrder: "أكمل طلبك", fullName: "الاسم الكامل", email: "البريد الإلكتروني", phone: "رقم الهاتف",
             address: "العنوان", codMessage: "📌 الدفع عند الاستلام فقط.", submitOrder: "تقديم الطلب",
@@ -1270,10 +1269,8 @@
         if (!images || images.length === 0) return;
         lightboxImages = images;
         lightboxIndex = index;
-        const lightboxImg = document.getElementById('lightboxImage');
-        const counter = document.getElementById('lightboxCounter');
-        if (lightboxImg) lightboxImg.src = images[index];
-        if (counter) counter.innerText = `${index + 1} / ${images.length}`;
+        document.getElementById('lightboxImage').src = images[index];
+        document.getElementById('lightboxCounter').innerText = `${index + 1} / ${images.length}`;
         document.getElementById('lightbox').classList.add('active');
         document.body.style.overflow = 'hidden';
     }
@@ -1312,7 +1309,7 @@
             allProducts = await res.json();
             renderProducts();
         } catch(e) {
-            document.getElementById('productGrid').innerHTML = '<div class="loading">Error loading products</div>';
+            document.getElementById('productGrid').innerHTML = '<div class="loading">ERROR LOADING DATA</div>';
         }
     }
     
@@ -1320,7 +1317,7 @@
         let filtered = currentCategory === 'all' ? allProducts : allProducts.filter(p => p.category === currentCategory);
         let grid = document.getElementById('productGrid');
         if (!filtered.length) {
-            grid.innerHTML = '<div class="loading">No products in this category</div>';
+            grid.innerHTML = '<div class="loading">NO DATA IN THIS SECTOR</div>';
             return;
         }
         
@@ -1353,7 +1350,7 @@
         else cart.push({ id, name, size, price, quantity: 1, image });
         saveCart();
         updateCartUI();
-        showToast(`${name} (${size}) added`);
+        showToast(`${name} (${size}) ADDED`);
     }
     
     function saveCart() {
@@ -1379,7 +1376,7 @@
         const totalSpan = document.getElementById('cartTotalPrice');
         updateCartCount();
         if (cart.length === 0) {
-            container.innerHTML = '<div class="empty-cart-msg">' + (translations[currentLanguage]?.cartEmpty || 'Your cart is empty.') + '</div>';
+            container.innerHTML = '<div class="empty-cart-msg" style="text-align:center; color:#888; padding:40px;">' + (translations[currentLanguage]?.cartEmpty || 'Your cart is empty.') + '</div>';
             footer.style.display = 'none';
             return;
         }
@@ -1390,8 +1387,8 @@
             return `<div class="cart-item">
                 <div class="cart-item-info">
                     <div class="cart-item-title">${item.name}</div>
-                    <div class="cart-item-size">Size: ${item.size}</div>
-                    <div class="cart-item-price">${item.price} ETB</div>
+                    <div style="color:#888; font-size:0.7rem;">Size: ${item.size}</div>
+                    <div style="color:#aaa; font-size:0.75rem;">${item.price} ETB</div>
                 </div>
                 <div class="cart-item-quantity">
                     <button onclick="updateQty(${item.id},'${item.size}',-1)">−</button>
@@ -1418,7 +1415,7 @@
         cart = cart.filter(i => !(i.id === id && i.size === size));
         saveCart();
         updateCartUI();
-        showToast("Removed");
+        showToast("ITEM REMOVED");
     }
     
     async function placeOrder(e) {
@@ -1439,8 +1436,8 @@
             const result = await res.json();
             if (result.success) {
                 const errorDiv = document.getElementById('orderError');
-                errorDiv.style.color = '#00c853';
-                errorDiv.innerHTML = `✅ Order placed! ID: ${result.orderId}<br>📞 We'll contact you within 24 hours.`;
+                errorDiv.style.color = '#00ff66';
+                errorDiv.innerHTML = `✅ ORDER PLACED! ID: ${result.orderId}<br>📡 WE WILL CONTACT YOU WITHIN 24 HOURS.`;
                 cart = [];
                 saveCart();
                 updateCartUI();
@@ -1448,13 +1445,13 @@
                     closeOrderModal();
                     document.getElementById('orderForm').reset();
                     errorDiv.innerHTML = '';
-                    showToast('Order placed!');
+                    showToast('ORDER CONFIRMED');
                 }, 3000);
             } else {
-                document.getElementById('orderError').innerHTML = '❌ Error. Try again.';
+                document.getElementById('orderError').innerHTML = '❌ ERROR. TRY AGAIN.';
             }
         } catch (err) {
-            document.getElementById('orderError').innerHTML = '❌ Connection error. Try again.';
+            document.getElementById('orderError').innerHTML = '❌ CONNECTION ERROR.';
         }
     }
     
@@ -1470,7 +1467,7 @@
     
     function openOrderModal() {
         if (cart.length === 0) {
-            showToast("Cart empty");
+            showToast("CART EMPTY");
             return;
         }
         document.getElementById('orderModal').style.display = 'flex';
