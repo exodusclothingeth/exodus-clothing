@@ -2,8 +2,9 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>EXODUS - Admin Login</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -45,12 +46,18 @@
             border: none;
             border-radius: 40px;
             font-weight: 600;
+            font-size: 1rem;
             cursor: pointer;
         }
+        button:hover { background: #ddd; }
         .error {
+            background: rgba(255,68,68,0.2);
             color: #ff4444;
+            padding: 12px;
+            border-radius: 12px;
             text-align: center;
             margin-top: 16px;
+            font-size: 0.85rem;
             display: none;
         }
         .back-link { text-align: center; margin-top: 24px; }
@@ -60,7 +67,7 @@
 <body>
     <div class="login-container">
         <div class="logo">
-            <img src="images/exodus-logo.png" alt="EXODUS">
+            <img src="images/exodus-logo.png" alt="EXODUS" onerror="this.style.display='none'">
         </div>
         <h1>Admin Access</h1>
         <p class="subtitle">Enter your credentials</p>
@@ -79,7 +86,7 @@
     </div>
 
     <script>
-        // HARDCODED LOGIN (Temporary - works without database)
+        // SIMPLE HARDCODED LOGIN - WORKS IMMEDIATELY
         const VALID_EMAIL = 'exodusclothingeth@gmail.com';
         const VALID_PASSWORD = 'ExodusAdmin2025';
         
@@ -91,8 +98,10 @@
             const errorDiv = document.getElementById('errorMsg');
             
             if (email === VALID_EMAIL && password === VALID_PASSWORD) {
+                // Store login in sessionStorage
                 sessionStorage.setItem('admin_logged_in', 'true');
                 sessionStorage.setItem('admin_login_time', Date.now());
+                // Redirect to admin page
                 window.location.href = 'admin.html';
             } else {
                 errorDiv.style.display = 'block';
