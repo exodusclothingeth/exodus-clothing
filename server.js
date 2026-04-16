@@ -1,4 +1,4 @@
-// EXODUS CLOTHING - Complete Backend with Professional Email Designs
+// EXODUS CLOTHING - Complete Backend
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
@@ -77,20 +77,16 @@ app.post('/api/send-verification', async (req, res) => {
                 to: email,
                 subject: '🔐 EXODUS - Admin Login Code',
                 html: `
-                    <div style="font-family: Georgia, serif; max-width: 500px; margin: 0 auto; background: #ffffff;">
-                        <div style="background: #000000; padding: 30px; text-align: center;">
-                            <h1 style="color: #ffffff; margin: 0; font-size: 28px; letter-spacing: 4px;">EXODUS</h1>
-                            <p style="color: #888; margin: 5px 0 0;">CLOTHING</p>
+                    <div style="font-family: Arial, sans-serif; max-width: 500px; margin: 0 auto; padding: 20px; background: #fff;">
+                        <div style="background: #000; padding: 20px; text-align: center;">
+                            <h1 style="color: #fff; margin: 0;">EXODUS</h1>
                         </div>
-                        <div style="padding: 30px;">
-                            <h2 style="color: #000; margin-bottom: 20px;">Your Login Code</h2>
-                            <div style="background: #f5f5f5; padding: 20px; text-align: center; font-size: 32px; letter-spacing: 8px; font-weight: bold;">
+                        <div style="padding: 20px;">
+                            <h2>Your Login Code</h2>
+                            <div style="font-size: 32px; font-weight: bold; padding: 20px; background: #f0f0f0; text-align: center; letter-spacing: 5px;">
                                 ${code}
                             </div>
-                            <p style="color: #666; margin-top: 20px;">This code expires in 5 minutes.</p>
-                        </div>
-                        <div style="background: #000; padding: 20px; text-align: center;">
-                            <p style="color: #888; margin: 0; font-size: 11px;">EXODUS CLOTHING — ETHIOPIAN STREETWEAR</p>
+                            <p>This code expires in 5 minutes.</p>
                         </div>
                     </div>
                 `
@@ -141,26 +137,60 @@ app.get('/api/products', async (req, res) => {
         const { data, error } = await supabase.from('products').select('*').order('created_at', { ascending: false });
         if (error) throw error;
         res.json(data || []);
-    } catch (error) { res.json([]); }
+    } catch (error) { 
+        console.error('Error fetching products:', error);
+        res.json([]); 
+    }
 });
 
 app.post('/api/products', async (req, res) => {
     try {
-        const { name, price, image, sizes, stock } = req.body;
-        const { data, error } = await supabase.from('products').insert([{ name, price, image, sizes, stock }]).select();
+        const { name, price, images, sizes, stock, category } = req.body;
+        
+        console.log('📦 Adding product:', { name, price, category, sizes, imageCount: images?.length });
+        
+        const productData = {
+            name,
+            price,
+            images: images || [],
+            sizes: sizes || ['S', 'M', 'L', 'XL', 'XXL'],
+            stock: stock || {},
+            category: category || 'uncategorized',
+            created_at: new Date()
+        };
+        
+        const { data, error } = await supabase
+            .from('products')
+            .insert([productData])
+            .select();
+        
         if (error) throw error;
+        
+        console.log('✅ Product added successfully:', data[0].id);
         res.json({ success: true, product: data[0] });
-    } catch (error) { res.status(500).json({ error: error.message }); }
+    } catch (error) { 
+        console.error('❌ Error adding product:', error);
+        res.status(500).json({ error: error.message }); 
+    }
 });
 
 app.put('/api/products/:id', async (req, res) => {
     try {
         const { id } = req.params;
-        const { name, price, image, sizes, stock } = req.body;
-        const { data, error } = await supabase.from('products').update({ name, price, image, sizes, stock }).eq('id', id).select();
+        const { name, price, images, sizes, stock, category } = req.body;
+        
+        const { data, error } = await supabase
+            .from('products')
+            .update({ name, price, images: images || [], sizes, stock, category })
+            .eq('id', id)
+            .select();
+        
         if (error) throw error;
         res.json({ success: true, product: data[0] });
-    } catch (error) { res.status(500).json({ error: error.message }); }
+    } catch (error) { 
+        console.error('Error updating product:', error);
+        res.status(500).json({ error: error.message }); 
+    }
 });
 
 app.delete('/api/products/:id', async (req, res) => {
@@ -168,7 +198,10 @@ app.delete('/api/products/:id', async (req, res) => {
         const { id } = req.params;
         await supabase.from('products').delete().eq('id', id);
         res.json({ success: true });
-    } catch (error) { res.status(500).json({ error: error.message }); }
+    } catch (error) { 
+        console.error('Error deleting product:', error);
+        res.status(500).json({ error: error.message }); 
+    }
 });
 
 // ========== ORDER APIS ==========
@@ -192,105 +225,26 @@ app.post('/api/orders', async (req, res) => {
         if (error) throw error;
         
         if (transporter) {
-            // Beautiful Order Confirmation Email to Customer
             await transporter.sendMail({
                 from: `"EXODUS CLOTHING" <${YOUR_EMAIL}>`,
                 to: customer.email,
-                subject: `✨ EXODUS - Order Confirmation #${orderId}`,
-                html: `
-                    <!DOCTYPE html>
-                    <html>
-                    <head><meta charset="UTF-8"><title>EXODUS Order Confirmation</title></head>
-                    <body style="font-family: 'Georgia', 'Times New Roman', serif; margin: 0; padding: 0; background-color: #f5f5f5;">
-                        <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff;">
-                            <div style="background-color: #000000; padding: 40px 20px; text-align: center;">
-                                <h1 style="color: #ffffff; font-size: 36px; letter-spacing: 4px; margin: 0;">EXODUS</h1>
-                                <p style="color: #888888; margin: 10px 0 0; font-size: 12px; letter-spacing: 2px;">CLOTHING</p>
-                            </div>
-                            <div style="padding: 40px 30px;">
-                                <h2 style="color: #000000; font-size: 24px; margin-bottom: 20px;">Thank You for Your Order</h2>
-                                <p style="color: #333333; line-height: 1.6; margin-bottom: 30px;">Your order has been received and will be processed within 24 hours.</p>
-                                <div style="background-color: #f8f8f8; padding: 20px; margin-bottom: 30px; border-left: 3px solid #000000;">
-                                    <p style="margin: 0 0 5px;"><strong style="color: #000000;">Order ID:</strong> <span style="color: #666;">${orderId}</span></p>
-                                    <p style="margin: 0;"><strong style="color: #000000;">Total:</strong> <span style="color: #666;">${total} ETB</span></p>
-                                </div>
-                                <h3 style="color: #000000; font-size: 18px; margin-bottom: 15px;">Items Ordered</h3>
-                                <table style="width: 100%; border-collapse: collapse; margin-bottom: 30px;">
-                                    ${items.map(item => `
-                                        <tr style="border-bottom: 1px solid #eeeeee;">
-                                            <td style="padding: 12px 0;"><span style="font-weight: 500;">${item.name}</span><br><span style="color: #888; font-size: 12px;">Size: ${item.size} × ${item.quantity}</span></td>
-                                            <td style="padding: 12px 0; text-align: right;">${item.price * item.quantity} ETB</td>
-                                        </tr>
-                                    `).join('')}
-                                    <tr><td style="padding: 15px 0; border-top: 2px solid #000000; text-align: right;"><strong>Total</strong></td><td style="padding: 15px 0; border-top: 2px solid #000000; text-align: right;"><strong>${total} ETB</strong></td></tr>
-                                </table>
-                                <div style="background-color: #f8f8f8; padding: 20px; margin-bottom: 30px;">
-                                    <p style="margin: 0 0 5px;"><strong style="color: #000000;">Shipping Address:</strong></p>
-                                    <p style="margin: 0; color: #666; line-height: 1.5;">${customer.address}</p>
-                                </div>
-                                <div style="border-top: 1px solid #eeeeee; padding-top: 30px;">
-                                    <p style="color: #000000; font-weight: 500; margin-bottom: 10px;">📦 Delivery Information</p>
-                                    <p style="color: #666; font-size: 14px; margin-bottom: 5px;">• Cash on delivery only</p>
-                                    <p style="color: #666; font-size: 14px; margin-bottom: 5px;">• We'll contact you within 24 hours</p>
-                                    <p style="color: #666; font-size: 14px;">• Delivery person will take a photo as proof</p>
-                                </div>
-                            </div>
-                            <div style="background-color: #000000; padding: 30px; text-align: center;">
-                                <p style="color: #888888; margin: 0 0 10px; font-size: 12px;">📞 ${YOUR_PHONE} | ✉️ ${YOUR_EMAIL}</p>
-                                <p style="color: #444444; margin: 0; font-size: 10px;">EXODUS CLOTHING — ETHIOPIAN STREETWEAR</p>
-                            </div>
-                        </div>
-                    </body>
-                    </html>
-                `
+                subject: `EXODUS - Order Confirmation ${orderId}`,
+                html: `<h2>Thank you for your order!</h2><p>Order ID: ${orderId}</p><p>Total: ${total} ETB</p><p>We will contact you within 24 hours.</p>`
             });
             
-            // Notification Email to Brand Owner
             await transporter.sendMail({
                 from: `"EXODUS CLOTHING" <${YOUR_EMAIL}>`,
                 to: YOUR_EMAIL,
                 subject: `🔥 NEW ORDER: ${orderId}`,
-                html: `
-                    <!DOCTYPE html>
-                    <html>
-                    <head><meta charset="UTF-8"><title>New EXODUS Order</title></head>
-                    <body style="font-family: 'Arial', sans-serif; margin: 0; padding: 0;">
-                        <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff;">
-                            <div style="background-color: #000000; padding: 30px; text-align: center;">
-                                <h1 style="color: #ffffff; margin: 0;">NEW ORDER</h1>
-                            </div>
-                            <div style="padding: 30px;">
-                                <div style="background-color: #f0f0f0; padding: 15px; margin-bottom: 20px;">
-                                    <p><strong>Order ID:</strong> ${orderId}</p>
-                                    <p><strong>Total:</strong> ${total} ETB</p>
-                                    <p><strong>Date:</strong> ${new Date().toLocaleString()}</p>
-                                </div>
-                                <h3>Customer Information</h3>
-                                <p><strong>Name:</strong> ${customer.name}</p>
-                                <p><strong>Phone:</strong> ${customer.phone}</p>
-                                <p><strong>Email:</strong> ${customer.email}</p>
-                                <p><strong>Address:</strong> ${customer.address}</p>
-                                <h3>Items Ordered</h3>
-                                <table style="width: 100%; border-collapse: collapse;">
-                                    ${items.map(item => `<tr style="border-bottom: 1px solid #ddd;"><td style="padding: 8px 0;">${item.name} (${item.size}) x${item.quantity}</td><td style="padding: 8px 0; text-align: right;">${item.price * item.quantity} ETB</td></tr>`).join('')}
-                                    <tr><td style="padding: 15px 0; border-top: 2px solid #000; text-align: right;"><strong>Total</strong></td><td style="padding: 15px 0; border-top: 2px solid #000; text-align: right;"><strong>${total} ETB</strong></td></tr>
-                                </table>
-                                <div style="margin-top: 30px; padding: 15px; background-color: #f9f9f9;">
-                                    <p><strong>📋 Action Required:</strong></p>
-                                    <p>1. Prepare the order</p>
-                                    <p>2. Contact customer for delivery</p>
-                                    <p>3. Mark as "Out for Delivery" in admin dashboard</p>
-                                </div>
-                            </div>
-                        </div>
-                    </body>
-                    </html>
-                `
+                html: `<h2>New Order!</h2><p>Order ID: ${orderId}</p><p>Customer: ${customer.name}</p><p>Phone: ${customer.phone}</p><p>Total: ${total} ETB</p>`
             });
         }
         
         res.json({ success: true, orderId });
-    } catch (error) { res.status(500).json({ error: error.message }); }
+    } catch (error) { 
+        console.error('Error creating order:', error);
+        res.status(500).json({ error: error.message }); 
+    }
 });
 
 app.get('/api/orders', async (req, res) => {
@@ -298,7 +252,10 @@ app.get('/api/orders', async (req, res) => {
         const { data, error } = await supabase.from('orders').select('*').order('created_at', { ascending: false });
         if (error) throw error;
         res.json(data || []);
-    } catch (error) { res.json([]); }
+    } catch (error) { 
+        console.error('Error fetching orders:', error);
+        res.json([]); 
+    }
 });
 
 app.put('/api/orders/:orderId/status', async (req, res) => {
@@ -306,92 +263,39 @@ app.put('/api/orders/:orderId/status', async (req, res) => {
         const { orderId } = req.params;
         const { delivery_status } = req.body;
         
-        const { data, error } = await supabase.from('orders').update({ delivery_status }).eq('order_id', orderId).select();
+        const { data, error } = await supabase
+            .from('orders')
+            .update({ delivery_status })
+            .eq('order_id', orderId)
+            .select();
+        
         if (error) throw error;
         
         const order = data[0];
         
-        if (transporter && order) {
-            if (delivery_status === 'out_for_delivery') {
-                // Out for Delivery Email
-                await transporter.sendMail({
-                    from: `"EXODUS CLOTHING" <${YOUR_EMAIL}>`,
-                    to: order.customer_email,
-                    subject: `📦 EXODUS - Your Order #${orderId} is Out for Delivery!`,
-                    html: `
-                        <!DOCTYPE html>
-                        <html>
-                        <head><meta charset="UTF-8"><title>EXODUS - Out for Delivery</title></head>
-                        <body style="font-family: 'Georgia', serif; margin: 0; padding: 0;">
-                            <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff;">
-                                <div style="background-color: #000000; padding: 30px; text-align: center;">
-                                    <h1 style="color: #ffffff; font-size: 28px; margin: 0;">OUT FOR DELIVERY</h1>
-                                </div>
-                                <div style="padding: 30px;">
-                                    <h2 style="color: #000000; font-size: 22px; margin-bottom: 20px;">Your Order is on the Way!</h2>
-                                    <div style="background-color: #f8f8f8; padding: 20px; margin-bottom: 25px;">
-                                        <p style="margin: 0 0 5px;"><strong>Order ID:</strong> ${orderId}</p>
-                                        <p style="margin: 0;"><strong>Total to pay:</strong> ${order.total} ETB (Cash on delivery)</p>
-                                    </div>
-                                    <div style="margin-bottom: 25px;">
-                                        <p style="font-weight: 500; margin-bottom: 10px;">🚚 What to Expect:</p>
-                                        <p style="color: #555; margin-bottom: 5px;">• Delivery person will call before arriving</p>
-                                        <p style="color: #555; margin-bottom: 5px;">• Please have cash ready</p>
-                                        <p style="color: #555;">• Delivery person will take a photo as proof of delivery</p>
-                                    </div>
-                                    <div style="border-top: 1px solid #eee; padding-top: 20px;">
-                                        <p style="color: #888; font-size: 12px;">Questions? Call us: ${YOUR_PHONE}</p>
-                                    </div>
-                                </div>
-                                <div style="background-color: #000000; padding: 20px; text-align: center;">
-                                    <p style="color: #888; margin: 0; font-size: 11px;">EXODUS CLOTHING — MADE IN ETHIOPIA</p>
-                                </div>
-                            </div>
-                        </body>
-                        </html>
-                    `
-                });
-            } else if (delivery_status === 'delivered') {
-                // Delivered Thank You Email
-                await transporter.sendMail({
-                    from: `"EXODUS CLOTHING" <${YOUR_EMAIL}>`,
-                    to: order.customer_email,
-                    subject: `✅ EXODUS - Your Order #${orderId} Has Been Delivered`,
-                    html: `
-                        <!DOCTYPE html>
-                        <html>
-                        <head><meta charset="UTF-8"><title>EXODUS - Order Delivered</title></head>
-                        <body style="font-family: 'Georgia', serif; margin: 0; padding: 0;">
-                            <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff;">
-                                <div style="background-color: #000000; padding: 30px; text-align: center;">
-                                    <h1 style="color: #ffffff; font-size: 28px; margin: 0;">ORDER DELIVERED</h1>
-                                </div>
-                                <div style="padding: 30px; text-align: center;">
-                                    <div style="font-size: 60px; margin-bottom: 20px;">✅</div>
-                                    <h2 style="color: #000000; margin-bottom: 15px;">Thank You for Shopping with EXODUS!</h2>
-                                    <p style="color: #555; line-height: 1.6; margin-bottom: 25px;">Your order #${orderId} has been successfully delivered.</p>
-                                    <div style="background-color: #f8f8f8; padding: 20px; margin-bottom: 25px;">
-                                        <p style="margin-bottom: 10px;">✨ <strong>We'd Love to See Your Style</strong></p>
-                                        <p style="color: #555;">Tag us on Instagram: <strong>@exodus_stw</strong></p>
-                                        <p style="color: #555;">Use #ExodusClothing</p>
-                                    </div>
-                                    <div style="border-top: 1px solid #eee; padding-top: 20px;">
-                                        <p style="color: #888; font-size: 12px;">Thank you for supporting Ethiopian streetwear 🇪🇹</p>
-                                    </div>
-                                </div>
-                                <div style="background-color: #000000; padding: 20px; text-align: center;">
-                                    <p style="color: #888; margin: 0; font-size: 11px;">EXODUS CLOTHING — exodusclothingeth@gmail.com</p>
-                                </div>
-                            </div>
-                        </body>
-                        </html>
-                    `
-                });
-            }
+        if (transporter && order && delivery_status === 'out_for_delivery') {
+            await transporter.sendMail({
+                from: `"EXODUS CLOTHING" <${YOUR_EMAIL}>`,
+                to: order.customer_email,
+                subject: `📦 EXODUS - Your Order #${orderId} is Out for Delivery!`,
+                html: `<h2>Your Order is Out for Delivery!</h2><p>Order ID: ${orderId}</p><p>Total to pay: ${order.total} ETB (Cash on delivery)</p><p>Delivery person will call before arriving.</p>`
+            });
+        }
+        
+        if (transporter && order && delivery_status === 'delivered') {
+            await transporter.sendMail({
+                from: `"EXODUS CLOTHING" <${YOUR_EMAIL}>`,
+                to: order.customer_email,
+                subject: `✅ EXODUS - Order #${orderId} Delivered!`,
+                html: `<h2>Order Delivered!</h2><p>Thank you for shopping with EXODUS CLOTHING!</p><p>Follow us on Instagram: @exodus_stw</p>`
+            });
         }
         
         res.json({ success: true, order: data[0] });
-    } catch (error) { res.status(500).json({ error: error.message }); }
+    } catch (error) { 
+        console.error('Error updating order status:', error);
+        res.status(500).json({ error: error.message }); 
+    }
 });
 
 // ========== DELIVERY PHOTO UPLOAD ==========
@@ -402,7 +306,10 @@ app.post('/api/upload-delivery-photo/:orderId', upload.single('photo'), async (r
         
         await supabase.from('orders').update({ delivery_photo: photoUrl }).eq('order_id', orderId);
         res.json({ success: true, photoUrl });
-    } catch (error) { res.status(500).json({ error: error.message }); }
+    } catch (error) { 
+        console.error('Error uploading photo:', error);
+        res.status(500).json({ error: error.message }); 
+    }
 });
 
 // ========== HERO IMAGE API ==========
@@ -411,7 +318,9 @@ app.get('/api/hero-image', async (req, res) => {
         const { data, error } = await supabase.from('settings').select('value').eq('key', 'hero_image').single();
         if (error && error.code !== 'PGRST116') throw error;
         res.json({ url: data?.value || null });
-    } catch (error) { res.json({ url: null }); }
+    } catch (error) { 
+        res.json({ url: null }); 
+    }
 });
 
 app.post('/api/hero-image', async (req, res) => {
@@ -419,7 +328,10 @@ app.post('/api/hero-image', async (req, res) => {
         const { url } = req.body;
         await supabase.from('settings').upsert({ key: 'hero_image', value: url }, { onConflict: 'key' });
         res.json({ success: true });
-    } catch (error) { res.status(500).json({ error: error.message }); }
+    } catch (error) { 
+        console.error('Error saving hero image:', error);
+        res.status(500).json({ error: error.message }); 
+    }
 });
 
 const PORT = process.env.PORT || 3000;
@@ -429,7 +341,10 @@ app.listen(PORT, () => {
 ║     🖤 EXODUS CLOTHING - COMPLETE STORE RUNNING              ║
 ║     URL: http://localhost:${PORT}                              ║
 ║     Email: ${YOUR_EMAIL}                                      ║
-║     ✅ Professional email designs ready                       ║
+║     Phone: ${YOUR_PHONE}                                      ║
+║                                                              ║
+║     ✅ Email notifications ready                             ║
+║     ✅ Product API with categories & multi-images ready      ║
 ╚═══════════════════════════════════════════════════════════════╝
     `);
 });
