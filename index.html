@@ -4,15 +4,53 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>EXODUS CLOTHING | Ethiopian Streetwear</title>
+    
+    <!-- Fonts - Properly loaded for mobile -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Ethiopic:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Ethiopic:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Inter', sans-serif; background: #000000; color: #ffffff; font-size: 16px; }
-        body.lang-am { font-family: 'Noto Sans Ethiopic', 'Inter', sans-serif; }
-        body.lang-ar { font-family: 'Cairo', 'Inter', sans-serif; direction: rtl; }
+        
+        /* Default English */
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background: #000000; 
+            color: #ffffff; 
+            font-size: 16px;
+            transition: font-family 0.2s ease;
+        }
+        
+        /* Amharic Font */
+        body.lang-am { 
+            font-family: 'Noto Sans Ethiopic', 'Inter', sans-serif; 
+        }
+        
+        /* Arabic Font + RTL (Right to Left) */
+        body.lang-ar { 
+            font-family: 'Cairo', 'Inter', sans-serif; 
+            direction: rtl;
+        }
+        
+        /* RTL specific adjustments for Arabic */
+        body.lang-ar .navbar,
+        body.lang-ar .nav-links,
+        body.lang-ar .header-icons,
+        body.lang-ar .footer-grid,
+        body.lang-ar .product-info,
+        body.lang-ar .size-buttons {
+            direction: rtl;
+        }
+        
+        body.lang-ar .hero-content {
+            text-align: right;
+        }
+        
+        body.lang-ar .cart-item {
+            direction: rtl;
+        }
         
         .container { max-width: 1200px; margin: 0 auto; padding: 0 16px; }
         .navbar { display: flex; justify-content: space-between; align-items: center; padding: 16px 0; border-bottom: 1px solid #222; flex-wrap: wrap; gap: 12px; }
@@ -25,7 +63,18 @@
         .cart-count { position: absolute; top: -8px; right: -12px; background: white; color: black; font-size: 0.65rem; padding: 2px 6px; border-radius: 20px; font-weight: bold; }
         
         .language-switcher { display: flex; gap: 5px; margin-left: 10px; }
-        .lang-btn { background: #1a1a1a; border: 1px solid #333; color: #fff; padding: 5px 10px; border-radius: 30px; cursor: pointer; font-size: 0.7rem; }
+        .lang-btn { 
+            background: #1a1a1a; 
+            border: 1px solid #333; 
+            color: #fff; 
+            padding: 5px 12px; 
+            border-radius: 30px; 
+            cursor: pointer; 
+            font-size: 0.7rem; 
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .lang-btn:hover { background: #333; }
         .lang-btn.active { background: #fff; color: #000; border-color: #fff; }
         
         .btn-primary { background: white; color: black; padding: 12px 24px; border-radius: 40px; text-decoration: none; font-weight: 600; display: inline-block; font-size: 0.9rem; border: none; cursor: pointer; }
@@ -111,7 +160,11 @@
         @media (max-width: 768px) {
             .lightbox-prev, .lightbox-next { padding: 10px 15px; font-size: 18px; }
             .lightbox-close { font-size: 30px; top: 10px; right: 15px; }
+            .lang-btn { padding: 4px 8px; font-size: 0.65rem; }
         }
+        
+        .loading { text-align: center; padding: 40px; color: #888; }
+        .empty-products { text-align: center; padding: 40px; color: #888; }
     </style>
 </head>
 <body id="appBody">
@@ -128,42 +181,160 @@
 <!-- Cart Sidebar -->
 <div class="cart-overlay" id="cartOverlay"></div>
 <div class="cart-sidebar" id="cartSidebar">
-    <div class="cart-header"><h2>Your Cart</h2><button class="close-cart" id="closeCartBtn"><i class="fas fa-times"></i></button></div>
+    <div class="cart-header"><h2 id="cartTitle">Your Cart</h2><button class="close-cart" id="closeCartBtn"><i class="fas fa-times"></i></button></div>
     <div class="cart-items" id="cartItemsContainer"><div style="text-align:center; color:#888;">Your cart is empty.</div></div>
     <div class="cart-footer" id="cartFooter" style="display:none;">
-        <div class="cart-total"><span>Total</span><span id="cartTotalPrice">0 ETB</span></div>
-        <button class="checkout-btn" id="checkoutBtn">Place Order</button>
+        <div class="cart-total"><span id="totalLabel">Total</span><span id="cartTotalPrice">0 ETB</span></div>
+        <button class="checkout-btn" id="checkoutBtn" id="placeOrderBtn">Place Order</button>
     </div>
 </div>
 
 <!-- Order Modal -->
-<div class="modal" id="orderModal"><div class="modal-content"><span class="close-modal" id="closeModalBtn">&times;</span><h2>Complete Your Order</h2><form id="orderForm"><input type="text" id="customerName" placeholder="Full Name" required><input type="email" id="customerEmail" placeholder="Email" required><input type="text" id="customerPhone" placeholder="Phone" required><textarea id="customerAddress" placeholder="Address" required></textarea><div style="background:#1a1a1a; padding:12px; border-radius:12px;"><p>📌 Cash on delivery only.</p></div><button type="submit" class="btn-primary" style="width:100%;">Place Order</button></form><div id="orderError" style="color:#ff4444; margin-top:12px;"></div></div></div>
+<div class="modal" id="orderModal"><div class="modal-content"><span class="close-modal" id="closeModalBtn">&times;</span><h2 id="orderTitle">Complete Your Order</h2><form id="orderForm"><input type="text" id="customerName" placeholder="Full Name" required><input type="email" id="customerEmail" placeholder="Email" required><input type="text" id="customerPhone" placeholder="Phone" required><textarea id="customerAddress" placeholder="Address" required></textarea><div style="background:#1a1a1a; padding:12px; border-radius:12px;"><p id="codMessage">📌 Cash on delivery only.</p></div><button type="submit" class="btn-primary" style="width:100%;" id="submitOrderBtn">Place Order</button></form><div id="orderError" style="color:#ff4444; margin-top:12px;"></div></div></div>
 <div class="toast-notify" id="toastMsg">Item added</div>
 
-<header><div class="container"><div class="navbar"><a href="index.html" class="logo"><img src="images/exodus-logo.png" alt="EXODUS"></a><ul class="nav-links"><li><a href="index.html">Home</a></li><li><a href="#">Shop</a></li><li><a href="#">Drops</a></li><li><a href="track.html">Track Order</a></li></ul><div class="header-icons"><div class="language-switcher"><button class="lang-btn" data-lang="en">EN</button><button class="lang-btn" data-lang="am">አማ</button><button class="lang-btn" data-lang="ar">عربي</button></div><i class="fas fa-shopping-bag" id="cartIcon"><span class="cart-count" id="cartCount">0</span></i></div></div></div></header>
+<header><div class="container"><div class="navbar"><a href="index.html" class="logo"><img src="images/exodus-logo.png" alt="EXODUS"></a><ul class="nav-links"><li><a href="index.html" id="navHome">Home</a></li><li><a href="#" id="navShop">Shop</a></li><li><a href="#" id="navDrops">Drops</a></li><li><a href="track.html" id="navTrack">Track Order</a></li></ul><div class="header-icons"><div class="language-switcher"><button class="lang-btn" data-lang="en">EN</button><button class="lang-btn" data-lang="am">አማ</button><button class="lang-btn" data-lang="ar">عربي</button></div><i class="fas fa-shopping-bag" id="cartIcon"><span class="cart-count" id="cartCount">0</span></i></div></div></div></header>
 
-<main><div class="container"><div class="hero"><div class="hero-grid"><div class="hero-content"><div class="hero-badge">🇪🇹 MADE IN ETHIOPIA</div><h1>Leave the old.<br>Embrace EXODUS.</h1><p>Premium Ethiopian streetwear. Cash on delivery.</p><a href="#" class="btn-primary" id="shopNowBtn">Shop Now →</a></div><div class="hero-image"><img id="heroImage" src="" alt="EXODUS"></div></div></div>
+<main><div class="container"><div class="hero"><div class="hero-grid"><div class="hero-content"><div class="hero-badge" id="heroBadge">🇪🇹 MADE IN ETHIOPIA</div><h1 id="heroTitle">Leave the old.<br>Embrace EXODUS.</h1><p id="heroSubtitle">Premium Ethiopian streetwear. Cash on delivery.</p><a href="#" class="btn-primary" id="shopNowBtn">Shop Now →</a></div><div class="hero-image"><img id="heroImage" src="" alt="EXODUS"></div></div></div>
 
 <div class="categories" id="categoryFilters">
-    <div class="category-item" data-category="all"><i class="fas fa-th-large"></i><h4>All</h4></div>
-    <div class="category-item" data-category="hoodies"><i class="fas fa-tshirt"></i><h4>Hoodies</h4></div>
-    <div class="category-item" data-category="mens"><i class="fas fa-male"></i><h4>Men's</h4></div>
-    <div class="category-item" data-category="womens"><i class="fas fa-female"></i><h4>Women's</h4></div>
-    <div class="category-item" data-category="accessories"><i class="fas fa-hat-cowboy"></i><h4>Accessories</h4></div>
+    <div class="category-item" data-category="all"><i class="fas fa-th-large"></i><h4 id="catAll">All</h4></div>
+    <div class="category-item" data-category="hoodies"><i class="fas fa-tshirt"></i><h4 id="catHoodies">Hoodies</h4></div>
+    <div class="category-item" data-category="mens"><i class="fas fa-male"></i><h4 id="catMens">Men's</h4></div>
+    <div class="category-item" data-category="womens"><i class="fas fa-female"></i><h4 id="catWomens">Women's</h4></div>
+    <div class="category-item" data-category="accessories"><i class="fas fa-hat-cowboy"></i><h4 id="catAccessories">Accessories</h4></div>
 </div>
 
-<div class="section-title">🔥 Latest Drops</div>
+<div class="section-title" id="latestDrops">🔥 Latest Drops</div>
 <div id="productGrid" class="product-grid"><div class="loading">Loading products...</div></div></div></main>
 
-<footer><div class="container"><div class="footer-grid"><div class="footer-col"><h3>EXODUS</h3><p>Streetwear for the rebellion.<br>Made in Ethiopia 🇪🇹</p></div><div class="footer-col"><h4>Support</h4><p>FAQ<br>Shipping<br>Returns<br>Size Guide</p></div><div class="footer-col"><h4>Contact</h4><p>📞 +251968621548<br>✉️ exodusclothingeth@gmail.com</p></div><div class="footer-col"><h4>Quick Links</h4><p><a href="track.html">📦 Track Your Order</a></p></div><div class="footer-col social-icons"><a href="https://www.instagram.com/exodus_stw" target="_blank"><i class="fab fa-instagram"></i></a><a href="#"><i class="fab fa-telegram"></i></a><a href="#"><i class="fab fa-tiktok"></i></a></div></div><p style="text-align:center; margin-top:32px; color:#444; font-size:0.7rem;">EXODUS CLOTHING — Ethiopian Streetwear</p></div></footer>
+<footer><div class="container"><div class="footer-grid"><div class="footer-col"><h3>EXODUS</h3><p>Streetwear for the rebellion.<br>Made in Ethiopia 🇪🇹</p></div><div class="footer-col"><h4 id="footerSupport">Support</h4><p id="footerFaq">FAQ<br><span id="footerShipping">Shipping</span><br><span id="footerReturns">Returns</span><br><span id="footerSizeGuide">Size Guide</span></p></div><div class="footer-col"><h4 id="footerContact">Contact</h4><p>📞 +251968621548<br>✉️ exodusclothingeth@gmail.com</p></div><div class="footer-col"><h4 id="footerQuickLinks">Quick Links</h4><p><a href="track.html" id="footerTrackLink">📦 Track Your Order</a></p></div><div class="footer-col social-icons"><a href="https://www.instagram.com/exodus_stw" target="_blank"><i class="fab fa-instagram"></i></a><a href="#"><i class="fab fa-telegram"></i></a><a href="#"><i class="fab fa-tiktok"></i></a></div></div><p style="text-align:center; margin-top:32px; color:#444; font-size:0.7rem;">EXODUS CLOTHING — Ethiopian Streetwear</p></div></footer>
 
 <script>
-    // Language translations
-    const translations = { en: { home: "Home", shop: "Shop", drops: "Drops", trackOrder: "Track Order" }, am: { home: "መነሻ", shop: "ግዢ", drops: "አዲስ", trackOrder: "ክትትል" }, ar: { home: "الرئيسية", shop: "تسوق", drops: "جديد", trackOrder: "تتبع" } };
-    let currentLanguage = localStorage.getItem('exodus_language') || 'en';
-    function setLanguage(lang) { currentLanguage = lang; localStorage.setItem('exodus_language', lang); document.getElementById('appBody').className = lang === 'ar' ? 'lang-ar' : (lang === 'am' ? 'lang-am' : ''); document.querySelectorAll('[data-i18n]').forEach(el => { let key = el.getAttribute('data-i18n'); if(translations[lang] && translations[lang][key]) el.innerText = translations[lang][key]; }); document.querySelectorAll('.lang-btn').forEach(btn => { if(btn.dataset.lang === lang) btn.classList.add('active'); else btn.classList.remove('active'); }); }
-    document.querySelectorAll('.lang-btn').forEach(btn => btn.addEventListener('click', () => setLanguage(btn.dataset.lang)));
+    // ========== COMPLETE LANGUAGE TRANSLATIONS ==========
+    const translations = {
+        en: {
+            home: "Home", shop: "Shop", drops: "Drops", trackOrder: "Track Order",
+            madeInEthiopia: "🇪🇹 MADE IN ETHIOPIA",
+            heroTitle: "Leave the old.<br>Embrace EXODUS.",
+            heroSubtitle: "Premium Ethiopian streetwear. Cash on delivery.",
+            shopNow: "Shop Now →",
+            catAll: "All", catHoodies: "Hoodies", catMens: "Men's", catWomens: "Women's", catAccessories: "Accessories",
+            latestDrops: "🔥 Latest Drops",
+            yourCart: "Your Cart", cartEmpty: "Your cart is empty.", total: "Total", placeOrder: "Place Order",
+            completeOrder: "Complete Your Order", fullName: "Full Name", email: "Email", phone: "Phone",
+            address: "Address", codMessage: "📌 Cash on delivery only.", submitOrder: "Place Order",
+            support: "Support", faq: "FAQ", shipping: "Shipping", returns: "Returns", sizeGuide: "Size Guide",
+            contact: "Contact", quickLinks: "Quick Links", trackYourOrder: "📦 Track Your Order"
+        },
+        am: {
+            home: "መነሻ", shop: "ግዢ", drops: "አዲስ", trackOrder: "ትዕዛዝ ይከታተሉ",
+            madeInEthiopia: "🇪🇹 በኢትዮጵያ ተሠራ",
+            heroTitle: "አሮጌውን ትተህ።<br>EXODUS ን ተቀበል።",
+            heroSubtitle: "ፕሪሚየም ኢትዮጵያዊ የጎዳና ልብሶች። በደረሰ ጊዜ ክፍያ",
+            shopNow: "አሁን ግዙ →",
+            catAll: "ሁሉም", catHoodies: "ሁዲዎች", catMens: "የወንዶች", catWomens: "የሴቶች", catAccessories: "መለዋወጫዎች",
+            latestDrops: "🔥 አዲስ ዕቃዎች",
+            yourCart: "የእርስዎ ጋሪ", cartEmpty: "ጋሪዎ ባዶ ነው።", total: "ጠቅላላ", placeOrder: "ትዕዛዝ አስገባ",
+            completeOrder: "ትዕዛዝዎን ያሟሉ", fullName: "ሙሉ ስም", email: "ኢሜይል", phone: "ስልክ ቁጥር",
+            address: "አድራሻ", codMessage: "📌 በደረሰ ጊዜ ክፍያ ብቻ።", submitOrder: "ትዕዛዝ አስገባ",
+            support: "ድጋፍ", faq: "ተዘውትረው የሚጠየቁ ጥያቄዎች", shipping: "መላኪያ", returns: "መመለሻ", sizeGuide: "የመጠን መምሪያ",
+            contact: "አግኙን", quickLinks: "ፈጣን አገናኞች", trackYourOrder: "ትዕዛዝ ይከታተሉ"
+        },
+        ar: {
+            home: "الرئيسية", shop: "تسوق", drops: "إصدارات جديدة", trackOrder: "تتبع الطلب",
+            madeInEthiopia: "🇪🇹 صنع في إثيوبيا",
+            heroTitle: "اترك القديم.<br>احتضن EXODUS.",
+            heroSubtitle: "ملابس الشارع الإثيوبية الفاخرة. الدفع عند الاستلام",
+            shopNow: "تسوق الآن →",
+            catAll: "الكل", catHoodies: "هوديز", catMens: "رجالي", catWomens: "نسائي", catAccessories: "إكسسوارات",
+            latestDrops: "🔥 أحدث الإصدارات",
+            yourCart: "سلتك", cartEmpty: "سلتك فارغة.", total: "المجموع", placeOrder: "تقديم الطلب",
+            completeOrder: "أكمل طلبك", fullName: "الاسم الكامل", email: "البريد الإلكتروني", phone: "رقم الهاتف",
+            address: "العنوان", codMessage: "📌 الدفع عند الاستلام فقط.", submitOrder: "تقديم الطلب",
+            support: "الدعم", faq: "الأسئلة الشائعة", shipping: "الشحن", returns: "الإرجاع", sizeGuide: "دليل المقاسات",
+            contact: "اتصل بنا", quickLinks: "روابط سريعة", trackYourOrder: "تتبع طلبك"
+        }
+    };
     
+    let currentLanguage = localStorage.getItem('exodus_language') || 'en';
+    
+    function setLanguage(lang) {
+        currentLanguage = lang;
+        localStorage.setItem('exodus_language', lang);
+        
+        // Set body class for font and RTL
+        const body = document.getElementById('appBody');
+        body.className = '';
+        if (lang === 'am') body.classList.add('lang-am');
+        if (lang === 'ar') body.classList.add('lang-ar');
+        
+        // Update all translatable elements
+        const t = translations[lang];
+        if (!t) return;
+        
+        // Navigation
+        document.getElementById('navHome') && (document.getElementById('navHome').innerText = t.home);
+        document.getElementById('navShop') && (document.getElementById('navShop').innerText = t.shop);
+        document.getElementById('navDrops') && (document.getElementById('navDrops').innerText = t.drops);
+        document.getElementById('navTrack') && (document.getElementById('navTrack').innerText = t.trackOrder);
+        
+        // Hero
+        document.getElementById('heroBadge') && (document.getElementById('heroBadge').innerText = t.madeInEthiopia);
+        document.getElementById('heroTitle') && (document.getElementById('heroTitle').innerHTML = t.heroTitle);
+        document.getElementById('heroSubtitle') && (document.getElementById('heroSubtitle').innerText = t.heroSubtitle);
+        document.getElementById('shopNowBtn') && (document.getElementById('shopNowBtn').innerHTML = t.shopNow);
+        
+        // Categories
+        document.getElementById('catAll') && (document.getElementById('catAll').innerText = t.catAll);
+        document.getElementById('catHoodies') && (document.getElementById('catHoodies').innerText = t.catHoodies);
+        document.getElementById('catMens') && (document.getElementById('catMens').innerText = t.catMens);
+        document.getElementById('catWomens') && (document.getElementById('catWomens').innerText = t.catWomens);
+        document.getElementById('catAccessories') && (document.getElementById('catAccessories').innerText = t.catAccessories);
+        
+        // Section
+        document.getElementById('latestDrops') && (document.getElementById('latestDrops').innerHTML = t.latestDrops);
+        
+        // Cart
+        document.getElementById('cartTitle') && (document.getElementById('cartTitle').innerText = t.yourCart);
+        document.getElementById('totalLabel') && (document.getElementById('totalLabel').innerText = t.total);
+        document.getElementById('checkoutBtn') && (document.getElementById('checkoutBtn').innerText = t.placeOrder);
+        
+        // Modal
+        document.getElementById('orderTitle') && (document.getElementById('orderTitle').innerText = t.completeOrder);
+        document.getElementById('codMessage') && (document.getElementById('codMessage').innerText = t.codMessage);
+        document.getElementById('submitOrderBtn') && (document.getElementById('submitOrderBtn').innerText = t.submitOrder);
+        
+        // Placeholders
+        const nameInput = document.getElementById('customerName');
+        const emailInput = document.getElementById('customerEmail');
+        const phoneInput = document.getElementById('customerPhone');
+        const addressInput = document.getElementById('customerAddress');
+        if (nameInput) nameInput.placeholder = t.fullName;
+        if (emailInput) emailInput.placeholder = t.email;
+        if (phoneInput) phoneInput.placeholder = t.phone;
+        if (addressInput) addressInput.placeholder = t.address;
+        
+        // Footer
+        document.getElementById('footerSupport') && (document.getElementById('footerSupport').innerText = t.support);
+        document.getElementById('footerFaq') && (document.getElementById('footerFaq').innerHTML = `${t.faq}<br><span id="footerShipping">${t.shipping}</span><br><span id="footerReturns">${t.returns}</span><br><span id="footerSizeGuide">${t.sizeGuide}</span>`);
+        document.getElementById('footerContact') && (document.getElementById('footerContact').innerText = t.contact);
+        document.getElementById('footerQuickLinks') && (document.getElementById('footerQuickLinks').innerText = t.quickLinks);
+        document.getElementById('footerTrackLink') && (document.getElementById('footerTrackLink').innerHTML = t.trackYourOrder);
+        
+        // Update language buttons
+        document.querySelectorAll('.lang-btn').forEach(btn => {
+            if (btn.dataset.lang === lang) btn.classList.add('active');
+            else btn.classList.remove('active');
+        });
+    }
+    
+    // Language switcher event listeners
+    document.querySelectorAll('.lang-btn').forEach(btn => {
+        btn.addEventListener('click', () => setLanguage(btn.dataset.lang));
+    });
+    
+    // ========== STORE FUNCTIONS ==========
     const API_BASE = window.location.origin + '/api';
     let cart = [], allProducts = [], currentCategory = 'all';
     let lightboxImages = [], lightboxIndex = 0;
@@ -200,7 +371,13 @@
         document.getElementById('lightboxCounter').innerText = `${lightboxIndex + 1} / ${lightboxImages.length}`;
     }
     
-    async function loadHeroImage() { try { let res = await fetch(`${API_BASE}/hero-image`); let data = await res.json(); document.getElementById('heroImage').src = data.url || 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=800&h=1000&fit=crop'; } catch(e) {} }
+    async function loadHeroImage() { 
+        try { 
+            let res = await fetch(`${API_BASE}/hero-image`); 
+            let data = await res.json(); 
+            document.getElementById('heroImage').src = data.url || 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=800&h=1000&fit=crop'; 
+        } catch(e) {} 
+    }
     
     async function loadProducts() { 
         try { 
@@ -217,13 +394,13 @@
         let grid = document.getElementById('productGrid');
         if(!filtered.length) { grid.innerHTML = '<div class="empty-products">No products in this category</div>'; return; }
         
-        grid.innerHTML = filtered.map((p, productIdx) => {
+        grid.innerHTML = filtered.map(p => {
             let totalStock = Object.values(p.stock).reduce((a,b)=>a+b,0);
             let isSoldOut = totalStock === 0;
             let images = p.images && p.images.length ? p.images : (p.image ? [p.image] : ['https://placehold.co/400x500/333/white?text=EXODUS']);
             let imagesJson = JSON.stringify(images).replace(/"/g, '&quot;');
             
-            return `<div class="product-card" data-product-id="${p.id}">
+            return `<div class="product-card">
                 <div class="image-container" onclick="openLightbox(${imagesJson}, 0)">
                     <img src="${images[0]}" alt="${p.name}" onerror="this.src='https://placehold.co/400x500/333/white?text=EXODUS'">
                     ${isSoldOut ? '<div class="sold-out-badge">SOLD OUT</div>' : ''}
@@ -259,7 +436,7 @@
         let totalSpan = document.getElementById('cartTotalPrice'); 
         updateCartCount(); 
         if(cart.length===0) { 
-            container.innerHTML='<div style="text-align:center; color:#888;">Your cart is empty.</div>'; 
+            container.innerHTML='<div style="text-align:center; color:#888;">' + (translations[currentLanguage]?.cartEmpty || 'Your cart is empty.') + '</div>'; 
             footer.style.display='none'; 
             return; 
         } 
