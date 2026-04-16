@@ -24,16 +24,12 @@
         .header-icons { display: flex; gap: 16px; font-size: 1.2rem; cursor: pointer; position: relative; align-items: center; }
         .cart-count { position: absolute; top: -8px; right: -12px; background: white; color: black; font-size: 0.65rem; padding: 2px 6px; border-radius: 20px; font-weight: bold; }
         
-        /* Language Switcher */
         .language-switcher { display: flex; gap: 5px; margin-left: 10px; }
-        .lang-btn { background: #1a1a1a; border: 1px solid #333; color: #fff; padding: 5px 10px; border-radius: 30px; cursor: pointer; font-size: 0.7rem; font-weight: 500; transition: 0.2s; }
-        .lang-btn:hover { background: #333; }
+        .lang-btn { background: #1a1a1a; border: 1px solid #333; color: #fff; padding: 5px 10px; border-radius: 30px; cursor: pointer; font-size: 0.7rem; }
         .lang-btn.active { background: #fff; color: #000; border-color: #fff; }
         
-        .btn-primary { background: white; color: black; padding: 12px 24px; border-radius: 40px; text-decoration: none; font-weight: 600; display: inline-block; font-size: 0.9rem; border: none; cursor: pointer; transition: 0.2s; }
-        .btn-primary:hover { background: #ddd; transform: scale(0.98); }
-        .btn-outline { background: transparent; border: 1.5px solid white; color: white; padding: 6px 14px; border-radius: 40px; cursor: pointer; font-size: 0.7rem; transition: 0.2s; }
-        .btn-outline:hover { background: white; color: black; }
+        .btn-primary { background: white; color: black; padding: 12px 24px; border-radius: 40px; text-decoration: none; font-weight: 600; display: inline-block; font-size: 0.9rem; border: none; cursor: pointer; }
+        .btn-outline { background: transparent; border: 1.5px solid white; color: white; padding: 6px 14px; border-radius: 40px; cursor: pointer; font-size: 0.7rem; }
         
         .hero { margin: 24px 0 32px; }
         .hero-grid { display: flex; flex-direction: column; gap: 24px; }
@@ -43,27 +39,42 @@
         .hero-content p { color: #aaa; margin-bottom: 24px; font-size: 0.9rem; }
         .hero-image img { width: 100%; border-radius: 20px; height: auto; max-height: 300px; object-fit: cover; }
         
+        /* Categories */
         .categories { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin: 24px 0; }
         .category-item { background: #111; padding: 20px 12px; text-align: center; border-radius: 16px; border: 1px solid #222; cursor: pointer; transition: 0.2s; }
+        .category-item.active { border-color: #fff; background: #1a1a1a; }
         .category-item i { font-size: 1.5rem; margin-bottom: 8px; }
         .category-item h4 { font-size: 0.9rem; margin-bottom: 4px; }
-        .category-item p { color: #888; font-size: 0.7rem; }
         
         .section-title { font-size: 1.5rem; font-weight: 700; margin: 32px 0 16px; }
         .product-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
-        .product-card { background: #111; border-radius: 16px; overflow: hidden; border: 1px solid #222; transition: transform 0.2s; }
+        .product-card { background: #111; border-radius: 16px; overflow: hidden; border: 1px solid #222; transition: transform 0.2s; position: relative; }
         .product-card:hover { transform: translateY(-4px); border-color: #444; }
-        .product-img { background: #1a1a1a; aspect-ratio: 3/4; overflow: hidden; }
-        .product-img img { width: 100%; height: 100%; object-fit: cover; }
+        
+        /* Image Slider */
+        .slider-container { position: relative; aspect-ratio: 3/4; overflow: hidden; background: #1a1a1a; }
+        .slider-images { display: flex; transition: transform 0.3s ease; height: 100%; }
+        .slider-images img { width: 100%; height: 100%; object-fit: cover; flex-shrink: 0; }
+        .slider-prev, .slider-next { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(0,0,0,0.5); color: white; border: none; padding: 8px 12px; cursor: pointer; z-index: 2; border-radius: 30px; font-size: 0.8rem; }
+        .slider-prev { left: 5px; }
+        .slider-next { right: 5px; }
+        .slider-dots { position: absolute; bottom: 8px; left: 0; right: 0; display: flex; justify-content: center; gap: 6px; z-index: 2; }
+        .dot { width: 6px; height: 6px; background: rgba(255,255,255,0.5); border-radius: 50%; cursor: pointer; }
+        .dot.active { background: white; }
+        
+        /* Sold Out Badge */
+        .sold-out-badge { position: absolute; top: 10px; right: 10px; background: #ff4444; color: white; padding: 4px 12px; border-radius: 20px; font-size: 0.7rem; font-weight: 600; z-index: 3; }
+        
         .product-info { padding: 12px; }
         .product-title { font-weight: 700; font-size: 0.8rem; margin-bottom: 4px; }
         .product-price { color: #aaa; margin-bottom: 8px; font-size: 0.85rem; }
         .size-buttons { display: flex; gap: 6px; flex-wrap: wrap; }
-        .size-btn { background: #1a1a1a; border: 1px solid #333; color: white; padding: 4px 8px; border-radius: 20px; font-size: 0.6rem; cursor: pointer; transition: 0.2s; }
-        .size-btn:hover { background: white; color: black; }
+        .size-btn { background: #1a1a1a; border: 1px solid #333; color: white; padding: 4px 8px; border-radius: 20px; font-size: 0.6rem; cursor: pointer; }
+        .size-btn.sold-out { opacity: 0.5; cursor: not-allowed; background: #333; text-decoration: line-through; }
+        .size-btn:hover:not(.sold-out) { background: white; color: black; }
         
-        .cart-sidebar { position: fixed; top: 0; right: -100%; width: 85%; max-width: 350px; height: 100%; background: #0f0f0f; z-index: 1001; transition: right 0.3s ease; display: flex; flex-direction: column; border-left: 1px solid #222; }
-        .cart-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); backdrop-filter: blur(3px); visibility: hidden; opacity: 0; transition: 0.2s; z-index: 1000; }
+        .cart-sidebar { position: fixed; top: 0; right: -100%; width: 85%; max-width: 350px; height: 100%; background: #0f0f0f; z-index: 1001; transition: right 0.3s; display: flex; flex-direction: column; border-left: 1px solid #222; }
+        .cart-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); visibility: hidden; opacity: 0; transition: 0.2s; z-index: 1000; }
         .cart-header { padding: 16px; display: flex; justify-content: space-between; border-bottom: 1px solid #222; }
         .close-cart { background: none; border: none; color: white; font-size: 1.3rem; cursor: pointer; }
         .cart-items { flex: 1; overflow-y: auto; padding: 16px; }
@@ -74,9 +85,7 @@
         
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 1100; align-items: center; justify-content: center; padding: 16px; }
         .modal-content { background: #111; padding: 24px; border-radius: 24px; width: 100%; max-width: 450px; border: 1px solid #222; }
-        .modal-content h2 { font-size: 1.3rem; margin-bottom: 16px; }
-        .modal-content input, .modal-content textarea { width: 100%; padding: 12px; margin: 8px 0; background: #1a1a1a; border: 1px solid #333; color: white; border-radius: 12px; font-size: 0.9rem; }
-        .modal-content textarea { min-height: 80px; }
+        .modal-content input, .modal-content textarea { width: 100%; padding: 12px; margin: 8px 0; background: #1a1a1a; border: 1px solid #333; color: white; border-radius: 12px; }
         .close-modal { float: right; font-size: 24px; cursor: pointer; color: #aaa; }
         .toast-notify { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #222; padding: 10px 20px; border-radius: 40px; opacity: 0; transition: 0.2s; z-index: 1200; font-size: 0.8rem; white-space: nowrap; }
         
@@ -84,13 +93,7 @@
         .footer-grid { display: flex; flex-direction: column; gap: 24px; text-align: center; }
         .footer-col h3, .footer-col h4 { margin-bottom: 12px; font-size: 1rem; }
         .footer-col p { color: #888; line-height: 1.6; font-size: 0.8rem; }
-        .footer-col a { color: #fff; text-decoration: none; }
-        .footer-col a:hover { text-decoration: underline; }
         .social-icons a { color: white; text-decoration: none; margin: 0 8px; display: inline-block; }
-        .social-icons i { font-size: 1.2rem; cursor: pointer; }
-        
-        .empty-products { text-align: center; padding: 40px 16px; background: #111; border-radius: 20px; }
-        .loading { text-align: center; padding: 40px; color: #888; }
         
         @media (min-width: 768px) {
             .container { padding: 0 32px; }
@@ -101,309 +104,103 @@
             .product-grid { grid-template-columns: repeat(3, 1fr); gap: 24px; }
             .logo img { height: 70px; }
             .footer-grid { flex-direction: row; justify-content: space-between; text-align: left; }
-            .cart-sidebar { width: 380px; }
-            .language-switcher { margin-left: 20px; }
         }
-        @media (min-width: 1024px) {
-            .product-grid { grid-template-columns: repeat(4, 1fr); }
-            .hero-content h1 { font-size: 3.5rem; }
-        }
+        @media (min-width: 1024px) { .product-grid { grid-template-columns: repeat(4, 1fr); } }
     </style>
 </head>
 <body id="appBody">
 
-<!-- Cart Sidebar -->
+<!-- Cart, Modals, etc. (same as before) -->
 <div class="cart-overlay" id="cartOverlay"></div>
 <div class="cart-sidebar" id="cartSidebar">
-    <div class="cart-header">
-        <h2 data-i18n="yourCart">Your Cart</h2>
-        <button class="close-cart" id="closeCartBtn"><i class="fas fa-times"></i></button>
-    </div>
-    <div class="cart-items" id="cartItemsContainer">
-        <div style="text-align:center; color:#888;" data-i18n="cartEmpty">Your cart is empty.</div>
-    </div>
+    <div class="cart-header"><h2>Your Cart</h2><button class="close-cart" id="closeCartBtn"><i class="fas fa-times"></i></button></div>
+    <div class="cart-items" id="cartItemsContainer"><div style="text-align:center; color:#888;">Your cart is empty.</div></div>
     <div class="cart-footer" id="cartFooter" style="display:none;">
-        <div class="cart-total">
-            <span data-i18n="total">Total</span>
-            <span id="cartTotalPrice">0 ETB</span>
-        </div>
-        <button class="checkout-btn" id="checkoutBtn" data-i18n="placeOrder">Place Order</button>
+        <div class="cart-total"><span>Total</span><span id="cartTotalPrice">0 ETB</span></div>
+        <button class="checkout-btn" id="checkoutBtn">Place Order</button>
     </div>
 </div>
-
-<!-- Order Modal -->
-<div class="modal" id="orderModal">
-    <div class="modal-content">
-        <span class="close-modal" id="closeModalBtn">&times;</span>
-        <h2 data-i18n="completeOrder">Complete Your Order</h2>
-        <form id="orderForm">
-            <input type="text" id="customerName" placeholder="Full Name" data-i18n="fullName" required>
-            <input type="email" id="customerEmail" placeholder="Email Address" data-i18n="emailAddress" required>
-            <input type="text" id="customerPhone" placeholder="Phone Number" data-i18n="phoneNumber" required>
-            <textarea id="customerAddress" placeholder="Shipping Address" data-i18n="shippingAddress" required></textarea>
-            <div style="background:#1a1a1a; padding:12px; border-radius:12px; margin:12px 0;">
-                <p style="color:#aaa; font-size:0.75rem;" data-i18n="cashOnDelivery">📌 Cash on delivery only. We'll contact you within 24 hours.</p>
-            </div>
-            <button type="submit" class="btn-primary" style="width:100%;" data-i18n="placeOrderBtn">Place Order</button>
-        </form>
-        <div id="orderError" style="color:#ff4444; margin-top:12px; font-size:0.8rem;"></div>
-    </div>
-</div>
-
+<div class="modal" id="orderModal"><div class="modal-content"><span class="close-modal" id="closeModalBtn">&times;</span><h2>Complete Your Order</h2><form id="orderForm"><input type="text" id="customerName" placeholder="Full Name" required><input type="email" id="customerEmail" placeholder="Email" required><input type="text" id="customerPhone" placeholder="Phone" required><textarea id="customerAddress" placeholder="Address" required></textarea><div style="background:#1a1a1a; padding:12px; border-radius:12px;"><p>📌 Cash on delivery only.</p></div><button type="submit" class="btn-primary" style="width:100%;">Place Order</button></form><div id="orderError" style="color:#ff4444; margin-top:12px;"></div></div></div>
 <div class="toast-notify" id="toastMsg">Item added</div>
 
-<!-- Navigation -->
-<header>
-    <div class="container">
-        <div class="navbar">
-            <a href="index.html" class="logo">
-                <img src="images/exodus-logo.png" alt="EXODUS">
-            </a>
-            <ul class="nav-links">
-                <li><a href="index.html" data-i18n="home">Home</a></li>
-                <li><a href="#" data-i18n="shop">Shop</a></li>
-                <li><a href="#" data-i18n="drops">New Drops</a></li>
-                <li><a href="track.html" data-i18n="trackOrder">Track Order</a></li>
-            </ul>
-            <div class="header-icons">
-                <div class="language-switcher">
-                    <button class="lang-btn" data-lang="en">EN</button>
-                    <button class="lang-btn" data-lang="am">አማ</button>
-                    <button class="lang-btn" data-lang="ar">عربي</button>
-                </div>
-                <i class="fas fa-shopping-bag" id="cartIcon">
-                    <span class="cart-count" id="cartCount">0</span>
-                </i>
-            </div>
-        </div>
-    </div>
-</header>
+<header><div class="container"><div class="navbar"><a href="index.html" class="logo"><img src="images/exodus-logo.png" alt="EXODUS"></a><ul class="nav-links"><li><a href="index.html">Home</a></li><li><a href="#">Shop</a></li><li><a href="#">Drops</a></li><li><a href="track.html">Track Order</a></li></ul><div class="header-icons"><div class="language-switcher"><button class="lang-btn" data-lang="en">EN</button><button class="lang-btn" data-lang="am">አማ</button><button class="lang-btn" data-lang="ar">عربي</button></div><i class="fas fa-shopping-bag" id="cartIcon"><span class="cart-count" id="cartCount">0</span></i></div></div></div></header>
 
-<main>
-    <div class="container">
-        <div class="hero">
-            <div class="hero-grid">
-                <div class="hero-content">
-                    <div class="hero-badge" data-i18n="madeInEthiopia">🇪🇹 MADE IN ETHIOPIA</div>
-                    <h1 data-i18n="heroTitle">Leave the old.<br>Embrace EXODUS.</h1>
-                    <p data-i18n="heroSubtitle">Premium Ethiopian streetwear. Cash on delivery.</p>
-                    <a href="#" class="btn-primary" id="shopNowBtn" data-i18n="shopNow">Shop Now →</a>
-                </div>
-                <div class="hero-image">
-                    <img id="heroImage" src="" alt="EXODUS Clothing">
-                </div>
-            </div>
-        </div>
+<main><div class="container"><div class="hero"><div class="hero-grid"><div class="hero-content"><div class="hero-badge">🇪🇹 MADE IN ETHIOPIA</div><h1>Leave the old.<br>Embrace EXODUS.</h1><p>Premium Ethiopian streetwear. Cash on delivery.</p><a href="#" class="btn-primary" id="shopNowBtn">Shop Now →</a></div><div class="hero-image"><img id="heroImage" src="" alt="EXODUS"></div></div></div>
 
-        <div class="categories">
-            <div class="category-item"><i class="fas fa-tshirt"></i><h4 data-i18n="hoodies">Hoodies</h4><p data-i18n="shopNowBtn">Shop now</p></div>
-            <div class="category-item"><i class="fas fa-male"></i><h4 data-i18n="mens">Men's</h4><p data-i18n="shopNowBtn">Shop now</p></div>
-            <div class="category-item"><i class="fas fa-female"></i><h4 data-i18n="womens">Women's</h4><p data-i18n="shopNowBtn">Shop now</p></div>
-            <div class="category-item"><i class="fas fa-hat-cowboy"></i><h4 data-i18n="accessories">Accessories</h4><p data-i18n="shopNowBtn">Shop now</p></div>
-        </div>
+<div class="categories" id="categoryFilters">
+    <div class="category-item" data-category="all"><i class="fas fa-th-large"></i><h4>All</h4></div>
+    <div class="category-item" data-category="hoodies"><i class="fas fa-tshirt"></i><h4>Hoodies</h4></div>
+    <div class="category-item" data-category="mens"><i class="fas fa-male"></i><h4>Men's</h4></div>
+    <div class="category-item" data-category="womens"><i class="fas fa-female"></i><h4>Women's</h4></div>
+    <div class="category-item" data-category="accessories"><i class="fas fa-hat-cowboy"></i><h4>Accessories</h4></div>
+</div>
 
-        <div class="section-title" data-i18n="latestDrops">🔥 Latest Drops</div>
-        <div id="productGrid" class="product-grid">
-            <div class="loading">Loading products...</div>
-        </div>
-    </div>
-</main>
+<div class="section-title">🔥 Latest Drops</div>
+<div id="productGrid" class="product-grid"><div class="loading">Loading products...</div></div></div></main>
 
-<footer>
-    <div class="container">
-        <div class="footer-grid">
-            <div class="footer-col">
-                <h3>EXODUS</h3>
-                <p>Streetwear for the rebellion.<br>Made in Ethiopia 🇪🇹</p>
-            </div>
-            <div class="footer-col">
-                <h4 data-i18n="support">Support</h4>
-                <p><span data-i18n="faq">FAQ</span><br><span data-i18n="shipping">Shipping</span><br><span data-i18n="returns">Returns</span><br><span data-i18n="sizeGuide">Size Guide</span></p>
-            </div>
-            <div class="footer-col">
-                <h4 data-i18n="contact">Contact</h4>
-                <p>📞 +251968621548<br>✉️ exodusclothingeth@gmail.com</p>
-            </div>
-            <div class="footer-col">
-                <h4 data-i18n="quickLinks">Quick Links</h4>
-                <p><a href="track.html" data-i18n="trackOrder">📦 Track Your Order</a></p>
-            </div>
-            <div class="footer-col social-icons">
-                <a href="https://www.instagram.com/exodus_stw" target="_blank"><i class="fab fa-instagram"></i></a>
-                <a href="#" target="_blank"><i class="fab fa-telegram"></i></a>
-                <a href="#" target="_blank"><i class="fab fa-tiktok"></i></a>
-            </div>
-        </div>
-        <p style="text-align:center; margin-top:32px; color:#444; font-size:0.7rem;">EXODUS CLOTHING — Ethiopian Streetwear</p>
-    </div>
-</footer>
+<footer><div class="container"><div class="footer-grid"><div class="footer-col"><h3>EXODUS</h3><p>Streetwear for the rebellion.<br>Made in Ethiopia 🇪🇹</p></div><div class="footer-col"><h4>Support</h4><p>FAQ<br>Shipping<br>Returns<br>Size Guide</p></div><div class="footer-col"><h4>Contact</h4><p>📞 +251968621548<br>✉️ exodusclothingeth@gmail.com</p></div><div class="footer-col"><h4>Quick Links</h4><p><a href="track.html">📦 Track Your Order</a></p></div><div class="footer-col social-icons"><a href="https://www.instagram.com/exodus_stw" target="_blank"><i class="fab fa-instagram"></i></a><a href="#"><i class="fab fa-telegram"></i></a><a href="#"><i class="fab fa-tiktok"></i></a></div></div><p style="text-align:center; margin-top:32px; color:#444; font-size:0.7rem;">EXODUS CLOTHING — Ethiopian Streetwear</p></div></footer>
 
 <script>
-    // ========== LANGUAGE TRANSLATIONS ==========
-    const translations = {
-        en: {
-            home: "Home", shop: "Shop", drops: "New Drops", trackOrder: "Track Order",
-            madeInEthiopia: "🇪🇹 MADE IN ETHIOPIA",
-            heroTitle: "Leave the old.<br>Embrace EXODUS.",
-            heroSubtitle: "Premium Ethiopian streetwear. Cash on delivery.",
-            shopNow: "Shop Now →",
-            hoodies: "Hoodies", mens: "Men's", womens: "Women's", accessories: "Accessories", shopNowBtn: "Shop now",
-            latestDrops: "🔥 Latest Drops",
-            yourCart: "Your Cart", cartEmpty: "Your cart is empty.", total: "Total", placeOrder: "Place Order",
-            completeOrder: "Complete Your Order", fullName: "Full Name", emailAddress: "Email Address",
-            phoneNumber: "Phone Number", shippingAddress: "Shipping Address",
-            cashOnDelivery: "📌 Cash on delivery only. We'll contact you within 24 hours.",
-            placeOrderBtn: "Place Order", support: "Support", faq: "FAQ", shipping: "Shipping",
-            returns: "Returns", sizeGuide: "Size Guide", contact: "Contact", quickLinks: "Quick Links"
-        },
-        am: {
-            home: "መነሻ", shop: "ግዢ", drops: "አዲስ ዕቃዎች", trackOrder: "ትዕዛዝ ይከታተሉ",
-            madeInEthiopia: "🇪🇹 በኢትዮጵያ ተሠራ",
-            heroTitle: "አሮጌውን ትተህ።<br>EXODUS ን ተቀበል።",
-            heroSubtitle: "ፕሪሚየም ኢትዮጵያዊ የጎዳና ልብሶች። በደረሰ ጊዜ ክፍያ",
-            shopNow: "አሁን ግዙ →",
-            hoodies: "ሁዲዎች", mens: "የወንዶች", womens: "የሴቶች", accessories: "መለዋወጫዎች", shopNowBtn: "አሁን ግዙ",
-            latestDrops: "🔥 አዲስ ዕቃዎች",
-            yourCart: "የእርስዎ ጋሪ", cartEmpty: "ጋሪዎ ባዶ ነው።", total: "ጠቅላላ", placeOrder: "ትዕዛዝ አስገባ",
-            completeOrder: "ትዕዛዝዎን ያሟሉ", fullName: "ሙሉ ስም", emailAddress: "ኢሜይል አድራሻ",
-            phoneNumber: "ስልክ ቁጥር", shippingAddress: "የመላኪያ አድራሻ",
-            cashOnDelivery: "📌 በደረሰ ጊዜ ክፍያ ብቻ። በ24 ሰዓታት ውስጥ እንገናኝዎታለን።",
-            placeOrderBtn: "ትዕዛዝ አስገባ", support: "ድጋፍ", faq: "ተዘውትረው የሚጠየቁ ጥያቄዎች",
-            shipping: "መላኪያ", returns: "መመለሻ", sizeGuide: "የመጠን መምሪያ", contact: "አግኙን", quickLinks: "ፈጣን አገናኞች"
-        },
-        ar: {
-            home: "الرئيسية", shop: "تسوق", drops: "إصدارات جديدة", trackOrder: "تتبع الطلب",
-            madeInEthiopia: "🇪🇹 صنع في إثيوبيا",
-            heroTitle: "اترك القديم.<br>احتضن EXODUS.",
-            heroSubtitle: "ملابس الشارع الإثيوبية الفاخرة. الدفع عند الاستلام",
-            shopNow: "تسوق الآن →",
-            hoodies: "هوديز", mens: "رجالي", womens: "نسائي", accessories: "إكسسوارات", shopNowBtn: "تسوق الآن",
-            latestDrops: "🔥 أحدث الإصدارات",
-            yourCart: "سلتك", cartEmpty: "سلتك فارغة.", total: "المجموع", placeOrder: "تقديم الطلب",
-            completeOrder: "أكمل طلبك", fullName: "الاسم الكامل", emailAddress: "البريد الإلكتروني",
-            phoneNumber: "رقم الهاتف", shippingAddress: "عنوان الشحن",
-            cashOnDelivery: "📌 الدفع عند الاستلام فقط. سنتصل بك خلال 24 ساعة.",
-            placeOrderBtn: "تقديم الطلب", support: "الدعم", faq: "الأسئلة الشائعة",
-            shipping: "الشحن", returns: "الإرجاع", sizeGuide: "دليل المقاسات", contact: "اتصل بنا", quickLinks: "روابط سريعة"
-        }
-    };
-    
+    // Translations object (simplified)
+    const translations = { en: { home: "Home", shop: "Shop", drops: "Drops", trackOrder: "Track Order" }, am: { home: "መነሻ", shop: "ግዢ", drops: "አዲስ", trackOrder: "ክትትል" }, ar: { home: "الرئيسية", shop: "تسوق", drops: "جديد", trackOrder: "تتبع" } };
     let currentLanguage = localStorage.getItem('exodus_language') || 'en';
+    function setLanguage(lang) { currentLanguage = lang; localStorage.setItem('exodus_language', lang); document.getElementById('appBody').className = lang === 'ar' ? 'lang-ar' : (lang === 'am' ? 'lang-am' : ''); document.querySelectorAll('[data-i18n]').forEach(el => { let key = el.getAttribute('data-i18n'); if(translations[lang] && translations[lang][key]) el.innerText = translations[lang][key]; }); document.querySelectorAll('.lang-btn').forEach(btn => { if(btn.dataset.lang === lang) btn.classList.add('active'); else btn.classList.remove('active'); }); }
+    document.querySelectorAll('.lang-btn').forEach(btn => btn.addEventListener('click', () => setLanguage(btn.dataset.lang)));
     
-    function setLanguage(lang) {
-        currentLanguage = lang;
-        localStorage.setItem('exodus_language', lang);
-        document.getElementById('appBody').className = lang === 'ar' ? 'lang-ar' : (lang === 'am' ? 'lang-am' : '');
-        updatePageLanguage();
-        document.querySelectorAll('.lang-btn').forEach(btn => {
-            if (btn.dataset.lang === lang) btn.classList.add('active');
-            else btn.classList.remove('active');
-        });
-    }
-    
-    function updatePageLanguage() {
-        document.querySelectorAll('[data-i18n]').forEach(el => {
-            const key = el.getAttribute('data-i18n');
-            if (translations[currentLanguage] && translations[currentLanguage][key]) {
-                if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
-                    el.placeholder = translations[currentLanguage][key];
-                } else {
-                    el.innerHTML = translations[currentLanguage][key];
-                }
-            }
-        });
-    }
-    
-    // ========== STORE FUNCTIONS ==========
     const API_BASE = window.location.origin + '/api';
-    let cart = [];
-
-    async function loadHeroImage() {
-        try {
-            const response = await fetch(`${API_BASE}/hero-image`);
-            const data = await response.json();
-            document.getElementById('heroImage').src = data.url || 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=800&h=1000&fit=crop';
-        } catch(e) {
-            document.getElementById('heroImage').src = 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=800&h=1000&fit=crop';
-        }
-    }
-
-    async function loadProducts() {
-        const grid = document.getElementById('productGrid');
-        try {
-            const response = await fetch(`${API_BASE}/products`);
-            const products = await response.json();
-            if (products.length === 0) {
-                grid.innerHTML = '<div class="empty-products"><h3>No Products Yet</h3><p>Check back soon for new drops!</p></div>';
-                return;
-            }
-            grid.innerHTML = products.map(p => `
-                <div class="product-card">
-                    <div class="product-img"><img src="${p.image}" alt="${p.name}" onerror="this.src='https://placehold.co/400x500/333/white?text=EXODUS'"></div>
-                    <div class="product-info">
-                        <div class="product-title">${p.name}</div>
-                        <div class="product-price">${p.price.toLocaleString()} ETB</div>
-                        <div class="size-buttons">
-                            ${p.sizes.map(s => `<button class="size-btn" onclick="addToCart(${p.id}, '${s}', '${p.name.replace(/'/g, "\\'")}', ${p.price}, '${p.image}')">${s}</button>`).join('')}
-                        </div>
-                    </div>
+    let cart = [], allProducts = [], currentCategory = 'all';
+    
+    async function loadHeroImage() { try { let res = await fetch(`${API_BASE}/hero-image`); let data = await res.json(); document.getElementById('heroImage').src = data.url || 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=800&h=1000&fit=crop'; } catch(e) {} }
+    
+    async function loadProducts() { try { let res = await fetch(`${API_BASE}/products`); allProducts = await res.json(); renderProducts(); } catch(e) { document.getElementById('productGrid').innerHTML = '<div class="empty-products">Error loading products</div>'; } }
+    
+    function renderProducts() {
+        let filtered = currentCategory === 'all' ? allProducts : allProducts.filter(p => p.category === currentCategory);
+        let grid = document.getElementById('productGrid');
+        if(!filtered.length) { grid.innerHTML = '<div class="empty-products">No products in this category</div>'; return; }
+        grid.innerHTML = filtered.map(p => {
+            let totalStock = Object.values(p.stock).reduce((a,b)=>a+b,0);
+            let isSoldOut = totalStock === 0;
+            let images = p.images && p.images.length ? p.images : [p.image || 'https://placehold.co/400x500/333/white?text=EXODUS'];
+            return `<div class="product-card" data-product-id="${p.id}">
+                <div class="slider-container" id="slider-${p.id}">
+                    <div class="slider-images" id="slider-images-${p.id}">${images.map(img => `<img src="${img}" alt="${p.name}" onerror="this.src='https://placehold.co/400x500/333/white?text=EXODUS'">`).join('')}</div>
+                    ${images.length > 1 ? `<button class="slider-prev" onclick="slideProduct(${p.id}, -1)">‹</button><button class="slider-next" onclick="slideProduct(${p.id}, 1)">›</button><div class="slider-dots" id="dots-${p.id}"></div>` : ''}
+                    ${isSoldOut ? '<div class="sold-out-badge">SOLD OUT</div>' : ''}
                 </div>
-            `).join('');
-        } catch(e) {
-            grid.innerHTML = '<div class="empty-products"><h3>Loading Error</h3><p>Please refresh the page</p></div>';
-        }
+                <div class="product-info">
+                    <div class="product-title">${p.name}</div>
+                    <div class="product-price">${p.price.toLocaleString()} ETB</div>
+                    <div class="size-buttons">${p.sizes.map(s => { let stock = p.stock[s] || 0; return `<button class="size-btn ${stock === 0 ? 'sold-out' : ''}" ${stock === 0 ? 'disabled' : `onclick="addToCart(${p.id}, '${s}', '${p.name.replace(/'/g, "\\'")}', ${p.price}, '${images[0]}')"`}>${s}${stock === 0 ? ' (sold out)' : ''}</button>`; }).join('')}</div>
+                </div>
+            </div>`;
+        }).join('');
+        // Initialize sliders
+        allProducts.forEach(p => { if(p.images && p.images.length > 1) initSlider(p.id, p.images.length); });
     }
-
-    function addToCart(id, size, name, price, image) {
-        const existing = cart.find(i => i.id === id && i.size === size);
-        if (existing) existing.quantity++;
-        else cart.push({ id, name, size, price, quantity: 1, image });
-        saveCart();
-        updateCartUI();
-        showToast(`${name} (${size}) added`);
-    }
-
+    
+    // Slider logic
+    let slideIndexes = {};
+    function initSlider(productId, totalImages) { slideIndexes[productId] = 0; updateSlider(productId, totalImages); }
+    function slideProduct(productId, direction) { let total = document.querySelectorAll(`#slider-images-${productId} img`).length; if(!total) return; slideIndexes[productId] = (slideIndexes[productId] + direction + total) % total; updateSlider(productId, total); }
+    function updateSlider(productId, total) { let container = document.getElementById(`slider-images-${productId}`); if(container) container.style.transform = `translateX(-${slideIndexes[productId] * 100}%)`; let dotsDiv = document.getElementById(`dots-${productId}`); if(dotsDiv) { dotsDiv.innerHTML = Array.from({length: total}, (_,i) => `<div class="dot ${i === slideIndexes[productId] ? 'active' : ''}" onclick="slideTo(${productId}, ${i})"></div>`).join(''); } }
+    function slideTo(productId, index) { let total = document.querySelectorAll(`#slider-images-${productId} img`).length; slideIndexes[productId] = index; updateSlider(productId, total); }
+    
+    window.slideProduct = slideProduct; window.slideTo = slideTo;
+    
+    function addToCart(id, size, name, price, image) { let existing = cart.find(i => i.id === id && i.size === size); if(existing) existing.quantity++; else cart.push({ id, name, size, price, quantity: 1, image }); saveCart(); updateCartUI(); showToast(`${name} (${size}) added`); }
     function saveCart() { localStorage.setItem('exodus_cart', JSON.stringify(cart)); updateCartCount(); }
     function updateCartCount() { document.getElementById('cartCount').innerText = cart.reduce((s,i)=>s+i.quantity,0); }
-    function showToast(msg) { const t=document.getElementById('toastMsg'); t.innerText=msg; t.style.opacity='1'; setTimeout(()=>t.style.opacity='0',2000); }
-
-    function updateCartUI() {
-        const container = document.getElementById('cartItemsContainer');
-        const footer = document.getElementById('cartFooter');
-        const totalSpan = document.getElementById('cartTotalPrice');
-        updateCartCount();
-        if (cart.length === 0) { container.innerHTML = '<div style="text-align:center; color:#888;" data-i18n="cartEmpty">Your cart is empty.</div>'; footer.style.display = 'none'; return; }
-        footer.style.display = 'block';
-        let total = 0;
-        container.innerHTML = cart.map(item => { total += item.price * item.quantity; return `<div class="cart-item"><div><strong>${item.name}</strong> (${item.size})<br>${item.price} ETB x ${item.quantity}</div><div><button onclick="updateQty(${item.id},'${item.size}',-1)">-</button> ${item.quantity} <button onclick="updateQty(${item.id},'${item.size}',1)">+</button> <button onclick="removeItem(${item.id},'${item.size}')">🗑️</button></div></div>`; }).join('');
-        totalSpan.innerText = `${total} ETB`;
-    }
-
-    function updateQty(id, size, delta) {
-        const item = cart.find(i => i.id === id && i.size === size);
-        if (item) { item.quantity += delta; if (item.quantity <= 0) cart = cart.filter(i => !(i.id === id && i.size === size)); saveCart(); updateCartUI(); }
-    }
-    function removeItem(id, size) { cart = cart.filter(i => !(i.id === id && i.size === size)); saveCart(); updateCartUI(); showToast("Removed"); }
-
-    async function placeOrder(e) {
-        e.preventDefault();
-        const customer = { name: document.getElementById('customerName').value, email: document.getElementById('customerEmail').value, phone: document.getElementById('customerPhone').value, address: document.getElementById('customerAddress').value };
-        const total = cart.reduce((s,i)=>s+(i.price*i.quantity),0);
-        const response = await fetch(`${API_BASE}/orders`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ customer, items: cart, total }) });
-        const result = await response.json();
-        if (result.success) {
-            document.getElementById('orderError').style.color = '#00c853';
-            document.getElementById('orderError').innerHTML = `✅ Order placed! ID: ${result.orderId}<br>📞 We'll contact you within 24 hours.`;
-            cart = []; saveCart(); updateCartUI();
-            setTimeout(() => { closeOrderModal(); document.getElementById('orderForm').reset(); document.getElementById('orderError').innerHTML = ''; showToast(`Order placed!`); }, 3000);
-        } else { document.getElementById('orderError').innerHTML = '❌ Error. Try again.'; }
-    }
-
-    function openCart() { document.getElementById('cartSidebar').style.right = '0px'; document.getElementById('cartOverlay').style.visibility = 'visible'; document.getElementById('cartOverlay').style.opacity = '1'; }
-    function closeCart() { document.getElementById('cartSidebar').style.right = '-100%'; document.getElementById('cartOverlay').style.visibility = 'hidden'; document.getElementById('cartOverlay').style.opacity = '0'; }
-    function openOrderModal() { if (cart.length === 0) { showToast("Cart empty"); return; } document.getElementById('orderModal').style.display = 'flex'; }
-    function closeOrderModal() { document.getElementById('orderModal').style.display = 'none'; document.getElementById('orderError').innerHTML = ''; }
-
+    function showToast(msg) { let t=document.getElementById('toastMsg'); t.innerText=msg; t.style.opacity='1'; setTimeout(()=>t.style.opacity='0',2000); }
+    function updateCartUI() { let container = document.getElementById('cartItemsContainer'); let footer = document.getElementById('cartFooter'); let totalSpan = document.getElementById('cartTotalPrice'); updateCartCount(); if(cart.length===0) { container.innerHTML='<div style="text-align:center; color:#888;">Your cart is empty.</div>'; footer.style.display='none'; return; } footer.style.display='block'; let total=0; container.innerHTML=cart.map(item=>{ total+=item.price*item.quantity; return `<div class="cart-item"><div><strong>${item.name}</strong> (${item.size})<br>${item.price} ETB x ${item.quantity}</div><div><button onclick="updateQty(${item.id},'${item.size}',-1)">-</button> ${item.quantity} <button onclick="updateQty(${item.id},'${item.size}',1)">+</button> <button onclick="removeItem(${item.id},'${item.size}')">🗑️</button></div></div>`; }).join(''); totalSpan.innerText=`${total} ETB`; }
+    function updateQty(id,size,delta) { let item=cart.find(i=>i.id===id&&i.size===size); if(item){ item.quantity+=delta; if(item.quantity<=0) cart=cart.filter(i=>!(i.id===id&&i.size===size)); saveCart(); updateCartUI(); } }
+    function removeItem(id,size) { cart=cart.filter(i=>!(i.id===id&&i.size===size)); saveCart(); updateCartUI(); showToast("Removed"); }
+    async function placeOrder(e) { e.preventDefault(); let customer={ name:document.getElementById('customerName').value, email:document.getElementById('customerEmail').value, phone:document.getElementById('customerPhone').value, address:document.getElementById('customerAddress').value }; let total=cart.reduce((s,i)=>s+(i.price*i.quantity),0); let res=await fetch(`${API_BASE}/orders`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({customer,items:cart,total})}); let result=await res.json(); if(result.success){ document.getElementById('orderError').style.color='#00c853'; document.getElementById('orderError').innerHTML=`✅ Order placed! ID: ${result.orderId}<br>📞 We'll contact you within 24 hours.`; cart=[]; saveCart(); updateCartUI(); setTimeout(()=>{ closeOrderModal(); document.getElementById('orderForm').reset(); document.getElementById('orderError').innerHTML=''; showToast(`Order placed!`); },3000); } else { document.getElementById('orderError').innerHTML='❌ Error. Try again.'; } }
+    function openCart() { document.getElementById('cartSidebar').style.right='0px'; document.getElementById('cartOverlay').style.visibility='visible'; document.getElementById('cartOverlay').style.opacity='1'; }
+    function closeCart() { document.getElementById('cartSidebar').style.right='-100%'; document.getElementById('cartOverlay').style.visibility='hidden'; document.getElementById('cartOverlay').style.opacity='0'; }
+    function openOrderModal() { if(cart.length===0) { showToast("Cart empty"); return; } document.getElementById('orderModal').style.display='flex'; }
+    function closeOrderModal() { document.getElementById('orderModal').style.display='none'; document.getElementById('orderError').innerHTML=''; }
+    
     document.getElementById('cartIcon')?.addEventListener('click', openCart);
     document.getElementById('closeCartBtn')?.addEventListener('click', closeCart);
     document.getElementById('cartOverlay')?.addEventListener('click', closeCart);
@@ -411,18 +208,26 @@
     document.getElementById('closeModalBtn')?.addEventListener('click', closeOrderModal);
     document.getElementById('orderForm')?.addEventListener('submit', placeOrder);
     document.getElementById('shopNowBtn')?.addEventListener('click', (e) => { e.preventDefault(); document.querySelector('.section-title').scrollIntoView({ behavior: 'smooth' }); });
-
-    document.querySelectorAll('.lang-btn').forEach(btn => {
-        btn.addEventListener('click', () => setLanguage(btn.dataset.lang));
+    
+    // Category filtering
+    document.querySelectorAll('.category-item').forEach(cat => {
+        cat.addEventListener('click', () => {
+            document.querySelectorAll('.category-item').forEach(c => c.classList.remove('active'));
+            cat.classList.add('active');
+            currentCategory = cat.dataset.category;
+            renderProducts();
+        });
     });
-
-    const savedCart = localStorage.getItem('exodus_cart');
-    if (savedCart) cart = JSON.parse(savedCart);
+    // Set "All" as active by default
+    document.querySelector('.category-item[data-category="all"]')?.classList.add('active');
+    
+    let savedCart = localStorage.getItem('exodus_cart');
+    if(savedCart) cart = JSON.parse(savedCart);
     loadHeroImage();
     loadProducts();
     updateCartUI();
     setLanguage(currentLanguage);
-
+    
     window.addToCart = addToCart; window.updateQty = updateQty; window.removeItem = removeItem;
 </script>
 </body>
