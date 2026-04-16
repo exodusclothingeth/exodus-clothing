@@ -60,6 +60,17 @@
             font-size: 0.85rem;
             display: none;
         }
+        .debug {
+            background: rgba(255,255,255,0.1);
+            color: #888;
+            padding: 12px;
+            border-radius: 12px;
+            text-align: center;
+            margin-top: 16px;
+            font-size: 0.7rem;
+            font-family: monospace;
+            display: none;
+        }
         .back-link { text-align: center; margin-top: 24px; }
         .back-link a { color: #888; text-decoration: none; }
     </style>
@@ -73,12 +84,13 @@
         <p class="subtitle">Enter your credentials</p>
         
         <form id="loginForm">
-            <input type="email" id="email" placeholder="Email" value="exodusclothingeth@gmail.com">
-            <input type="password" id="password" placeholder="Password">
+            <input type="text" id="email" placeholder="Email" value="exodusclothingeth@gmail.com">
+            <input type="password" id="password" placeholder="Password" value="ExodusAdmin2025">
             <button type="submit">Login →</button>
         </form>
         
         <div id="errorMsg" class="error"></div>
+        <div id="debugMsg" class="debug"></div>
         
         <div class="back-link">
             <a href="index.html">← Back to Store</a>
@@ -86,9 +98,13 @@
     </div>
 
     <script>
-        // SIMPLE HARDCODED LOGIN - WORKS IMMEDIATELY
+        // CORRECT CREDENTIALS - Copy exactly these values
         const VALID_EMAIL = 'exodusclothingeth@gmail.com';
         const VALID_PASSWORD = 'ExodusAdmin2025';
+        
+        // Pre-fill the form with the exact credentials for testing
+        document.getElementById('email').value = VALID_EMAIL;
+        document.getElementById('password').value = VALID_PASSWORD;
         
         document.getElementById('loginForm').addEventListener('submit', (e) => {
             e.preventDefault();
@@ -96,16 +112,29 @@
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
             const errorDiv = document.getElementById('errorMsg');
+            const debugDiv = document.getElementById('debugMsg');
+            
+            // Hide previous messages
+            errorDiv.style.display = 'none';
+            debugDiv.style.display = 'none';
+            
+            // Debug: Show what you entered vs what's expected
+            debugDiv.style.display = 'block';
+            debugDiv.innerHTML = `
+                <strong>Debug Info:</strong><br>
+                You entered: "${email}"<br>
+                Expected: "${VALID_EMAIL}"<br>
+                Email match: ${email === VALID_EMAIL ? '✅ YES' : '❌ NO'}<br>
+                Password match: ${password === VALID_PASSWORD ? '✅ YES' : '❌ NO'}
+            `;
             
             if (email === VALID_EMAIL && password === VALID_PASSWORD) {
-                // Store login in sessionStorage
                 sessionStorage.setItem('admin_logged_in', 'true');
                 sessionStorage.setItem('admin_login_time', Date.now());
-                // Redirect to admin page
                 window.location.href = 'admin.html';
             } else {
                 errorDiv.style.display = 'block';
-                errorDiv.textContent = '❌ Invalid email or password';
+                errorDiv.textContent = '❌ Invalid email or password - check debug info above';
             }
         });
     </script>
