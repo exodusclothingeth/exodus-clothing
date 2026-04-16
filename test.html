@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Product</title>
+</head>
+<body style="background:#000; color:#fff; padding:20px;">
+    <h1>Test Add Product</h1>
+    <input type="text" id="name" placeholder="Name" value="Test Hoodie"><br><br>
+    <input type="number" id="price" placeholder="Price" value="2499"><br><br>
+    <input type="text" id="image" placeholder="Image URL" value="https://placehold.co/400x500/333/white?text=EXODUS"><br><br>
+    <button onclick="addProduct()">Add Product</button>
+    <pre id="result" style="margin-top:20px;"></pre>
+
+    <script>
+        async function addProduct() {
+            const result = document.getElementById('result');
+            result.innerText = 'Sending...';
+            
+            const product = {
+                name: document.getElementById('name').value,
+                price: parseInt(document.getElementById('price').value),
+                image: document.getElementById('image').value,
+                images: [document.getElementById('image').value],
+                sizes: ['S','M','L','XL'],
+                stock: { S:5, M:3, L:2, XL:1 },
+                category: 'hoodies'
+            };
+            
+            try {
+                const res = await fetch('/api/products', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(product)
+                });
+                const data = await res.json();
+                result.innerText = JSON.stringify(data, null, 2);
+            } catch(err) {
+                result.innerText = 'Error: ' + err.message;
+            }
+        }
+    </script>
+</body>
+</html>
