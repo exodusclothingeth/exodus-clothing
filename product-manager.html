@@ -13,13 +13,12 @@
         h1 { margin-bottom: 8px; }
         .subtitle { color: #888; margin-bottom: 32px; }
         
-        .admin-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; flex-wrap: wrap; gap: 15px; border-bottom: 1px solid #222; padding-bottom: 20px; }
-        .logo h1 { font-size: 1.8rem; font-weight: 800; letter-spacing: 2px; }
-        .logo p { color: #888; font-size: 0.7rem; letter-spacing: 2px; }
-        .nav-tabs { display: flex; gap: 5px; background: #111; padding: 5px; border-radius: 50px; border: 1px solid #222; }
-        .nav-tab { padding: 10px 24px; border-radius: 40px; text-decoration: none; color: #aaa; font-weight: 500; }
-        .nav-tab.active { background: #fff; color: #000; }
-        .logout-btn { background: #1a1a1a; color: #fff; border: 1px solid #333; padding: 10px 20px; border-radius: 40px; cursor: pointer; }
+        /* Tabs */
+        .tabs { display: flex; gap: 8px; margin-bottom: 32px; border-bottom: 1px solid #222; padding-bottom: 16px; flex-wrap: wrap; }
+        .tab-btn { background: #111; border: 1px solid #333; padding: 12px 28px; border-radius: 40px; cursor: pointer; color: #aaa; transition: 0.2s; }
+        .tab-btn.active { background: white; color: black; border-color: white; }
+        .tab-pane { display: none; }
+        .tab-pane.active { display: block; }
         
         .two-columns { display: grid; grid-template-columns: 1fr 2fr; gap: 32px; }
         .form-card, .products-card, .hero-card { background: #111; border: 1px solid #222; border-radius: 24px; padding: 28px; }
@@ -44,10 +43,30 @@
         .image-preview { width: 60px; height: 60px; background: #1a1a1a; border-radius: 8px; overflow: hidden; }
         .image-preview img { width: 100%; height: 100%; object-fit: cover; }
         
+        /* Hero Images Manager */
+        .hero-images-list { margin: 20px 0; max-height: 300px; overflow-y: auto; }
+        .hero-image-item { display: flex; align-items: center; gap: 15px; padding: 12px; background: #1a1a1a; border-radius: 12px; margin-bottom: 10px; border: 1px solid #333; }
+        .hero-image-preview { width: 80px; height: 80px; border-radius: 8px; overflow: hidden; background: #000; }
+        .hero-image-preview img { width: 100%; height: 100%; object-fit: cover; }
+        .hero-image-url { flex: 1; font-size: 0.7rem; color: #888; word-break: break-all; }
+        .hero-image-actions { display: flex; gap: 8px; }
+        .hero-image-actions button { background: #333; color: white; border: none; padding: 6px 12px; border-radius: 8px; cursor: pointer; }
+        .hero-image-actions button:hover { background: #ff4444; }
+        .btn-add-hero { background: #fff; color: #000; margin-top: 15px; }
+        .slideshow-preview { margin-top: 20px; padding: 20px; background: #0a0a0a; border-radius: 16px; text-align: center; }
+        .slideshow-preview h4 { margin-bottom: 15px; color: #aaa; }
+        .slideshow-preview-container { position: relative; max-width: 300px; margin: 0 auto; border-radius: 12px; overflow: hidden; aspect-ratio: 4/5; }
+        .slideshow-preview-container img { width: 100%; height: 100%; object-fit: cover; }
+        .slideshow-preview-prev, .slideshow-preview-next { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(0,0,0,0.5); color: white; border: none; padding: 8px 12px; cursor: pointer; border-radius: 50%; }
+        .slideshow-preview-prev { left: 5px; }
+        .slideshow-preview-next { right: 5px; }
+        
         button { background: white; color: black; border: none; padding: 12px 24px; border-radius: 40px; font-weight: 600; cursor: pointer; transition: 0.2s; }
         button:hover { background: #ddd; }
         .btn-secondary { background: #222; color: white; }
         .btn-secondary:hover { background: #333; }
+        .btn-danger { background: #ff4444; color: white; }
+        .btn-danger:hover { background: #cc0000; }
         
         .products-table { overflow-x: auto; }
         table { width: 100%; border-collapse: collapse; }
@@ -62,12 +81,10 @@
         .alert-out { background: #ff444433; border-left: 4px solid #ff4444; padding: 12px; border-radius: 12px; margin-bottom: 8px; }
         .alert-low { background: #ffaa0044; border-left: 4px solid #ffaa00; padding: 12px; border-radius: 12px; margin-bottom: 8px; }
         
-        .hero-preview img { max-width: 100%; border-radius: 20px; max-height: 200px; object-fit: cover; }
-        .current-hero { background: #1a1a1a; padding: 16px; border-radius: 16px; margin-top: 16px; }
-        
         .toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: #00c853; padding: 12px 24px; border-radius: 40px; opacity: 0; transition: 0.2s; z-index: 1000; }
         .imgbb-guide { background: #1a1a1a; padding: 16px; border-radius: 16px; margin-top: 20px; }
         .imgbb-guide p { color: #aaa; font-size: 0.8rem; }
+        .back-link { display: inline-block; margin-top: 32px; color: #888; text-decoration: none; }
         .loading { text-align: center; padding: 40px; color: #888; }
         
         @media (max-width: 900px) { .two-columns { grid-template-columns: 1fr; } }
@@ -76,289 +93,334 @@
 <body>
 
 <script>
+    // LOGIN CHECK
     const isLoggedIn = sessionStorage.getItem('admin_logged_in');
-    if (!isLoggedIn) window.location.href = 'verify.html';
-    function logout() { sessionStorage.clear(); window.location.href = 'verify.html'; }
+    if (!isLoggedIn) {
+        window.location.href = 'verify.html';
+    }
 </script>
 
 <div class="container">
-    <div class="admin-header">
-        <div class="logo"><h1>EXODUS</h1><p>ADMIN PANEL</p></div>
-        <div class="nav-tabs">
-            <a href="admin.html" class="nav-tab">📦 Orders</a>
-            <a href="product-manager.html" class="nav-tab active">👕 Products</a>
-        </div>
-        <button class="logout-btn" onclick="logout()">Logout</button>
+    <h1>📦 EXODUS Admin Panel</h1>
+    <p class="subtitle">Manage your products, hero images, and store content</p>
+
+    <!-- Tabs -->
+    <div class="tabs">
+        <button class="tab-btn active" data-tab="products">👕 Products</button>
+        <button class="tab-btn" data-tab="hero">🖼️ Hero Images (Slideshow)</button>
     </div>
 
-    <div class="two-columns">
-        <!-- Add/Edit Product Form -->
-        <div class="form-card">
-            <h2 id="formTitle">➕ Add New Product</h2>
-            <form id="productForm">
-                <div class="form-group">
-                    <label>Product Name</label>
-                    <input type="text" id="productName" required>
-                </div>
-                <div class="form-group">
-                    <label>Price (ETB)</label>
-                    <input type="number" id="productPrice" required>
-                </div>
-                <div class="form-group">
-                    <label>Category</label>
-                    <select id="productCategory" required>
-                        <option value="">Select Category</option>
-                        <option value="shirts">shirts</option>
-                        <option value="mens">Men's</option>
-                        <option value="womens">Women's</option>
-                        <option value="accessories">Accessories</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>Product Images (up to 5)</label>
-                    <div class="image-inputs" id="imageInputs">
-                        <div class="image-row">
-                            <input type="url" class="img-url" placeholder="Main image URL (ImgBB)" id="img0">
-                            <div class="image-preview" id="preview0"></div>
+    <!-- Products Tab -->
+    <div id="productsTab" class="tab-pane active">
+        <div class="two-columns">
+            <!-- Add/Edit Product Form -->
+            <div class="form-card">
+                <h2 id="formTitle">➕ Add New Product</h2>
+                <form id="productForm">
+                    <div class="form-group">
+                        <label>Product Name</label>
+                        <input type="text" id="productName" required placeholder="e.g., EXODUS SKULL HOODIE">
+                    </div>
+                    <div class="form-group">
+                        <label>Price (ETB)</label>
+                        <input type="number" id="productPrice" required placeholder="e.g., 2799">
+                    </div>
+                    <div class="form-group">
+                        <label>Category</label>
+                        <select id="productCategory" required>
+                            <option value="">Select Category</option>
+                            <option value="mens">Men's</option>
+                            <option value="womens">Women's</option>
+                            <option value="accessories">Accessories</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Product Images (up to 5)</label>
+                        <div class="image-inputs" id="imageInputs">
+                            <div class="image-row">
+                                <input type="url" class="img-url" placeholder="Main image URL (ImgBB)" id="img0">
+                                <div class="image-preview" id="preview0"></div>
+                            </div>
+                            <div class="image-row">
+                                <input type="url" class="img-url" placeholder="Image 2 (optional)" id="img1">
+                                <div class="image-preview" id="preview1"></div>
+                            </div>
+                            <div class="image-row">
+                                <input type="url" class="img-url" placeholder="Image 3 (optional)" id="img2">
+                                <div class="image-preview" id="preview2"></div>
+                            </div>
+                            <div class="image-row">
+                                <input type="url" class="img-url" placeholder="Image 4 (optional)" id="img3">
+                                <div class="image-preview" id="preview3"></div>
+                            </div>
+                            <div class="image-row">
+                                <input type="url" class="img-url" placeholder="Image 5 (optional)" id="img4">
+                                <div class="image-preview" id="preview4"></div>
+                            </div>
                         </div>
-                        <div class="image-row">
-                            <input type="url" class="img-url" placeholder="Image 2 (optional)" id="img1">
-                            <div class="image-preview" id="preview1"></div>
-                        </div>
-                        <div class="image-row">
-                            <input type="url" class="img-url" placeholder="Image 3 (optional)" id="img2">
-                            <div class="image-preview" id="preview2"></div>
-                        </div>
-                        <div class="image-row">
-                            <input type="url" class="img-url" placeholder="Image 4 (optional)" id="img3">
-                            <div class="image-preview" id="preview3"></div>
-                        </div>
-                        <div class="image-row">
-                            <input type="url" class="img-url" placeholder="Image 5 (optional)" id="img4">
-                            <div class="image-preview" id="preview4"></div>
+                        <div class="imgbb-guide">
+                            <p>📸 Upload each photo to <a href="https://imgbb.com" target="_blank" style="color:#00c853;">imgbb.com</a> → Copy "Direct Link" → Paste above</p>
                         </div>
                     </div>
-                    <div class="imgbb-guide">
-                        <p>📸 Upload each photo to <a href="https://imgbb.com" target="_blank" style="color:#00c853;">imgbb.com</a> → Copy "Direct Link" → Paste above</p>
+                    <div class="form-group">
+                        <label>Sizes Available</label>
+                        <div class="sizes-container" id="sizesContainer">
+                            <div class="size-checkbox" data-size="S">S</div>
+                            <div class="size-checkbox" data-size="M">M</div>
+                            <div class="size-checkbox" data-size="L">L</div>
+                            <div class="size-checkbox" data-size="XL">XL</div>
+                            <div class="size-checkbox" data-size="XXL">XXL</div>
+                            <div class="size-checkbox" data-size="One Size">One Size</div>
+                        </div>
                     </div>
-                </div>
-                <div class="form-group">
-                    <label>Sizes Available</label>
-                    <div class="sizes-container" id="sizesContainer">
-                        <div class="size-checkbox" data-size="S">S</div>
-                        <div class="size-checkbox" data-size="M">M</div>
-                        <div class="size-checkbox" data-size="L">L</div>
-                        <div class="size-checkbox" data-size="XL">XL</div>
-                        <div class="size-checkbox" data-size="XXL">XXL</div>
-                        <div class="size-checkbox" data-size="One Size">One Size</div>
+                    <div class="form-group">
+                        <label>Stock per Size</label>
+                        <div id="stockInputs" class="stock-inputs"></div>
                     </div>
-                </div>
-                <div class="form-group">
-                    <label>Stock per Size</label>
-                    <div id="stockInputs" class="stock-inputs"></div>
-                </div>
-                <input type="hidden" id="editingId">
-                <button type="submit" id="submitBtn">➕ Add Product</button>
-                <button type="button" id="cancelEditBtn" class="btn-secondary" style="display:none;">Cancel Edit</button>
-            </form>
-        </div>
+                    <input type="hidden" id="editingId">
+                    <button type="submit" id="submitBtn">➕ Add Product</button>
+                    <button type="button" id="cancelEditBtn" class="btn-secondary" style="display:none;">Cancel Edit</button>
+                </form>
+            </div>
 
-        <!-- Products List -->
-        <div class="products-card">
-            <h2>📋 Your Products</h2>
-            <div id="stockAlert" class="alert-box"></div>
-            <div class="products-table">
-                <div id="productsLoading" class="loading">Loading products...</div>
-                <table id="productsTable" style="display:none;">
-                    <thead><tr><th>Image</th><th>Name</th><th>Category</th><th>Price</th><th>Sizes</th><th>Stock</th><th>Actions</th></tr></thead>
-                    <tbody id="productsTableBody"></tbody>
-                </table>
+            <!-- Products List -->
+            <div class="products-card">
+                <h2>📋 Your Products</h2>
+                <div id="stockAlert" class="alert-box"></div>
+                <div class="products-table">
+                    <div id="productsLoading" class="loading">Loading products...</div>
+                    <table id="productsTable" style="display:none;">
+                        <thead><tr><th>Image</th><th>Name</th><th>Category</th><th>Price</th><th>Sizes</th><th>Stock</th><th>Actions</th></tr></thead>
+                        <tbody id="productsTableBody"></tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- Hero Image Section -->
-    <div style="margin-top: 40px;">
+    <!-- Hero Images Tab (Slideshow Manager) -->
+    <div id="heroTab" class="tab-pane">
         <div class="hero-card">
-            <h2>🖼️ Hero Image (Store Banner)</h2>
-            <input type="url" id="heroImageUrl" placeholder="Hero image URL from ImgBB">
-            <button id="saveHeroBtn" style="margin-top:10px;">Save Hero Image</button>
-            <button id="resetHeroBtn" class="btn-secondary" style="margin-left:10px;">Reset to Default</button>
-            <div class="hero-preview"><div class="current-hero"><img id="heroPreview" src=""></div></div>
+            <h2>🖼️ Hero Images Slideshow</h2>
+            <p style="color: #888; margin-bottom: 24px;">Add multiple images to create an automatic slideshow on your store homepage. Images will rotate every 5 seconds.</p>
+            
+            <div class="imgbb-guide" style="margin-bottom: 20px;">
+                <p>📸 <strong>How to add hero images:</strong></p>
+                <p>1. Upload your image to <a href="https://imgbb.com" target="_blank" style="color:#00c853;">imgbb.com</a><br>
+                2. Copy the "Direct Link"<br>
+                3. Paste below and click "Add Hero Image"</p>
+            </div>
+            
+            <div class="form-group">
+                <label>New Hero Image URL</label>
+                <div style="display: flex; gap: 10px;">
+                    <input type="url" id="newHeroImageUrl" placeholder="https://i.ibb.co/xxxxx/image.jpg" style="flex: 1;">
+                    <button id="addHeroImageBtn" class="btn-add-hero" style="white-space: nowrap;">➕ Add Image</button>
+                </div>
+            </div>
+            
+            <h3 style="margin: 20px 0 10px;">Current Hero Images</h3>
+            <div id="heroImagesList" class="hero-images-list">
+                <div class="loading">Loading hero images...</div>
+            </div>
+            
+            <div class="slideshow-preview">
+                <h4>📺 Slideshow Preview</h4>
+                <div class="slideshow-preview-container" id="slideshowPreview">
+                    <img id="previewSlide" src="" alt="Preview">
+                    <button class="slideshow-preview-prev" id="previewPrevBtn">‹</button>
+                    <button class="slideshow-preview-next" id="previewNextBtn">›</button>
+                </div>
+                <p style="color: #888; font-size: 0.7rem; margin-top: 10px;">Preview of how your slideshow will look (auto-rotates every 5 seconds)</p>
+            </div>
+            
+            <button id="saveHeroImagesBtn" style="margin-top: 20px; background: #fff;">💾 Save All Hero Images</button>
+            <button id="resetHeroImagesBtn" class="btn-secondary" style="margin-left: 12px;">↺ Reset to Default</button>
         </div>
     </div>
+
+    <a href="index.html" class="back-link">← Back to Store</a> | 
+    <a href="admin.html" class="back-link">📦 Order Dashboard</a>
 </div>
+
 <div class="toast" id="toastMsg">Saved!</div>
 
 <script>
     const API_BASE = window.location.origin + '/api';
-    let selectedSizes = ['S','M','L','XL','XXL'];
+    let selectedSizes = ['S', 'M', 'L', 'XL', 'XXL'];
     let editingProductId = null;
+    let heroImagesArray = [];
+    let previewIndex = 0;
+    let previewInterval;
 
-    function showToast(msg) { let t=document.getElementById('toastMsg'); t.innerText=msg; t.style.opacity='1'; setTimeout(()=>t.style.opacity='0',2000); }
-    
-    // Preview images as you type URLs
-    function setupImagePreviews() {
-        for(let i=0; i<=4; i++) {
-            let input = document.getElementById(`img${i}`);
-            let previewDiv = document.getElementById(`preview${i}`);
-            if(input && previewDiv) {
-                input.addEventListener('input', () => {
-                    if(input.value) {
-                        previewDiv.innerHTML = `<img src="${input.value}" style="width:100%;height:100%;object-fit:cover;" onerror="this.parentElement.innerHTML=''">`;
-                    } else {
-                        previewDiv.innerHTML = '';
-                    }
-                });
-            }
-        }
+    function showToast(msg) {
+        const toast = document.getElementById('toastMsg');
+        toast.textContent = msg;
+        toast.style.opacity = '1';
+        setTimeout(() => toast.style.opacity = '0', 2000);
     }
-    
-    function getImagesArray() {
-        let images = [];
-        for(let i=0; i<=4; i++) {
-            let val = document.getElementById(`img${i}`).value.trim();
-            if(val) images.push(val);
-        }
-        return images;
-    }
-    
-    function setImagesArray(images) {
-        for(let i=0; i<=4; i++) {
-            let input = document.getElementById(`img${i}`);
-            if(input) {
-                input.value = images[i] || '';
-                let previewDiv = document.getElementById(`preview${i}`);
-                if(previewDiv && images[i]) {
-                    previewDiv.innerHTML = `<img src="${images[i]}" style="width:100%;height:100%;object-fit:cover;" onerror="this.parentElement.innerHTML=''">`;
-                } else if(previewDiv) {
-                    previewDiv.innerHTML = '';
-                }
-            }
-        }
-    }
-    
+
+    // ========== PRODUCT MANAGEMENT ==========
     function renderSizeCheckboxes() {
-        let div = document.getElementById('stockInputs');
-        div.innerHTML = '';
+        const stockDiv = document.getElementById('stockInputs');
+        stockDiv.innerHTML = '';
         selectedSizes.forEach(size => {
-            div.innerHTML += `<div class="stock-item"><label>${size}</label><input type="number" id="stock_${size}" value="0" min="0" class="stock-input"></div>`;
+            stockDiv.innerHTML += `
+                <div class="stock-item">
+                    <label>${size}</label>
+                    <input type="number" id="stock_${size}" value="0" min="0" class="stock-input">
+                </div>
+            `;
         });
     }
-    
-    document.querySelectorAll('.size-checkbox').forEach(cb => {
-        cb.onclick = () => {
-            let size = cb.dataset.size;
-            if(selectedSizes.includes(size)) {
+
+    document.querySelectorAll('.size-checkbox').forEach(checkbox => {
+        checkbox.addEventListener('click', () => {
+            const size = checkbox.dataset.size;
+            if (selectedSizes.includes(size)) {
                 selectedSizes = selectedSizes.filter(s => s !== size);
-                cb.classList.remove('selected');
+                checkbox.classList.remove('selected');
             } else {
                 selectedSizes.push(size);
-                cb.classList.add('selected');
+                checkbox.classList.add('selected');
             }
             renderSizeCheckboxes();
-        };
-        if(['S','M','L','XL','XXL'].includes(cb.dataset.size)) cb.classList.add('selected');
+        });
+        if (['S','M','L','XL','XXL'].includes(checkbox.dataset.size)) {
+            checkbox.classList.add('selected');
+        }
     });
-    
+
     function getStockObject() {
-        let stock = {};
+        const stock = {};
         selectedSizes.forEach(size => {
-            let inp = document.getElementById(`stock_${size}`);
-            stock[size] = inp ? parseInt(inp.value) || 0 : 0;
+            const input = document.getElementById(`stock_${size}`);
+            stock[size] = input ? parseInt(input.value) || 0 : 0;
         });
         return stock;
     }
-    
+
     function checkLowStock(products) {
-        let out = products.filter(p => Object.values(p.stock).every(q => q === 0));
-        let low = products.filter(p => Object.values(p.stock).some(q => q <= 3 && q > 0));
-        let div = document.getElementById('stockAlert');
-        if(out.length || low.length) {
-            div.style.display = 'block';
-            div.innerHTML = (out.length ? `<div class="alert-out"><strong>⚠️ OUT OF STOCK:</strong> ${out.map(p=>p.name).join(', ')}</div>` : '') +
-                           (low.length ? `<div class="alert-low"><strong>📦 LOW STOCK (≤3 left):</strong> ${low.map(p=>p.name).join(', ')}</div>` : '');
-        } else {
-            div.style.display = 'none';
+        const outOfStock = products.filter(p => Object.values(p.stock).every(qty => qty === 0));
+        const lowStock = products.filter(p => Object.values(p.stock).some(qty => qty <= 3 && qty > 0));
+        const alertDiv = document.getElementById('stockAlert');
+        if (alertDiv) {
+            if (outOfStock.length > 0 || lowStock.length > 0) {
+                alertDiv.style.display = 'block';
+                let html = '';
+                if (outOfStock.length > 0) {
+                    html += `<div class="alert-out"><strong>⚠️ OUT OF STOCK:</strong> ${outOfStock.map(p => p.name).join(', ')}</div>`;
+                }
+                if (lowStock.length > 0) {
+                    html += `<div class="alert-low"><strong>📦 LOW STOCK (≤3 left):</strong> ${lowStock.map(p => p.name).join(', ')}</div>`;
+                }
+                alertDiv.innerHTML = html;
+            } else {
+                alertDiv.style.display = 'none';
+            }
         }
     }
-    
+
     async function loadProducts() {
-        let loading = document.getElementById('productsLoading');
-        let table = document.getElementById('productsTable');
+        const loading = document.getElementById('productsLoading');
+        const table = document.getElementById('productsTable');
         try {
-            let res = await fetch(`${API_BASE}/products`);
-            let products = await res.json();
+            const response = await fetch(`${API_BASE}/products`);
+            const products = await response.json();
             loading.style.display = 'none';
             table.style.display = 'table';
             checkLowStock(products);
-            let tbody = document.getElementById('productsTableBody');
-            if(products.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;">No products yet</td></tr>';
+            const tbody = document.getElementById('productsTableBody');
+            if (products.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;">No products yet. Add your first product above!</td></tr>';
                 return;
             }
-            tbody.innerHTML = products.map(p => `
+            tbody.innerHTML = products.map(product => `
                 <tr>
-                    <td><img src="${p.images?.[0] || ''}" class="product-image" onerror="this.src='https://placehold.co/400x500/333/white?text=No+Image'"></td>
-                    <td><strong>${p.name}</strong></td>
-                    <td>${p.category || 'uncategorized'}</td>
-                    <td>${p.price} ETB</td>
-                    <td>${p.sizes.join(', ')}</td>
-                    <td>${Object.entries(p.stock).map(([s,q]) => `${s}:${q}`).join(', ')}</td>
-                    <td><button class="edit-btn" onclick="editProduct(${p.id})">Edit</button><button class="delete-btn" onclick="deleteProduct(${p.id})">Delete</button></td>
+                    <td><img src="${product.images?.[0] || ''}" class="product-image" onerror="this.src='https://placehold.co/400x500/333/white?text=No+Image'"></td>
+                    <td><strong>${product.name}</strong></td>
+                    <td>${product.category || 'uncategorized'}</td>
+                    <td>${product.price} ETB</td>
+                    <td>${product.sizes.join(', ')}</td>
+                    <td>${Object.entries(product.stock).map(([size, qty]) => `${size}:${qty}`).join(', ')}</td>
+                    <td><button class="edit-btn" onclick="editProduct(${product.id})">Edit</button><button class="delete-btn" onclick="deleteProduct(${product.id})">Delete</button></td>
                 </tr>
             `).join('');
-        } catch(e) {
+        } catch (error) {
             loading.innerHTML = 'Error loading products';
         }
     }
-    
+
     async function editProduct(id) {
-        let res = await fetch(`${API_BASE}/products`);
-        let products = await res.json();
-        let p = products.find(p => p.id === id);
-        if(!p) return;
+        const response = await fetch(`${API_BASE}/products`);
+        const products = await response.json();
+        const product = products.find(p => p.id === id);
+        if (!product) return;
         editingProductId = id;
         document.getElementById('formTitle').innerHTML = '✏️ Edit Product';
         document.getElementById('submitBtn').innerHTML = '💾 Save Changes';
         document.getElementById('cancelEditBtn').style.display = 'inline-block';
-        document.getElementById('productName').value = p.name;
-        document.getElementById('productPrice').value = p.price;
-        document.getElementById('productCategory').value = p.category || '';
-        setImagesArray(p.images || []);
+        document.getElementById('productName').value = product.name;
+        document.getElementById('productPrice').value = product.price;
+        document.getElementById('productCategory').value = product.category || '';
+        
+        // Set images
+        const images = product.images || (product.image ? [product.image] : []);
+        for (let i = 0; i <= 4; i++) {
+            const input = document.getElementById(`img${i}`);
+            const preview = document.getElementById(`preview${i}`);
+            if (input) {
+                input.value = images[i] || '';
+                if (preview && images[i]) {
+                    preview.innerHTML = `<img src="${images[i]}" style="width:100%;height:100%;object-fit:cover;">`;
+                } else if (preview) {
+                    preview.innerHTML = '';
+                }
+            }
+        }
+        
         document.querySelectorAll('.size-checkbox').forEach(cb => cb.classList.remove('selected'));
-        selectedSizes = [...p.sizes];
+        selectedSizes = [...product.sizes];
         document.querySelectorAll('.size-checkbox').forEach(cb => {
-            if(selectedSizes.includes(cb.dataset.size)) cb.classList.add('selected');
+            if (selectedSizes.includes(cb.dataset.size)) cb.classList.add('selected');
         });
         renderSizeCheckboxes();
         setTimeout(() => {
-            Object.entries(p.stock).forEach(([size, qty]) => {
-                let inp = document.getElementById(`stock_${size}`);
-                if(inp) inp.value = qty;
+            Object.entries(product.stock).forEach(([size, qty]) => {
+                const input = document.getElementById(`stock_${size}`);
+                if (input) input.value = qty;
             });
         }, 50);
     }
-    
+
     async function deleteProduct(id) {
-        if(confirm('Delete this product?')) {
+        if (confirm('Delete this product?')) {
             await fetch(`${API_BASE}/products/${id}`, { method: 'DELETE' });
             showToast('Product deleted');
             loadProducts();
         }
     }
-    
+
     document.getElementById('productForm').addEventListener('submit', async (e) => {
         e.preventDefault();
-        let product = {
+        
+        // Collect images
+        const images = [];
+        for (let i = 0; i <= 4; i++) {
+            const val = document.getElementById(`img${i}`).value.trim();
+            if (val) images.push(val);
+        }
+        
+        const product = {
             name: document.getElementById('productName').value,
             price: parseInt(document.getElementById('productPrice').value),
             category: document.getElementById('productCategory').value,
-            images: getImagesArray(),
+            images: images,
             sizes: selectedSizes,
             stock: getStockObject()
         };
-        if(editingProductId) {
+        
+        if (editingProductId) {
             await fetch(`${API_BASE}/products/${editingProductId}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
@@ -373,69 +435,227 @@
             });
             showToast('Product added!');
         }
+        
         document.getElementById('productForm').reset();
-        setImagesArray([]);
+        for (let i = 0; i <= 4; i++) {
+            const preview = document.getElementById(`preview${i}`);
+            if (preview) preview.innerHTML = '';
+        }
         editingProductId = null;
         document.getElementById('formTitle').innerHTML = '➕ Add New Product';
         document.getElementById('submitBtn').innerHTML = '➕ Add Product';
         document.getElementById('cancelEditBtn').style.display = 'none';
         selectedSizes = ['S','M','L','XL','XXL'];
         document.querySelectorAll('.size-checkbox').forEach(cb => {
-            if(['S','M','L','XL','XXL'].includes(cb.dataset.size)) cb.classList.add('selected');
+            if (['S','M','L','XL','XXL'].includes(cb.dataset.size)) cb.classList.add('selected');
             else cb.classList.remove('selected');
         });
         renderSizeCheckboxes();
         loadProducts();
     });
-    
+
     document.getElementById('cancelEditBtn').addEventListener('click', () => {
         editingProductId = null;
         document.getElementById('productForm').reset();
-        setImagesArray([]);
+        for (let i = 0; i <= 4; i++) {
+            const preview = document.getElementById(`preview${i}`);
+            if (preview) preview.innerHTML = '';
+        }
         document.getElementById('formTitle').innerHTML = '➕ Add New Product';
         document.getElementById('submitBtn').innerHTML = '➕ Add Product';
         document.getElementById('cancelEditBtn').style.display = 'none';
         selectedSizes = ['S','M','L','XL','XXL'];
         document.querySelectorAll('.size-checkbox').forEach(cb => {
-            if(['S','M','L','XL','XXL'].includes(cb.dataset.size)) cb.classList.add('selected');
+            if (['S','M','L','XL','XXL'].includes(cb.dataset.size)) cb.classList.add('selected');
             else cb.classList.remove('selected');
         });
         renderSizeCheckboxes();
     });
-    
-    // Hero image functions
-    async function loadHero() {
-        let res = await fetch(`${API_BASE}/hero-image`);
-        let data = await res.json();
-        let url = data.url || 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=800&h=1000&fit=crop';
-        document.getElementById('heroImageUrl').value = url;
-        document.getElementById('heroPreview').src = url;
+
+    // Setup image previews
+    for (let i = 0; i <= 4; i++) {
+        const input = document.getElementById(`img${i}`);
+        const preview = document.getElementById(`preview${i}`);
+        if (input && preview) {
+            input.addEventListener('input', () => {
+                if (input.value) {
+                    preview.innerHTML = `<img src="${input.value}" style="width:100%;height:100%;object-fit:cover;" onerror="this.parentElement.innerHTML=''">`;
+                } else {
+                    preview.innerHTML = '';
+                }
+            });
+        }
     }
-    async function saveHero() {
-        let url = document.getElementById('heroImageUrl').value;
-        if(!url) return;
-        await fetch(`${API_BASE}/hero-image`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ url }) });
-        showToast('Hero image saved');
-        document.getElementById('heroPreview').src = url;
+
+    // ========== HERO IMAGES MANAGEMENT ==========
+    async function loadHeroImages() {
+        try {
+            const response = await fetch(`${API_BASE}/hero-images`);
+            const data = await response.json();
+            heroImagesArray = data.images || [];
+            renderHeroImagesList();
+            startPreviewSlideshow();
+        } catch (error) {
+            console.log('Error loading hero images');
+            heroImagesArray = [];
+            renderHeroImagesList();
+        }
     }
-    async function resetHero() {
-        let def = 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=800&h=1000&fit=crop';
-        await fetch(`${API_BASE}/hero-image`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ url: def }) });
-        document.getElementById('heroImageUrl').value = def;
-        document.getElementById('heroPreview').src = def;
-        showToast('Reset to default');
+
+    function renderHeroImagesList() {
+        const container = document.getElementById('heroImagesList');
+        if (!container) return;
+        
+        if (heroImagesArray.length === 0) {
+            container.innerHTML = '<div style="text-align:center; padding:20px; color:#888;">No hero images added. Add your first image above.</div>';
+            return;
+        }
+        
+        container.innerHTML = heroImagesArray.map((url, index) => `
+            <div class="hero-image-item">
+                <div class="hero-image-preview">
+                    <img src="${url}" onerror="this.src='https://placehold.co/400x500/333/white?text=Error'">
+                </div>
+                <div class="hero-image-url">${url.substring(0, 50)}...</div>
+                <div class="hero-image-actions">
+                    <button onclick="moveHeroImageUp(${index})" ${index === 0 ? 'disabled' : ''}>↑</button>
+                    <button onclick="moveHeroImageDown(${index})" ${index === heroImagesArray.length - 1 ? 'disabled' : ''}>↓</button>
+                    <button onclick="removeHeroImage(${index})">🗑️</button>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    function moveHeroImageUp(index) {
+        if (index === 0) return;
+        [heroImagesArray[index - 1], heroImagesArray[index]] = [heroImagesArray[index], heroImagesArray[index - 1]];
+        renderHeroImagesList();
+        startPreviewSlideshow();
+    }
+
+    function moveHeroImageDown(index) {
+        if (index === heroImagesArray.length - 1) return;
+        [heroImagesArray[index + 1], heroImagesArray[index]] = [heroImagesArray[index], heroImagesArray[index + 1]];
+        renderHeroImagesList();
+        startPreviewSlideshow();
+    }
+
+    function removeHeroImage(index) {
+        heroImagesArray.splice(index, 1);
+        renderHeroImagesList();
+        startPreviewSlideshow();
+    }
+
+    function addHeroImage() {
+        const url = document.getElementById('newHeroImageUrl').value.trim();
+        if (!url) {
+            showToast('Please enter an image URL');
+            return;
+        }
+        heroImagesArray.push(url);
+        document.getElementById('newHeroImageUrl').value = '';
+        renderHeroImagesList();
+        startPreviewSlideshow();
+        showToast('Hero image added');
+    }
+
+    async function saveHeroImages() {
+        try {
+            await fetch(`${API_BASE}/hero-images`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ images: heroImagesArray })
+            });
+            showToast('Hero images saved! The slideshow will update on your store.');
+        } catch (error) {
+            showToast('Error saving hero images');
+        }
+    }
+
+    async function resetHeroImages() {
+        const defaultImages = ['https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=800&h=1000&fit=crop'];
+        heroImagesArray = [...defaultImages];
+        renderHeroImagesList();
+        await saveHeroImages();
+        startPreviewSlideshow();
+        showToast('Hero images reset to default');
+    }
+
+    function startPreviewSlideshow() {
+        if (previewInterval) clearInterval(previewInterval);
+        
+        if (heroImagesArray.length === 0) {
+            document.getElementById('previewSlide').src = 'https://placehold.co/800x1000/333/white?text=No+Images';
+            return;
+        }
+        
+        previewIndex = 0;
+        document.getElementById('previewSlide').src = heroImagesArray[0];
+        
+        if (heroImagesArray.length > 1) {
+            previewInterval = setInterval(() => {
+                previewIndex = (previewIndex + 1) % heroImagesArray.length;
+                document.getElementById('previewSlide').src = heroImagesArray[previewIndex];
+            }, 5000);
+        }
     }
     
-    document.getElementById('saveHeroBtn').onclick = saveHero;
-    document.getElementById('resetHeroBtn').onclick = resetHero;
+    function prevPreviewSlide() {
+        if (heroImagesArray.length === 0) return;
+        previewIndex = (previewIndex - 1 + heroImagesArray.length) % heroImagesArray.length;
+        document.getElementById('previewSlide').src = heroImagesArray[previewIndex];
+        if (previewInterval) {
+            clearInterval(previewInterval);
+            startPreviewSlideshow();
+        }
+    }
     
-    setupImagePreviews();
+    function nextPreviewSlide() {
+        if (heroImagesArray.length === 0) return;
+        previewIndex = (previewIndex + 1) % heroImagesArray.length;
+        document.getElementById('previewSlide').src = heroImagesArray[previewIndex];
+        if (previewInterval) {
+            clearInterval(previewInterval);
+            startPreviewSlideshow();
+        }
+    }
+
+    document.getElementById('addHeroImageBtn')?.addEventListener('click', addHeroImage);
+    document.getElementById('saveHeroImagesBtn')?.addEventListener('click', saveHeroImages);
+    document.getElementById('resetHeroImagesBtn')?.addEventListener('click', resetHeroImages);
+    document.getElementById('previewPrevBtn')?.addEventListener('click', prevPreviewSlide);
+    document.getElementById('previewNextBtn')?.addEventListener('click', nextPreviewSlide);
+
+    // ========== TAB SWITCHING ==========
+    function setupTabs() {
+        const tabs = document.querySelectorAll('.tab-btn');
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                const tabName = tab.dataset.tab;
+                tabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                document.querySelectorAll('.tab-pane').forEach(pane => pane.classList.remove('active'));
+                if (tabName === 'products') {
+                    document.getElementById('productsTab').classList.add('active');
+                    loadProducts();
+                } else if (tabName === 'hero') {
+                    document.getElementById('heroTab').classList.add('active');
+                    loadHeroImages();
+                }
+            });
+        });
+    }
+
     renderSizeCheckboxes();
     loadProducts();
-    loadHero();
+    setupTabs();
+    loadHeroImages();
     
     window.editProduct = editProduct;
     window.deleteProduct = deleteProduct;
+    window.moveHeroImageUp = moveHeroImageUp;
+    window.moveHeroImageDown = moveHeroImageDown;
+    window.removeHeroImage = removeHeroImage;
 </script>
 </body>
 </html>
