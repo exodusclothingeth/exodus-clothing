@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
-    <title>EXODUS CLOTHING | Black & White Cyberpunk</title>
+    <title>EXODUS CLOTHING | Luxury Ethiopian Streetwear</title>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Ethiopic:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -22,6 +22,7 @@
             --border-light: rgba(255, 255, 255, 0.08);
             --text-primary: #ffffff;
             --text-secondary: #aaaaaa;
+            --text-muted: #444444;
         }
         
         body {
@@ -29,7 +30,6 @@
             background: var(--bg-dark);
             color: var(--text-primary);
             overflow-x: hidden;
-            font-size: 16px;
         }
         
         body.lang-am { font-family: 'Noto Sans Ethiopic', 'Inter', sans-serif; }
@@ -95,7 +95,6 @@
             border-bottom: 1px solid var(--border-light);
         }
         
-        /* Logo - Responsive sizing */
         .logo img {
             height: auto;
             max-height: 80px;
@@ -174,15 +173,15 @@
             background: rgba(255,255,255,0.1);
         }
         
-        /* Hero Section */
+        /* Hero Section - Luxury */
         .hero {
             margin: 50px 0 60px;
         }
         
         .hero-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 50px;
+            grid-template-columns: 1fr 0.9fr;
+            gap: 60px;
             align-items: center;
         }
         
@@ -209,15 +208,59 @@
             line-height: 1.5;
         }
         
-.hero-image img {
-    width: 75%;
-    max-width: 400px;
-    border-radius: 20px;
-    height: auto;
-    display: block;
-    margin: 0 auto;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-}        
+        /* Hero Stats - Luxury Style */
+        .hero-stats {
+            display: flex;
+            gap: 32px;
+            margin: 32px 0 28px;
+            flex-wrap: wrap;
+        }
+        
+        .hero-stat {
+            text-align: left;
+        }
+        
+        .hero-stat .stat-number {
+            display: block;
+            font-size: 1.2rem;
+            font-weight: 700;
+            font-family: 'Space Mono', monospace;
+            letter-spacing: 1px;
+        }
+        
+        .hero-stat .stat-label {
+            display: block;
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            letter-spacing: 0.5px;
+        }
+        
+        .highlight {
+            background: linear-gradient(135deg, #fff 0%, #aaa 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .hero-image {
+            text-align: center;
+        }
+        
+        .hero-image img {
+            width: 75%;
+            max-width: 400px;
+            border-radius: 20px;
+            height: auto;
+            display: block;
+            margin: 0 auto;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            transition: transform 0.4s ease;
+        }
+        
+        .hero-image img:hover {
+            transform: scale(1.02);
+        }
+        
         /* Buttons */
         .btn-primary {
             background: white;
@@ -683,7 +726,7 @@
             font-size: 1.1rem;
         }
         
-        /* ========== RESPONSIVE BREAKPOINTS ========== */
+        /* Responsive */
         @media (max-width: 1024px) {
             .product-grid {
                 grid-template-columns: repeat(3, 1fr);
@@ -700,295 +743,190 @@
                 justify-content: center;
             }
             .hero-grid {
-                gap: 35px;
+                gap: 40px;
             }
         }
         
-@media (max-width: 768px) {
-    .container {
-        padding: 0 12px;
-    }
-    
-    .hero {
-        margin: 20px 0 30px;
-    }
-    
-    .hero-grid {
-        grid-template-columns: 1fr;
-        gap: 20px;
-        text-align: center;
-    }
-    
-    .hero-content h1 {
-        font-size: 1.5rem;
-    }
-    
-    .hero-content p {
-        font-size: 0.8rem;
-        margin-bottom: 20px;
-    }
-.hero-stats {
-    justify-content: center;
-    gap: 24px;
-}
-
-.hero-stat {
-    text-align: center;
-}
-
-.hero-image img {
-    width: 70%;
-    max-width: 280px;
-}
-
-.hero-content h1 {
-    font-size: 1.6rem;
-}
-
-.hero-stat .stat-number {
-    font-size: 1rem;
-}
-
-.hero-stat .stat-label {
-    font-size: 0.65rem;
-}
-    
-    /* FIX: Smaller hero image on mobile */
-.hero-image img {
-    width: 75%;
-    max-width: 400px;
-    border-radius: 20px;
-    height: auto;
-    display: block;
-    margin: 0 auto;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-    transition: transform 0.4s ease;
-}
-
-.hero-image img:hover {
-    transform: scale(1.02);
-}   
- /* Hero Stats - Luxury Style */
-.hero-stats {
-    display: flex;
-    gap: 32px;
-    margin: 32px 0 28px;
-    flex-wrap: wrap;
-}
-
-.hero-stat {
-    text-align: left;
-}
-
-.hero-stat .stat-number {
-    display: block;
-    font-size: 1.2rem;
-    font-weight: 700;
-    font-family: 'Space Mono', monospace;
-    letter-spacing: 1px;
-}
-
-.hero-stat .stat-label {
-    display: block;
-    font-size: 0.7rem;
-    color: var(--text-secondary);
-    letter-spacing: 0.5px;
-}
-
-.highlight {
-    background: linear-gradient(135deg, #fff 0%, #aaa 100%);
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-}
-    .hero-badge {
-        letter-spacing: 2px;
-        font-size: 0.65rem;
-    }
-    
-    .categories {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 10px;
-        margin: 25px 0;
-    }
-    
-    .category-item {
-        padding: 14px 8px;
-    }
-    
-    .category-item i {
-        font-size: 1.2rem;
-        margin-bottom: 6px;
-    }
-    
-    .category-item h4 {
-        font-size: 0.7rem;
-    }
-    
-    .product-grid {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 12px;
-    }
-    
-    .product-info {
-        padding: 10px;
-    }
-    
-    .product-title {
-        font-size: 0.7rem;
-    }
-    
-    .product-price {
-        font-size: 0.7rem;
-        margin-bottom: 6px;
-    }
-    
-    .size-buttons {
-        gap: 5px;
-    }
-    
-    .size-btn {
-        padding: 3px 7px;
-        font-size: 0.55rem;
-    }
-    
-    .section-title {
-        margin: 30px 0 16px;
-        font-size: 1.2rem;
-    }
-    
-    .section-title::after {
-        width: 35px;
-        bottom: -6px;
-    }
-    
-    .logo img {
-        max-height: 50px;
-    }
-    
-    .nav-links {
-        gap: 16px;
-    }
-    
-    .nav-links a {
-        font-size: 0.7rem;
-    }
-    
-    .btn-primary {
-        padding: 8px 20px;
-        font-size: 0.75rem;
-    }
-    
-    .language-switcher {
-        gap: 5px;
-    }
-    
-    .lang-btn {
-        padding: 4px 8px;
-        font-size: 0.6rem;
-    }
-    
-    .footer-grid {
-        flex-direction: column;
-        text-align: center;
-        gap: 20px;
-    }
-    
-    .footer-col h3, .footer-col h4 {
-        font-size: 0.85rem;
-        margin-bottom: 10px;
-    }
-    
-    .footer-col p {
-        font-size: 0.7rem;
-    }
-    
-    .social-icons {
-        justify-content: center;
-        gap: 15px;
-    }
-    
-    .cart-sidebar {
-        width: 85%;
-        right: -85%;
-    }
-    
-    .toast-notify {
-        white-space: normal;
-        text-align: center;
-        max-width: 85vw;
-        font-size: 0.7rem;
-        padding: 8px 16px;
-    }
-}
-
-@media (max-width: 480px) {
-    .logo img {
-        max-height: 42px;
-    }
-    
-    .hero-content h1 {
-        font-size: 1.3rem;
-    }
-    
-    .hero-content p {
-        font-size: 0.75rem;
-    }
-    
-    .hero-image img {
-        width: 90%;
-        max-width: 220px;
-    }
-    
-    .product-title {
-        font-size: 0.65rem;
-    }
-    
-    .size-btn {
-        padding: 2px 5px;
-        font-size: 0.5rem;
-    }
-    
-    .category-item {
-        padding: 10px 6px;
-    }
-    
-    .category-item i {
-        font-size: 1rem;
-    }
-    
-    .category-item h4 {
-        font-size: 0.65rem;
-    }
-    
-    .btn-primary {
-        padding: 7px 16px;
-        font-size: 0.7rem;
-    }
-}
-
-.loading {
-    text-align: center;
-    padding: 40px;
-    color: #888;
-    font-family: 'Space Mono', monospace;
-    font-size: 0.8rem;
-}
-
-@keyframes fadeInUp {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.hero-content, .hero-image {
-    animation: fadeInUp 0.6s ease;
-}    </style>
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 16px;
+            }
+            
+            .hero {
+                margin: 30px 0 40px;
+            }
+            
+            .hero-grid {
+                grid-template-columns: 1fr;
+                gap: 25px;
+                text-align: center;
+            }
+            
+            .hero-content h1 {
+                font-size: 1.6rem;
+            }
+            
+            .hero-badge {
+                letter-spacing: 2px;
+            }
+            
+            .hero-stats {
+                justify-content: center;
+                gap: 24px;
+            }
+            
+            .hero-stat {
+                text-align: center;
+            }
+            
+            .hero-stat .stat-number {
+                font-size: 1rem;
+            }
+            
+            .hero-stat .stat-label {
+                font-size: 0.65rem;
+            }
+            
+            .hero-image img {
+                width: 70%;
+                max-width: 280px;
+            }
+            
+            .categories {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 12px;
+                margin: 30px 0;
+            }
+            
+            .category-item {
+                padding: 18px 10px;
+            }
+            
+            .category-item i {
+                font-size: 1.3rem;
+            }
+            
+            .category-item h4 {
+                font-size: 0.75rem;
+            }
+            
+            .product-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 14px;
+            }
+            
+            .product-title {
+                font-size: 0.75rem;
+            }
+            
+            .product-price {
+                font-size: 0.7rem;
+            }
+            
+            .size-btn {
+                padding: 3px 7px;
+                font-size: 0.55rem;
+            }
+            
+            .section-title {
+                margin: 35px 0 20px;
+                font-size: 1.3rem;
+            }
+            
+            .section-title::after {
+                width: 40px;
+            }
+            
+            .logo img {
+                max-height: 60px;
+            }
+            
+            .nav-links a {
+                font-size: 0.75rem;
+            }
+            
+            .btn-primary {
+                padding: 10px 24px;
+                font-size: 0.8rem;
+            }
+            
+            .footer-grid {
+                flex-direction: column;
+                text-align: center;
+                gap: 25px;
+            }
+            
+            .social-icons {
+                justify-content: center;
+            }
+            
+            .cart-sidebar {
+                width: 85%;
+                right: -85%;
+            }
+            
+            .toast-notify {
+                white-space: normal;
+                text-align: center;
+                max-width: 85vw;
+                font-size: 0.7rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .logo img {
+                max-height: 50px;
+            }
+            
+            .hero-content h1 {
+                font-size: 1.3rem;
+            }
+            
+            .hero-content p {
+                font-size: 0.75rem;
+            }
+            
+            .hero-image img {
+                width: 85%;
+                max-width: 240px;
+            }
+            
+            .product-info {
+                padding: 10px;
+            }
+            
+            .product-title {
+                font-size: 0.7rem;
+            }
+            
+            .size-btn {
+                padding: 2px 6px;
+                font-size: 0.5rem;
+            }
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 50px;
+            color: #888;
+            font-family: 'Space Mono', monospace;
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .hero-content, .hero-image {
+            animation: fadeInUp 0.6s ease;
+        }
+    </style>
 </head>
 <body id="appBody">
 
@@ -1074,41 +1012,43 @@
 
 <main>
     <div class="container">
-<div class="hero">
-    <div class="hero-grid">
-        <div class="hero-content">
-            <div class="hero-badge" id="heroBadge">EST. 2024 • ADDIS ABABA</div>
-            <h1 id="heroTitle">Keeping Tradition<br>in a <span class="highlight">Modern World</span></h1>
-            <p id="heroSubtitle">Where Ethiopian heritage meets contemporary streetwear. Each piece tells a story of rebellion, culture, and the future.</p>
-            <div class="hero-stats">
-                <div class="hero-stat">
-                    <span class="stat-number">100%</span>
-                    <span class="stat-label">Ethiopian Made</span>
+        <!-- Luxury Hero Section -->
+        <div class="hero">
+            <div class="hero-grid">
+                <div class="hero-content">
+                    <div class="hero-badge" id="heroBadge">EST. 2024 • ADDIS ABABA</div>
+                    <h1 id="heroTitle">Keeping Tradition<br>in a <span class="highlight">Modern World</span></h1>
+                    <p id="heroSubtitle">Where Ethiopian heritage meets contemporary streetwear. Each piece tells a story of rebellion, culture, and the future.</p>
+                    <div class="hero-stats">
+                        <div class="hero-stat">
+                            <span class="stat-number">100%</span>
+                            <span class="stat-label">Ethiopian Made</span>
+                        </div>
+                        <div class="hero-stat">
+                            <span class="stat-number">24h</span>
+                            <span class="stat-label">Delivery</span>
+                        </div>
+                        <div class="hero-stat">
+                            <span class="stat-number">COD</span>
+                            <span class="stat-label">Cash on Delivery</span>
+                        </div>
+                    </div>
+                    <a href="#" class="btn-primary" id="shopNowBtn">DISCOVER COLLECTION →</a>
                 </div>
-                <div class="hero-stat">
-                    <span class="stat-number">24h</span>
-                    <span class="stat-label">Delivery</span>
-                </div>
-                <div class="hero-stat">
-                    <span class="stat-number">COD</span>
-                    <span class="stat-label">Cash on Delivery</span>
+                <div class="hero-image">
+                    <img id="heroImage" src="" alt="EXODUS">
                 </div>
             </div>
-            <a href="#" class="btn-primary" id="shopNowBtn">DISCOVER COLLECTION →</a>
         </div>
-        <div class="hero-image">
-            <img id="heroImage" src="" alt="EXODUS">
-        </div>
-    </div>
-</div>
+
         <div class="categories" id="categoryFilters">
             <div class="category-item" data-category="all">
                 <i class="fas fa-th-large"></i>
                 <h4 id="catAll">ALL</h4>
             </div>
-            <div class="category-item" data-category="shirt">
+            <div class="category-item" data-category="shirts">
                 <i class="fas fa-tshirt"></i>
-                <h4 id="catHoodies">SHIRTS</h4>
+                <h4 id="catShirts">SHIRTS</h4>
             </div>
             <div class="category-item" data-category="mens">
                 <i class="fas fa-male"></i>
@@ -1130,6 +1070,7 @@
         </div>
     </div>
 </main>
+
 <footer>
     <div class="container">
         <div class="footer-grid">
@@ -1161,16 +1102,17 @@
         <p style="text-align:center; margin-top:40px; color:#444; font-size:0.7rem;">EXODUS CLOTHING — ETHIOPIAN STREETWEAR</p>
     </div>
 </footer>
+
 <script>
     // ========== COMPLETE LANGUAGE TRANSLATIONS ==========
     const translations = {
         en: {
             home: "HOME", shop: "SHOP", drops: "DROPS", trackOrder: "TRACK",
-            madeInEthiopia: "MADE IN ETHIOPIA",
-            heroTitle: "Leave the old.<br>Embrace EXODUS.",
-            heroSubtitle: "Premium Ethiopian streetwear. Cash on delivery. Limited drops.",
-            shopNow: "SHOP NOW →",
-            catAll: "ALL", catHoodies: "SHIRTS", catMens: "MEN'S", catWomens: "WOMEN'S", catAccessories: "ACCESSORIES",
+            madeInEthiopia: "EST. 2024 • ADDIS ABABA",
+            heroTitle: "Keeping Tradition<br>in a Modern World",
+            heroSubtitle: "Where Ethiopian heritage meets contemporary streetwear. Each piece tells a story of rebellion, culture, and the future.",
+            shopNow: "DISCOVER COLLECTION →",
+            catAll: "ALL", catShirts: "SHIRTS", catMens: "MEN'S", catWomens: "WOMEN'S", catAccessories: "ACCESSORIES",
             latestDrops: "LATEST DROPS",
             yourCart: "YOUR CART", cartEmpty: "Your cart is empty.", total: "TOTAL", placeOrder: "PLACE ORDER",
             completeOrder: "COMPLETE ORDER", fullName: "Full Name", email: "Email", phone: "Phone",
@@ -1180,11 +1122,11 @@
         },
         am: {
             home: "መነሻ", shop: "ግዢ", drops: "አዲስ", trackOrder: "ክትትል",
-            madeInEthiopia: "በኢትዮጵያ ተሠራ",
-            heroTitle: "አሮጌውን ትተህ።<br>EXODUS ን ተቀበል።",
-            heroSubtitle: "ፕሪሚየም ኢትዮጵያዊ የጎዳና ልብሶች። በደረሰ ጊዜ ክፍያ",
-            shopNow: "አሁን ግዙ →",
-            catAll: "ሁሉም", catHoodies: "ሁዲዎች", catMens: "የወንዶች", catWomens: "የሴቶች", catAccessories: "መለዋወጫዎች",
+            madeInEthiopia: "እ.ኤ.አ. 2024 • አዲስ አበባ",
+            heroTitle: "ባህሉን ጠብቀህ<br>በዘመናዊው ዓለም",
+            heroSubtitle: "የኢትዮጵያ ቅርስ ከዘመናዊ የጎዳና ልብሶች ጋር",
+            shopNow: "ስብስቡን ያግኙ →",
+            catAll: "ሁሉም", catShirts: "ሸሚዝ", catMens: "የወንዶች", catWomens: "የሴቶች", catAccessories: "መለዋወጫዎች",
             latestDrops: "አዲስ ዕቃዎች",
             yourCart: "የእርስዎ ጋሪ", cartEmpty: "ጋሪዎ ባዶ ነው።", total: "ጠቅላላ", placeOrder: "ትዕዛዝ አስገባ",
             completeOrder: "ትዕዛዝዎን ያሟሉ", fullName: "ሙሉ ስም", email: "ኢሜይል", phone: "ስልክ ቁጥር",
@@ -1194,11 +1136,11 @@
         },
         ar: {
             home: "الرئيسية", shop: "تسوق", drops: "إصدارات", trackOrder: "تتبع",
-            madeInEthiopia: "صنع في إثيوبيا",
-            heroTitle: "اترك القديم.<br>احتضن EXODUS.",
-            heroSubtitle: "ملابس الشارع الإثيوبية الفاخرة. الدفع عند الاستلام",
-            shopNow: "تسوق الآن →",
-            catAll: "الكل", catHoodies: "هوديز", catMens: "رجالي", catWomens: "نسائي", catAccessories: "إكسسوارات",
+            madeInEthiopia: "تأسس 2024 • أديس أبابا",
+            heroTitle: "الحفاظ على التقاليد<br>في عالم حديث",
+            heroSubtitle: "حيث تلتقي التراث الإثيوبي مع ملابس الشارع المعاصرة",
+            shopNow: "اكتشف المجموعة →",
+            catAll: "الكل", catShirts: "قمصان", catMens: "رجالي", catWomens: "نسائي", catAccessories: "إكسسوارات",
             latestDrops: "أحدث الإصدارات",
             yourCart: "سلتك", cartEmpty: "سلتك فارغة.", total: "المجموع", placeOrder: "تقديم الطلب",
             completeOrder: "أكمل طلبك", fullName: "الاسم الكامل", email: "البريد الإلكتروني", phone: "رقم الهاتف",
@@ -1231,7 +1173,7 @@
         document.getElementById('heroSubtitle') && (document.getElementById('heroSubtitle').innerText = t.heroSubtitle);
         document.getElementById('shopNowBtn') && (document.getElementById('shopNowBtn').innerHTML = t.shopNow);
         document.getElementById('catAll') && (document.getElementById('catAll').innerText = t.catAll);
-        document.getElementById('catHoodies') && (document.getElementById('catHoodies').innerText = t.catHoodies);
+        document.getElementById('catShirts') && (document.getElementById('catShirts').innerText = t.catShirts);
         document.getElementById('catMens') && (document.getElementById('catMens').innerText = t.catMens);
         document.getElementById('catWomens') && (document.getElementById('catWomens').innerText = t.catWomens);
         document.getElementById('catAccessories') && (document.getElementById('catAccessories').innerText = t.catAccessories);
