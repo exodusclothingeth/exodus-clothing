@@ -190,7 +190,7 @@
             background: rgba(255,255,255,0.1);
         }
         
-        /* Hero Section with Slideshow */
+        /* Hero Section */
         .hero {
             margin: 50px 0 60px;
         }
@@ -200,6 +200,19 @@
             grid-template-columns: 1fr 0.9fr;
             gap: 60px;
             align-items: center;
+        }
+        
+        /* Hero Logo - 6x bigger than before */
+        .hero-logo {
+            text-align: left;
+            margin-bottom: 30px;
+        }
+        
+        .hero-logo img {
+            height: 180px;
+            width: auto;
+            max-width: 100%;
+            object-fit: contain;
         }
         
         .hero-badge {
@@ -369,7 +382,7 @@
             box-shadow: 0 5px 20px rgba(255,255,255,0.15);
         }
         
-        /* Categories - SHIRTS removed */
+        /* Categories */
         .categories {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
@@ -849,6 +862,14 @@
                 text-align: center;
             }
             
+            .hero-logo {
+                text-align: center;
+            }
+            
+            .hero-logo img {
+                height: 120px;
+            }
+            
             .hero-content h1 {
                 font-size: 1.6rem;
             }
@@ -964,6 +985,10 @@
         @media (max-width: 480px) {
             .logo img {
                 max-height: 50px;
+            }
+            
+            .hero-logo img {
+                height: 90px;
             }
             
             .hero-content h1 {
@@ -1098,10 +1123,14 @@
 
 <main>
     <div class="container">
-        <!-- Hero Section with Slideshow -->
+        <!-- Hero Section with Logo above text -->
         <div class="hero">
             <div class="hero-grid">
                 <div class="hero-content">
+                    <!-- EXODUS Logo - 6x bigger, placed above EST.2024 -->
+                    <div class="hero-logo">
+                        <img src="images/exodus-logo.png" alt="EXODUS">
+                    </div>
                     <div class="hero-badge" id="heroBadge">EST. 2024 • ADDIS ABABA</div>
                     <h1 id="heroTitle">Keeping Tradition<br>in a <span class="highlight">Modern World</span></h1>
                     <p id="heroSubtitle">Where Ethiopian heritage meets contemporary streetwear. Each piece tells a story of rebellion, culture, and the future.</p>
@@ -1132,7 +1161,7 @@
             </div>
         </div>
 
-        <!-- Categories - SHIRTS removed -->
+        <!-- Categories -->
         <div class="categories" id="categoryFilters">
             <div class="category-item" data-category="all">
                 <i class="fas fa-th-large"></i>
@@ -1306,13 +1335,11 @@
     
     async function loadHeroImages() {
         try {
-            // First, try to get hero images from settings
             const response = await fetch(`${API_BASE}/hero-images`);
             const data = await response.json();
             if (data.images && data.images.length > 0) {
                 heroImages = data.images;
             } else {
-                // Fallback to single image
                 const heroRes = await fetch(`${API_BASE}/hero-image`);
                 const heroData = await heroRes.json();
                 if (heroData.url) {
@@ -1335,25 +1362,21 @@
         
         if (!container || heroImages.length === 0) return;
         
-        // Clear container
         container.innerHTML = '';
         dotsContainer.innerHTML = '';
         
-        // Add slides
         heroImages.forEach((imgUrl, index) => {
             const slide = document.createElement('div');
             slide.className = 'hero-slide' + (index === 0 ? ' active' : '');
             slide.innerHTML = `<img src="${imgUrl}" alt="EXODUS Hero ${index + 1}">`;
             container.appendChild(slide);
             
-            // Add dot
             const dot = document.createElement('div');
             dot.className = 'hero-dot' + (index === 0 ? ' active' : '');
             dot.onclick = () => goToHeroSlide(index);
             dotsContainer.appendChild(dot);
         });
         
-        // Start autoplay
         startHeroAutoplay();
     }
     
@@ -1381,7 +1404,6 @@
     function goToHeroSlide(index) {
         currentHeroIndex = index;
         updateHeroSlide();
-        // Reset autoplay timer
         startHeroAutoplay();
     }
     
