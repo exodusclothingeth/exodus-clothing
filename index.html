@@ -22,7 +22,6 @@
             --border-light: rgba(255, 255, 255, 0.08);
             --text-primary: #ffffff;
             --text-secondary: #aaaaaa;
-            --text-muted: #444444;
         }
         
         body {
@@ -129,6 +128,24 @@
             align-items: center;
         }
         
+        /* Logo next to cart button */
+        .cart-with-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .cart-logo-icon {
+            height: 30px;
+            width: auto;
+            opacity: 0.8;
+            transition: opacity 0.3s;
+        }
+        
+        .cart-logo-icon:hover {
+            opacity: 1;
+        }
+        
         .cart-icon-wrapper {
             position: relative;
             cursor: pointer;
@@ -173,7 +190,7 @@
             background: rgba(255,255,255,0.1);
         }
         
-        /* Hero Section - Luxury */
+        /* Hero Section with Slideshow */
         .hero {
             margin: 50px 0 60px;
         }
@@ -208,7 +225,7 @@
             line-height: 1.5;
         }
         
-        /* Hero Stats - Luxury Style */
+        /* Hero Stats */
         .hero-stats {
             display: flex;
             gap: 32px;
@@ -242,23 +259,93 @@
             color: transparent;
         }
         
-        .hero-image {
-            text-align: center;
-        }
-        
-        .hero-image img {
-            width: 75%;
-            max-width: 400px;
+        /* Hero Slideshow */
+        .hero-slideshow {
+            position: relative;
+            width: 100%;
             border-radius: 20px;
-            height: auto;
-            display: block;
-            margin: 0 auto;
+            overflow: hidden;
             box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-            transition: transform 0.4s ease;
         }
         
-        .hero-image img:hover {
-            transform: scale(1.02);
+        .hero-slideshow-container {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 4/5;
+        }
+        
+        .hero-slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            transition: opacity 0.8s ease-in-out;
+            object-fit: cover;
+        }
+        
+        .hero-slide.active {
+            opacity: 1;
+        }
+        
+        .hero-slide img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .hero-slideshow-dots {
+            position: absolute;
+            bottom: 15px;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            z-index: 10;
+        }
+        
+        .hero-dot {
+            width: 8px;
+            height: 8px;
+            background: rgba(255,255,255,0.5);
+            border-radius: 50%;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        
+        .hero-dot.active {
+            background: white;
+            width: 20px;
+            border-radius: 10px;
+        }
+        
+        .hero-slideshow-prev, .hero-slideshow-next {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(0,0,0,0.5);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            cursor: pointer;
+            font-size: 18px;
+            border-radius: 50%;
+            z-index: 10;
+            transition: 0.3s;
+        }
+        
+        .hero-slideshow-prev:hover, .hero-slideshow-next:hover {
+            background: rgba(0,0,0,0.8);
+        }
+        
+        .hero-slideshow-prev {
+            left: 10px;
+        }
+        
+        .hero-slideshow-next {
+            right: 10px;
         }
         
         /* Buttons */
@@ -282,7 +369,7 @@
             box-shadow: 0 5px 20px rgba(255,255,255,0.15);
         }
         
-        /* Categories */
+        /* Categories - SHIRTS removed */
         .categories {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
@@ -787,9 +874,10 @@
                 font-size: 0.65rem;
             }
             
-            .hero-image img {
-                width: 70%;
+            .hero-slideshow-container {
+                aspect-ratio: 3/4;
                 max-width: 280px;
+                margin: 0 auto;
             }
             
             .categories {
@@ -886,11 +974,6 @@
                 font-size: 0.75rem;
             }
             
-            .hero-image img {
-                width: 85%;
-                max-width: 240px;
-            }
-            
             .product-info {
                 padding: 10px;
             }
@@ -923,7 +1006,7 @@
             }
         }
         
-        .hero-content, .hero-image {
+        .hero-content {
             animation: fadeInUp 0.6s ease;
         }
     </style>
@@ -1001,9 +1084,12 @@
                     <button class="lang-btn" data-lang="am">አማ</button>
                     <button class="lang-btn" data-lang="ar">عربي</button>
                 </div>
-                <div class="cart-icon-wrapper" id="cartIcon">
-                    <i class="fas fa-shopping-bag"></i>
-                    <span class="cart-count" id="cartCount">0</span>
+                <div class="cart-with-logo">
+                    <img src="images/exodus-logo.png" alt="EXODUS" class="cart-logo-icon">
+                    <div class="cart-icon-wrapper" id="cartIcon">
+                        <i class="fas fa-shopping-bag"></i>
+                        <span class="cart-count" id="cartCount">0</span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -1012,7 +1098,7 @@
 
 <main>
     <div class="container">
-        <!-- Luxury Hero Section -->
+        <!-- Hero Section with Slideshow -->
         <div class="hero">
             <div class="hero-grid">
                 <div class="hero-content">
@@ -1035,20 +1121,22 @@
                     </div>
                     <a href="#" class="btn-primary" id="shopNowBtn">DISCOVER COLLECTION →</a>
                 </div>
-                <div class="hero-image">
-                    <img id="heroImage" src="" alt="EXODUS">
+                <div class="hero-slideshow" id="heroSlideshow">
+                    <div class="hero-slideshow-container" id="heroSlideshowContainer">
+                        <!-- Slides will be added dynamically -->
+                    </div>
+                    <button class="hero-slideshow-prev" id="heroPrevBtn">‹</button>
+                    <button class="hero-slideshow-next" id="heroNextBtn">›</button>
+                    <div class="hero-slideshow-dots" id="heroDots"></div>
                 </div>
             </div>
         </div>
 
+        <!-- Categories - SHIRTS removed -->
         <div class="categories" id="categoryFilters">
             <div class="category-item" data-category="all">
                 <i class="fas fa-th-large"></i>
                 <h4 id="catAll">ALL</h4>
-            </div>
-            <div class="category-item" data-category="shirts">
-                <i class="fas fa-tshirt"></i>
-                <h4 id="catShirts">SHIRTS</h4>
             </div>
             <div class="category-item" data-category="mens">
                 <i class="fas fa-male"></i>
@@ -1112,7 +1200,7 @@
             heroTitle: "Keeping Tradition<br>in a Modern World",
             heroSubtitle: "Where Ethiopian heritage meets contemporary streetwear. Each piece tells a story of rebellion, culture, and the future.",
             shopNow: "DISCOVER COLLECTION →",
-            catAll: "ALL", catShirts: "SHIRTS", catMens: "MEN'S", catWomens: "WOMEN'S", catAccessories: "ACCESSORIES",
+            catAll: "ALL", catMens: "MEN'S", catWomens: "WOMEN'S", catAccessories: "ACCESSORIES",
             latestDrops: "LATEST DROPS",
             yourCart: "YOUR CART", cartEmpty: "Your cart is empty.", total: "TOTAL", placeOrder: "PLACE ORDER",
             completeOrder: "COMPLETE ORDER", fullName: "Full Name", email: "Email", phone: "Phone",
@@ -1126,7 +1214,7 @@
             heroTitle: "ባህሉን ጠብቀህ<br>በዘመናዊው ዓለም",
             heroSubtitle: "የኢትዮጵያ ቅርስ ከዘመናዊ የጎዳና ልብሶች ጋር",
             shopNow: "ስብስቡን ያግኙ →",
-            catAll: "ሁሉም", catShirts: "ሸሚዝ", catMens: "የወንዶች", catWomens: "የሴቶች", catAccessories: "መለዋወጫዎች",
+            catAll: "ሁሉም", catMens: "የወንዶች", catWomens: "የሴቶች", catAccessories: "መለዋወጫዎች",
             latestDrops: "አዲስ ዕቃዎች",
             yourCart: "የእርስዎ ጋሪ", cartEmpty: "ጋሪዎ ባዶ ነው።", total: "ጠቅላላ", placeOrder: "ትዕዛዝ አስገባ",
             completeOrder: "ትዕዛዝዎን ያሟሉ", fullName: "ሙሉ ስም", email: "ኢሜይል", phone: "ስልክ ቁጥር",
@@ -1140,7 +1228,7 @@
             heroTitle: "الحفاظ على التقاليد<br>في عالم حديث",
             heroSubtitle: "حيث تلتقي التراث الإثيوبي مع ملابس الشارع المعاصرة",
             shopNow: "اكتشف المجموعة →",
-            catAll: "الكل", catShirts: "قمصان", catMens: "رجالي", catWomens: "نسائي", catAccessories: "إكسسوارات",
+            catAll: "الكل", catMens: "رجالي", catWomens: "نسائي", catAccessories: "إكسسوارات",
             latestDrops: "أحدث الإصدارات",
             yourCart: "سلتك", cartEmpty: "سلتك فارغة.", total: "المجموع", placeOrder: "تقديم الطلب",
             completeOrder: "أكمل طلبك", fullName: "الاسم الكامل", email: "البريد الإلكتروني", phone: "رقم الهاتف",
@@ -1173,7 +1261,6 @@
         document.getElementById('heroSubtitle') && (document.getElementById('heroSubtitle').innerText = t.heroSubtitle);
         document.getElementById('shopNowBtn') && (document.getElementById('shopNowBtn').innerHTML = t.shopNow);
         document.getElementById('catAll') && (document.getElementById('catAll').innerText = t.catAll);
-        document.getElementById('catShirts') && (document.getElementById('catShirts').innerText = t.catShirts);
         document.getElementById('catMens') && (document.getElementById('catMens').innerText = t.catMens);
         document.getElementById('catWomens') && (document.getElementById('catWomens').innerText = t.catWomens);
         document.getElementById('catAccessories') && (document.getElementById('catAccessories').innerText = t.catAccessories);
@@ -1212,6 +1299,123 @@
         btn.addEventListener('click', () => setLanguage(btn.dataset.lang));
     });
     
+    // ========== HERO IMAGE SLIDESHOW ==========
+    let heroImages = [];
+    let currentHeroIndex = 0;
+    let heroInterval;
+    
+    async function loadHeroImages() {
+        try {
+            // First, try to get hero images from settings
+            const response = await fetch(`${API_BASE}/hero-images`);
+            const data = await response.json();
+            if (data.images && data.images.length > 0) {
+                heroImages = data.images;
+            } else {
+                // Fallback to single image
+                const heroRes = await fetch(`${API_BASE}/hero-image`);
+                const heroData = await heroRes.json();
+                if (heroData.url) {
+                    heroImages = [heroData.url];
+                } else {
+                    heroImages = ['https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=800&h=1000&fit=crop'];
+                }
+            }
+            initHeroSlideshow();
+        } catch(e) {
+            console.log('Error loading hero images, using default');
+            heroImages = ['https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=800&h=1000&fit=crop'];
+            initHeroSlideshow();
+        }
+    }
+    
+    function initHeroSlideshow() {
+        const container = document.getElementById('heroSlideshowContainer');
+        const dotsContainer = document.getElementById('heroDots');
+        
+        if (!container || heroImages.length === 0) return;
+        
+        // Clear container
+        container.innerHTML = '';
+        dotsContainer.innerHTML = '';
+        
+        // Add slides
+        heroImages.forEach((imgUrl, index) => {
+            const slide = document.createElement('div');
+            slide.className = 'hero-slide' + (index === 0 ? ' active' : '');
+            slide.innerHTML = `<img src="${imgUrl}" alt="EXODUS Hero ${index + 1}">`;
+            container.appendChild(slide);
+            
+            // Add dot
+            const dot = document.createElement('div');
+            dot.className = 'hero-dot' + (index === 0 ? ' active' : '');
+            dot.onclick = () => goToHeroSlide(index);
+            dotsContainer.appendChild(dot);
+        });
+        
+        // Start autoplay
+        startHeroAutoplay();
+    }
+    
+    function startHeroAutoplay() {
+        if (heroInterval) clearInterval(heroInterval);
+        if (heroImages.length > 1) {
+            heroInterval = setInterval(() => {
+                nextHeroSlide();
+            }, 5000);
+        }
+    }
+    
+    function nextHeroSlide() {
+        if (heroImages.length === 0) return;
+        currentHeroIndex = (currentHeroIndex + 1) % heroImages.length;
+        updateHeroSlide();
+    }
+    
+    function prevHeroSlide() {
+        if (heroImages.length === 0) return;
+        currentHeroIndex = (currentHeroIndex - 1 + heroImages.length) % heroImages.length;
+        updateHeroSlide();
+    }
+    
+    function goToHeroSlide(index) {
+        currentHeroIndex = index;
+        updateHeroSlide();
+        // Reset autoplay timer
+        startHeroAutoplay();
+    }
+    
+    function updateHeroSlide() {
+        const slides = document.querySelectorAll('.hero-slide');
+        const dots = document.querySelectorAll('.hero-dot');
+        
+        slides.forEach((slide, i) => {
+            if (i === currentHeroIndex) {
+                slide.classList.add('active');
+            } else {
+                slide.classList.remove('active');
+            }
+        });
+        
+        dots.forEach((dot, i) => {
+            if (i === currentHeroIndex) {
+                dot.classList.add('active');
+            } else {
+                dot.classList.remove('active');
+            }
+        });
+    }
+    
+    document.getElementById('heroPrevBtn')?.addEventListener('click', () => {
+        prevHeroSlide();
+        startHeroAutoplay();
+    });
+    
+    document.getElementById('heroNextBtn')?.addEventListener('click', () => {
+        nextHeroSlide();
+        startHeroAutoplay();
+    });
+    
     // ========== STORE FUNCTIONS ==========
     const API_BASE = window.location.origin + '/api';
     let cart = [], allProducts = [], currentCategory = 'all';
@@ -1245,14 +1449,6 @@
         lightboxIndex = (lightboxIndex - 1 + lightboxImages.length) % lightboxImages.length;
         document.getElementById('lightboxImage').src = lightboxImages[lightboxIndex];
         document.getElementById('lightboxCounter').innerText = `${lightboxIndex + 1} / ${lightboxImages.length}`;
-    }
-    
-    async function loadHeroImage() {
-        try {
-            const res = await fetch(`${API_BASE}/hero-image`);
-            const data = await res.json();
-            document.getElementById('heroImage').src = data.url || 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=800&h=1000&fit=crop';
-        } catch(e) {}
     }
     
     async function loadProducts() {
@@ -1456,7 +1652,7 @@
     // Load saved cart
     const savedCart = localStorage.getItem('exodus_cart');
     if (savedCart) cart = JSON.parse(savedCart);
-    loadHeroImage();
+    loadHeroImages();
     loadProducts();
     updateCartUI();
     setLanguage(currentLanguage);
