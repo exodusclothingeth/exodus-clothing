@@ -1,4 +1,4 @@
-// EXODUS CLOTHING - Complete Backend with Beautiful Email Templates
+// EXODUS CLOTHING - Complete Backend with Hero Images Slideshow
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
@@ -13,8 +13,10 @@ app.use(express.json());
 app.use(express.static('.'));
 app.use('/uploads', express.static('uploads'));
 
+// Create uploads folder
 if (!fs.existsSync('./uploads')) fs.mkdirSync('./uploads');
 
+// Multer setup for photo uploads
 const storage = multer.diskStorage({
     destination: './uploads/',
     filename: (req, file, cb) => {
@@ -23,27 +25,23 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage, limits: { fileSize: 5 * 1024 * 1024 } });
 
+// Supabase connection
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_ANON_KEY;
 const supabase = createClient(supabaseUrl, supabaseKey);
 
+// Your contact info
 const YOUR_EMAIL = 'exodusclothingeth@gmail.com';
 const YOUR_PHONE = '+251968621548';
 
-// ========== EMAIL SETUP ==========
+// Email setup
 let transporter = null;
-
 if (process.env.EMAIL_PASS) {
     transporter = nodemailer.createTransport({
         service: 'gmail',
-        auth: { 
-            user: YOUR_EMAIL, 
-            pass: process.env.EMAIL_PASS 
-        }
+        auth: { user: YOUR_EMAIL, pass: process.env.EMAIL_PASS }
     });
     console.log('✅ Email notifications ready');
-} else {
-    console.log('⚠️ Email not configured. Add EMAIL_PASS to environment variables.');
 }
 
 // ========== EMAIL VERIFICATION STORAGE ==========
@@ -78,7 +76,20 @@ app.post('/api/send-verification', async (req, res) => {
                 from: `"EXODUS CLOTHING" <${YOUR_EMAIL}>`,
                 to: email,
                 subject: '🔐 EXODUS - Admin Login Code',
-                html: getVerificationEmailTemplate(code)
+                html: `
+                    <div style="font-family: Arial, sans-serif; max-width: 500px; margin: 0 auto; padding: 20px; background: #fff;">
+                        <div style="background: #000; padding: 20px; text-align: center;">
+                            <h1 style="color: #fff; margin: 0;">EXODUS</h1>
+                        </div>
+                        <div style="padding: 20px;">
+                            <h2>Your Login Code</h2>
+                            <div style="font-size: 32px; font-weight: bold; padding: 20px; background: #f0f0f0; text-align: center; letter-spacing: 5px;">
+                                ${code}
+                            </div>
+                            <p>This code expires in 5 minutes.</p>
+                        </div>
+                    </div>
+                `
             });
             res.json({ success: true, message: 'Verification code sent to your email' });
         } else {
@@ -213,34 +224,22 @@ app.post('/api/orders', async (req, res) => {
         
         if (error) throw error;
         
-        // Send email to customer
         if (transporter) {
-            try {
-                await transporter.sendMail({
-                    from: `"EXODUS CLOTHING" <${YOUR_EMAIL}>`,
-                    to: customer.email,
-                    subject: `✨ EXODUS - Order Confirmation #${orderId}`,
-                    html: getOrderConfirmationTemplate(orderId, customer, items, total)
-                });
-                console.log(`📧 Order confirmation sent to ${customer.email}`);
-            } catch(emailError) {
-                console.log('Customer email failed:', emailError.message);
-            }
+            // Send confirmation to customer
+            await transporter.sendMail({
+                from: `"EXODUS CLOTHING" <${YOUR_EMAIL}>`,
+                to: customer.email,
+                subject: `EXODUS - Order Confirmation ${orderId}`,
+                html: `<h2>Thank you for your order!</h2><p>Order ID: ${orderId}</p><p>Total: ${total} ETB</p><p>We will contact you within 24 hours.</p><p>Questions? Call: ${YOUR_PHONE}</p>`
+            });
             
-            // Send notification to brand owner
-            try {
-                await transporter.sendMail({
-                    from: `"EXODUS CLOTHING" <${YOUR_EMAIL}>`,
-                    to: YOUR_EMAIL,
-                    subject: `🔥 NEW ORDER: ${orderId}`,
-                    html: getOwnerNotificationTemplate(orderId, customer, items, total)
-                });
-                console.log(`📧 Owner notification sent`);
-            } catch(emailError) {
-                console.log('Owner email failed:', emailError.message);
-            }
-        } else {
-            console.log('⚠️ Email not configured - order saved but no email sent');
+            // Send notification to you
+            await transporter.sendMail({
+                from: `"EXODUS CLOTHING" <${YOUR_EMAIL}>`,
+                to: YOUR_EMAIL,
+                subject: `🔥 NEW ORDER: ${orderId}`,
+                html: `<h2>New Order!</h2><p>Order ID: ${orderId}</p><p>Customer: ${customer.name}</p><p>Phone: ${customer.phone}</p><p>Total: ${total} ETB</p><p>Address: ${customer.address}</p>`
+            });
         }
         
         res.json({ success: true, orderId });
@@ -281,9 +280,8 @@ app.put('/api/orders/:orderId/status', async (req, res) => {
                 from: `"EXODUS CLOTHING" <${YOUR_EMAIL}>`,
                 to: order.customer_email,
                 subject: `📦 EXODUS - Your Order #${orderId} is Out for Delivery!`,
-                html: getOutForDeliveryTemplate(orderId, order)
+                html: `<h2>Your Order is Out for Delivery!</h2><p>Order ID: ${orderId}</p><p>Total to pay: ${order.total} ETB (Cash on delivery)</p><p>Delivery person will call before arriving.</p>`
             });
-            console.log(`📧 Out for delivery email sent to ${order.customer_email}`);
         }
         
         if (transporter && order && delivery_status === 'delivered') {
@@ -291,9 +289,8 @@ app.put('/api/orders/:orderId/status', async (req, res) => {
                 from: `"EXODUS CLOTHING" <${YOUR_EMAIL}>`,
                 to: order.customer_email,
                 subject: `✅ EXODUS - Your Order #${orderId} Has Been Delivered`,
-                html: getDeliveredTemplate(orderId, order)
+                html: `<h2>Order Delivered!</h2><p>Thank you for shopping with EXODUS CLOTHING!</p><p>Follow us on Instagram: @exodus_stw</p>`
             });
-            console.log(`📧 Delivery confirmation email sent to ${order.customer_email}`);
         }
         
         res.json({ success: true, order: data[0] });
@@ -317,7 +314,7 @@ app.post('/api/upload-delivery-photo/:orderId', upload.single('photo'), async (r
     }
 });
 
-// ========== HERO IMAGE API ==========
+// ========== HERO IMAGE API (Single - Legacy) ==========
 app.get('/api/hero-image', async (req, res) => {
     try {
         const { data, error } = await supabase.from('settings').select('value').eq('key', 'hero_image').single();
@@ -339,203 +336,30 @@ app.post('/api/hero-image', async (req, res) => {
     }
 });
 
-// ========== BEAUTIFUL EMAIL TEMPLATES ==========
+// ========== HERO IMAGES API (Multiple for Slideshow) ==========
+app.get('/api/hero-images', async (req, res) => {
+    try {
+        const { data, error } = await supabase.from('settings').select('value').eq('key', 'hero_images').single();
+        if (error && error.code !== 'PGRST116') throw error;
+        const images = data?.value ? JSON.parse(data.value) : [];
+        res.json({ images: images });
+    } catch (error) {
+        res.json({ images: [] });
+    }
+});
 
-function getVerificationEmailTemplate(code) {
-    return `
-<!DOCTYPE html>
-<html>
-<head><meta charset="UTF-8"><title>EXODUS Login Code</title></head>
-<body style="margin:0; padding:0; font-family: 'Georgia', 'Times New Roman', serif; background-color:#f5f5f5;">
-    <div style="max-width:500px; margin:0 auto; background-color:#ffffff;">
-        <div style="background-color:#000000; padding:40px 20px; text-align:center;">
-            <h1 style="color:#ffffff; font-size:32px; letter-spacing:4px; margin:0;">EXODUS</h1>
-            <p style="color:#888888; margin:10px 0 0; font-size:12px;">CLOTHING</p>
-        </div>
-        <div style="padding:40px 30px;">
-            <h2 style="color:#000000; font-size:22px; margin-bottom:20px;">Your Login Code</h2>
-            <div style="background-color:#f5f5f5; padding:25px; text-align:center; border-left:3px solid #000000;">
-                <div style="font-size:36px; font-weight:bold; letter-spacing:8px; color:#000000;">${code}</div>
-            </div>
-            <p style="color:#666666; margin-top:25px; font-size:14px;">This code expires in <strong>5 minutes</strong>.</p>
-            <p style="color:#666666; font-size:14px;">If you didn't request this, please ignore this email.</p>
-        </div>
-        <div style="background-color:#000000; padding:30px; text-align:center;">
-            <p style="color:#888888; margin:0; font-size:11px;">EXODUS CLOTHING — ETHIOPIAN STREETWEAR</p>
-        </div>
-    </div>
-</body>
-</html>
-    `;
-}
-
-function getOrderConfirmationTemplate(orderId, customer, items, total) {
-    const itemsHtml = items.map(item => `
-        <tr style="border-bottom:1px solid #eeeeee;">
-            <td style="padding:12px 0;">
-                <strong>${item.name}</strong><br>
-                <span style="color:#888; font-size:12px;">Size: ${item.size} × ${item.quantity}</span>
-            </td>
-            <td style="padding:12px 0; text-align:right;">${(item.price * item.quantity).toLocaleString()} ETB</td>
-        </tr>
-    `).join('');
-    
-    return `
-<!DOCTYPE html>
-<html>
-<head><meta charset="UTF-8"><title>EXODUS Order Confirmation</title></head>
-<body style="margin:0; padding:0; font-family: 'Georgia', 'Times New Roman', serif; background-color:#f5f5f5;">
-    <div style="max-width:600px; margin:0 auto; background-color:#ffffff;">
-        <div style="background-color:#000000; padding:40px 20px; text-align:center;">
-            <h1 style="color:#ffffff; font-size:36px; letter-spacing:4px; margin:0;">EXODUS</h1>
-            <p style="color:#888888; margin:10px 0 0; font-size:12px; letter-spacing:2px;">CLOTHING</p>
-        </div>
-        <div style="padding:40px 30px;">
-            <h2 style="color:#000000; font-size:24px; margin-bottom:20px;">Thank You for Your Order</h2>
-            <p style="color:#333333; line-height:1.6; margin-bottom:30px;">Your order has been received and will be processed within 24 hours.</p>
-            
-            <div style="background-color:#f8f8f8; padding:20px; margin-bottom:30px; border-left:3px solid #000000;">
-                <p style="margin:0 0 5px;"><strong style="color:#000000;">Order ID:</strong> <span style="color:#666;">${orderId}</span></p>
-                <p style="margin:0;"><strong style="color:#000000;">Total:</strong> <span style="color:#666;">${total.toLocaleString()} ETB</span></p>
-            </div>
-            
-            <h3 style="color:#000000; font-size:18px; margin-bottom:15px;">Items Ordered</h3>
-            <table style="width:100%; border-collapse:collapse; margin-bottom:30px;">
-                ${itemsHtml}
-                <tr>
-                    <td style="padding:15px 0; border-top:2px solid #000000; text-align:right;"><strong>Total</strong></td>
-                    <td style="padding:15px 0; border-top:2px solid #000000; text-align:right;"><strong>${total.toLocaleString()} ETB</strong></td>
-                </tr>
-            </table>
-            
-            <div style="background-color:#f8f8f8; padding:20px; margin-bottom:30px;">
-                <p style="margin:0 0 5px;"><strong style="color:#000000;">Shipping Address:</strong></p>
-                <p style="margin:0; color:#666; line-height:1.5;">${customer.address}</p>
-            </div>
-            
-            <div style="border-top:1px solid #eeeeee; padding-top:30px;">
-                <p style="color:#000000; font-weight:500; margin-bottom:10px;">📦 Delivery Information</p>
-                <p style="color:#666; font-size:14px; margin-bottom:5px;">• Cash on delivery only</p>
-                <p style="color:#666; font-size:14px; margin-bottom:5px;">• We'll contact you within 24 hours</p>
-                <p style="color:#666; font-size:14px;">• Delivery person will take a photo as proof</p>
-            </div>
-        </div>
-        <div style="background-color:#000000; padding:30px; text-align:center;">
-            <p style="color:#888888; margin:0 0 10px; font-size:12px;">📞 ${YOUR_PHONE} | ✉️ ${YOUR_EMAIL}</p>
-            <p style="color:#444444; margin:0; font-size:10px; letter-spacing:1px;">EXODUS CLOTHING — ETHIOPIAN STREETWEAR</p>
-        </div>
-    </div>
-</body>
-</html>
-    `;
-}
-
-function getOwnerNotificationTemplate(orderId, customer, items, total) {
-    const itemsHtml = items.map(item => `
-        <tr><td style="padding:8px 0;">${item.name} (${item.size}) x${item.quantity}</td><td style="padding:8px 0; text-align:right;">${(item.price * item.quantity).toLocaleString()} ETB</td></tr>
-    `).join('');
-    
-    return `
-<!DOCTYPE html>
-<html>
-<head><meta charset="UTF-8"><title>New EXODUS Order</title></head>
-<body style="margin:0; padding:0; font-family: Arial, sans-serif; background-color:#f5f5f5;">
-    <div style="max-width:600px; margin:0 auto; background-color:#ffffff;">
-        <div style="background-color:#000000; padding:30px; text-align:center;">
-            <h1 style="color:#ffffff; margin:0;">NEW ORDER</h1>
-        </div>
-        <div style="padding:30px;">
-            <div style="background-color:#f0f0f0; padding:15px; margin-bottom:20px;">
-                <p><strong>Order ID:</strong> ${orderId}</p>
-                <p><strong>Total:</strong> ${total.toLocaleString()} ETB</p>
-                <p><strong>Date:</strong> ${new Date().toLocaleString()}</p>
-            </div>
-            <h3>Customer Information</h3>
-            <p><strong>Name:</strong> ${customer.name}</p>
-            <p><strong>Phone:</strong> ${customer.phone}</p>
-            <p><strong>Email:</strong> ${customer.email}</p>
-            <p><strong>Address:</strong> ${customer.address}</p>
-            <h3>Items Ordered</h3>
-            <table style="width:100%; border-collapse:collapse;">${itemsHtml}</table>
-            <div style="margin-top:30px; padding:15px; background-color:#f9f9f9;">
-                <p><strong>📋 Action Required:</strong></p>
-                <p>1. Prepare the order</p>
-                <p>2. Contact customer for delivery</p>
-                <p>3. Mark as "Out for Delivery" in admin dashboard</p>
-            </div>
-        </div>
-    </div>
-</body>
-</html>
-    `;
-}
-
-function getOutForDeliveryTemplate(orderId, order) {
-    return `
-<!DOCTYPE html>
-<html>
-<head><meta charset="UTF-8"><title>EXODUS - Out for Delivery</title></head>
-<body style="margin:0; padding:0; font-family: 'Georgia', serif; background-color:#f5f5f5;">
-    <div style="max-width:600px; margin:0 auto; background-color:#ffffff;">
-        <div style="background-color:#000000; padding:30px; text-align:center;">
-            <h1 style="color:#ffffff; font-size:28px; margin:0;">OUT FOR DELIVERY</h1>
-        </div>
-        <div style="padding:30px;">
-            <h2 style="color:#000000; font-size:22px; margin-bottom:20px;">Your Order is on the Way!</h2>
-            <div style="background-color:#f8f8f8; padding:20px; margin-bottom:25px;">
-                <p style="margin:0 0 5px;"><strong>Order ID:</strong> ${orderId}</p>
-                <p style="margin:0;"><strong>Total to pay:</strong> ${order.total.toLocaleString()} ETB (Cash on delivery)</p>
-            </div>
-            <div style="margin-bottom:25px;">
-                <p style="font-weight:500; margin-bottom:10px;">🚚 What to Expect:</p>
-                <p style="color:#555; margin-bottom:5px;">• Delivery person will call before arriving</p>
-                <p style="color:#555; margin-bottom:5px;">• Please have cash ready</p>
-                <p style="color:#555;">• Delivery person will take a photo as proof of delivery</p>
-            </div>
-            <div style="border-top:1px solid #eee; padding-top:20px;">
-                <p style="color:#888; font-size:12px;">Questions? Call us: ${YOUR_PHONE}</p>
-            </div>
-        </div>
-        <div style="background-color:#000000; padding:20px; text-align:center;">
-            <p style="color:#888; margin:0; font-size:11px;">EXODUS CLOTHING — MADE IN ETHIOPIA</p>
-        </div>
-    </div>
-</body>
-</html>
-    `;
-}
-
-function getDeliveredTemplate(orderId, order) {
-    return `
-<!DOCTYPE html>
-<html>
-<head><meta charset="UTF-8"><title>EXODUS - Order Delivered</title></head>
-<body style="margin:0; padding:0; font-family: 'Georgia', serif; background-color:#f5f5f5;">
-    <div style="max-width:600px; margin:0 auto; background-color:#ffffff;">
-        <div style="background-color:#000000; padding:30px; text-align:center;">
-            <h1 style="color:#ffffff; font-size:28px; margin:0;">ORDER DELIVERED</h1>
-        </div>
-        <div style="padding:30px; text-align:center;">
-            <div style="font-size:60px; margin-bottom:20px;">✅</div>
-            <h2 style="color:#000000; margin-bottom:15px;">Thank You for Shopping with EXODUS!</h2>
-            <p style="color:#555; line-height:1.6; margin-bottom:25px;">Your order #${orderId} has been successfully delivered.</p>
-            <div style="background-color:#f8f8f8; padding:20px; margin-bottom:25px;">
-                <p style="margin-bottom:10px;">✨ <strong>We'd Love to See Your Style</strong></p>
-                <p style="color:#555;">Tag us on Instagram: <strong>@exodus_stw</strong></p>
-                <p style="color:#555;">Use #ExodusClothing</p>
-            </div>
-            <div style="border-top:1px solid #eee; padding-top:20px;">
-                <p style="color:#888; font-size:12px;">Thank you for supporting Ethiopian streetwear 🇪🇹</p>
-            </div>
-        </div>
-        <div style="background-color:#000000; padding:20px; text-align:center;">
-            <p style="color:#888; margin:0; font-size:11px;">EXODUS CLOTHING — exodusclothingeth@gmail.com</p>
-        </div>
-    </div>
-</body>
-</html>
-    `;
-}
+app.post('/api/hero-images', async (req, res) => {
+    try {
+        const { images } = req.body;
+        await supabase.from('settings').upsert({ 
+            key: 'hero_images', 
+            value: JSON.stringify(images || []) 
+        }, { onConflict: 'key' });
+        res.json({ success: true });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
@@ -544,9 +368,11 @@ app.listen(PORT, () => {
 ║     🖤 EXODUS CLOTHING - COMPLETE STORE RUNNING              ║
 ║     URL: http://localhost:${PORT}                              ║
 ║     Email: ${YOUR_EMAIL}                                      ║
-║     Email Status: ${transporter ? '✅ READY' : '⚠️ NOT CONFIGURED'}
+║     Phone: ${YOUR_PHONE}                                      ║
 ║                                                              ║
-║     ✅ Beautiful email templates active                      ║
+║     ✅ Email notifications ready                             ║
+║     ✅ Product API with categories & multi-images            ║
+║     ✅ Hero images slideshow API ready                       ║
 ╚═══════════════════════════════════════════════════════════════╝
     `);
 });
