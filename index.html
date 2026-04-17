@@ -727,15 +727,80 @@
         font-size: 0.8rem;
         margin-bottom: 20px;
     }
+.hero-stats {
+    justify-content: center;
+    gap: 24px;
+}
+
+.hero-stat {
+    text-align: center;
+}
+
+.hero-image img {
+    width: 70%;
+    max-width: 280px;
+}
+
+.hero-content h1 {
+    font-size: 1.6rem;
+}
+
+.hero-stat .stat-number {
+    font-size: 1rem;
+}
+
+.hero-stat .stat-label {
+    font-size: 0.65rem;
+}
     
     /* FIX: Smaller hero image on mobile */
-    .hero-image img {
-        width: 80%;
-        max-width: 260px;
-        margin: 0 auto;
-        display: block;
-    }
-    
+.hero-image img {
+    width: 75%;
+    max-width: 400px;
+    border-radius: 20px;
+    height: auto;
+    display: block;
+    margin: 0 auto;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    transition: transform 0.4s ease;
+}
+
+.hero-image img:hover {
+    transform: scale(1.02);
+}   
+ /* Hero Stats - Luxury Style */
+.hero-stats {
+    display: flex;
+    gap: 32px;
+    margin: 32px 0 28px;
+    flex-wrap: wrap;
+}
+
+.hero-stat {
+    text-align: left;
+}
+
+.hero-stat .stat-number {
+    display: block;
+    font-size: 1.2rem;
+    font-weight: 700;
+    font-family: 'Space Mono', monospace;
+    letter-spacing: 1px;
+}
+
+.hero-stat .stat-label {
+    display: block;
+    font-size: 0.7rem;
+    color: var(--text-secondary);
+    letter-spacing: 0.5px;
+}
+
+.highlight {
+    background: linear-gradient(135deg, #fff 0%, #aaa 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
     .hero-badge {
         letter-spacing: 2px;
         font-size: 0.65rem;
@@ -1009,20 +1074,33 @@
 
 <main>
     <div class="container">
-        <div class="hero">
-            <div class="hero-grid">
-                <div class="hero-content">
-                    <div class="hero-badge" id="heroBadge">MADE IN ETHIOPIA</div>
-                    <h1 id="heroTitle">Leave the old.<br>Embrace EXODUS.</h1>
-                    <p id="heroSubtitle">Premium Ethiopian streetwear. Cash on delivery. Limited drops.</p>
-                    <a href="#" class="btn-primary" id="shopNowBtn">SHOP NOW →</a>
+<div class="hero">
+    <div class="hero-grid">
+        <div class="hero-content">
+            <div class="hero-badge" id="heroBadge">EST. 2024 • ADDIS ABABA</div>
+            <h1 id="heroTitle">Keeping Tradition<br>in a <span class="highlight">Modern World</span></h1>
+            <p id="heroSubtitle">Where Ethiopian heritage meets contemporary streetwear. Each piece tells a story of rebellion, culture, and the future.</p>
+            <div class="hero-stats">
+                <div class="hero-stat">
+                    <span class="stat-number">100%</span>
+                    <span class="stat-label">Ethiopian Made</span>
                 </div>
-                <div class="hero-image">
-                    <img id="heroImage" src="" alt="EXODUS">
+                <div class="hero-stat">
+                    <span class="stat-number">24h</span>
+                    <span class="stat-label">Delivery</span>
+                </div>
+                <div class="hero-stat">
+                    <span class="stat-number">COD</span>
+                    <span class="stat-label">Cash on Delivery</span>
                 </div>
             </div>
+            <a href="#" class="btn-primary" id="shopNowBtn">DISCOVER COLLECTION →</a>
         </div>
-
+        <div class="hero-image">
+            <img id="heroImage" src="" alt="EXODUS">
+        </div>
+    </div>
+</div>
         <div class="categories" id="categoryFilters">
             <div class="category-item" data-category="all">
                 <i class="fas fa-th-large"></i>
