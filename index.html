@@ -202,7 +202,7 @@
             align-items: center;
         }
         
-        /* Hero Logo - 6x bigger than before */
+        /* Hero Logo */
         .hero-logo {
             text-align: left;
             margin-bottom: 30px;
@@ -295,7 +295,6 @@
             height: 100%;
             opacity: 0;
             transition: opacity 0.8s ease-in-out;
-            object-fit: cover;
         }
         
         .hero-slide.active {
@@ -826,7 +825,7 @@
             font-size: 1.1rem;
         }
         
-        /* Responsive */
+        /* ========== RESPONSIVE - PHONE FRIENDLY ========== */
         @media (max-width: 1024px) {
             .product-grid {
                 grid-template-columns: repeat(3, 1fr);
@@ -842,9 +841,6 @@
             .nav-links {
                 justify-content: center;
             }
-            .hero-grid {
-                gap: 40px;
-            }
         }
         
         @media (max-width: 768px) {
@@ -858,29 +854,35 @@
             
             .hero-grid {
                 grid-template-columns: 1fr;
-                gap: 25px;
+                gap: 30px;
                 text-align: center;
             }
             
             .hero-logo {
                 text-align: center;
+                margin-bottom: 20px;
             }
             
             .hero-logo img {
-                height: 120px;
+                height: 100px;
             }
             
             .hero-content h1 {
                 font-size: 1.6rem;
             }
             
+            .hero-content p {
+                font-size: 0.85rem;
+            }
+            
             .hero-badge {
                 letter-spacing: 2px;
+                font-size: 0.65rem;
             }
             
             .hero-stats {
                 justify-content: center;
-                gap: 24px;
+                gap: 20px;
             }
             
             .hero-stat {
@@ -892,13 +894,17 @@
             }
             
             .hero-stat .stat-label {
-                font-size: 0.65rem;
+                font-size: 0.6rem;
             }
             
             .hero-slideshow-container {
-                aspect-ratio: 3/4;
                 max-width: 280px;
                 margin: 0 auto;
+            }
+            
+            .hero-slideshow-prev, .hero-slideshow-next {
+                padding: 6px 10px;
+                font-size: 14px;
             }
             
             .categories {
@@ -908,61 +914,76 @@
             }
             
             .category-item {
-                padding: 18px 10px;
+                padding: 14px 8px;
             }
             
             .category-item i {
                 font-size: 1.3rem;
+                margin-bottom: 6px;
             }
             
             .category-item h4 {
-                font-size: 0.75rem;
+                font-size: 0.7rem;
             }
             
             .product-grid {
                 grid-template-columns: repeat(2, 1fr);
-                gap: 14px;
+                gap: 12px;
+            }
+            
+            .product-info {
+                padding: 10px;
             }
             
             .product-title {
-                font-size: 0.75rem;
+                font-size: 0.7rem;
             }
             
             .product-price {
                 font-size: 0.7rem;
+                margin-bottom: 6px;
+            }
+            
+            .size-buttons {
+                gap: 4px;
             }
             
             .size-btn {
                 padding: 3px 7px;
-                font-size: 0.55rem;
+                font-size: 0.5rem;
             }
             
             .section-title {
-                margin: 35px 0 20px;
-                font-size: 1.3rem;
+                font-size: 1.2rem;
+                margin: 30px 0 20px;
             }
             
             .section-title::after {
-                width: 40px;
+                width: 35px;
+                bottom: -6px;
             }
             
             .logo img {
-                max-height: 60px;
+                max-height: 50px;
+            }
+            
+            .nav-links {
+                gap: 16px;
             }
             
             .nav-links a {
-                font-size: 0.75rem;
+                font-size: 0.7rem;
             }
             
             .btn-primary {
-                padding: 10px 24px;
-                font-size: 0.8rem;
+                padding: 8px 20px;
+                font-size: 0.75rem;
             }
             
             .footer-grid {
                 flex-direction: column;
                 text-align: center;
-                gap: 25px;
+                gap: 20px;
             }
             
             .social-icons {
@@ -979,16 +1000,13 @@
                 text-align: center;
                 max-width: 85vw;
                 font-size: 0.7rem;
+                padding: 8px 16px;
             }
         }
         
         @media (max-width: 480px) {
-            .logo img {
-                max-height: 50px;
-            }
-            
             .hero-logo img {
-                height: 90px;
+                height: 80px;
             }
             
             .hero-content h1 {
@@ -999,25 +1017,50 @@
                 font-size: 0.75rem;
             }
             
-            .product-info {
-                padding: 10px;
+            .hero-stats {
+                gap: 15px;
+            }
+            
+            .hero-stat .stat-number {
+                font-size: 0.9rem;
+            }
+            
+            .hero-stat .stat-label {
+                font-size: 0.55rem;
             }
             
             .product-title {
-                font-size: 0.7rem;
+                font-size: 0.65rem;
+            }
+            
+            .product-price {
+                font-size: 0.65rem;
             }
             
             .size-btn {
-                padding: 2px 6px;
-                font-size: 0.5rem;
+                padding: 2px 5px;
+                font-size: 0.45rem;
+            }
+            
+            .category-item {
+                padding: 10px 6px;
+            }
+            
+            .category-item i {
+                font-size: 1.1rem;
+            }
+            
+            .category-item h4 {
+                font-size: 0.6rem;
             }
         }
         
         .loading {
             text-align: center;
-            padding: 50px;
+            padding: 40px;
             color: #888;
             font-family: 'Space Mono', monospace;
+            font-size: 0.8rem;
         }
         
         @keyframes fadeInUp {
@@ -1110,7 +1153,7 @@
                     <button class="lang-btn" data-lang="ar">عربي</button>
                 </div>
                 <div class="cart-with-logo">
-                    <img src="images/exodus-logo.png" alt="EXODUS" class="cart-logo-icon">
+                    <img src="images/exoduss.png" alt="EXODUS" class="cart-logo-icon">
                     <div class="cart-icon-wrapper" id="cartIcon">
                         <i class="fas fa-shopping-bag"></i>
                         <span class="cart-count" id="cartCount">0</span>
@@ -1127,9 +1170,9 @@
         <div class="hero">
             <div class="hero-grid">
                 <div class="hero-content">
-                    <!-- EXODUS Logo - 6x bigger, placed above EST.2024 -->
+                    <!-- EXODUS Logo - using exoduss.png -->
                     <div class="hero-logo">
-                        <img src="images/exodus-logo.png" alt="EXODUS">
+                        <img src="images/exoduss.png" alt="EXODUS">
                     </div>
                     <div class="hero-badge" id="heroBadge">EST. 2024 • ADDIS ABABA</div>
                     <h1 id="heroTitle">Keeping Tradition<br>in a <span class="highlight">Modern World</span></h1>
