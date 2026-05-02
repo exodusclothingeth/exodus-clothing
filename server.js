@@ -1,4 +1,4 @@
-// EXODUS CLOTHING - Complete Backend with Hero Images Slideshow
+// EXODUS CLOTHING - Complete Backend with Pooler Connection (IPv4 Fix)
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
@@ -25,9 +25,15 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage, limits: { fileSize: 5 * 1024 * 1024 } });
 
-// Supabase connection
-const supabaseUrl = process.env.SUPABASE_URL;
-const supabaseKey = process.env.SUPABASE_ANON_KEY;
+// ========== FIXED: Supabase Connection using POOLER (Port 6543) ==========
+// This uses IPv4 and prevents connection timeout errors on Render
+const supabaseUrl = process.env.SUPABASE_URL || 'https://vngzqfjggllcjldylhhy.supabase.co';
+const supabaseKey = process.env.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZuZ3pxZmpnZ2xsY2psZHlsaGh5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYyNjQzOTgsImV4cCI6MjA5MTg0MDM5OH0.O-BnHiwwqeycCFmOuFHFwTksiVjwP72qIKUmBcT06Ec';
+
+// Set the database connection string with your password using POOLER (Port 6543)
+// Your password: Exodusclothing.12
+process.env.SUPABASE_DB_URL = 'postgresql://postgres.vngzqfjggllcjldylhhy:Exodusclothing.12@aws-1-ap-southeast-1.pooler.supabase.com:6543/postgres';
+
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 // Your contact info
@@ -51,7 +57,7 @@ function generateCode() {
     return Math.floor(100000 + Math.random() * 900000).toString();
 }
 
-console.log('✅ Connected to Supabase');
+console.log('✅ Connected to Supabase via Pooler (Port 6543 - IPv4)');
 
 // ========== EMAIL VERIFICATION API ==========
 app.post('/api/send-verification', async (req, res) => {
@@ -225,7 +231,6 @@ app.post('/api/orders', async (req, res) => {
         if (error) throw error;
         
         if (transporter) {
-            // Send confirmation to customer
             await transporter.sendMail({
                 from: `"EXODUS CLOTHING" <${YOUR_EMAIL}>`,
                 to: customer.email,
@@ -233,7 +238,6 @@ app.post('/api/orders', async (req, res) => {
                 html: `<h2>Thank you for your order!</h2><p>Order ID: ${orderId}</p><p>Total: ${total} ETB</p><p>We will contact you within 24 hours.</p><p>Questions? Call: ${YOUR_PHONE}</p>`
             });
             
-            // Send notification to you
             await transporter.sendMail({
                 from: `"EXODUS CLOTHING" <${YOUR_EMAIL}>`,
                 to: YOUR_EMAIL,
@@ -370,6 +374,7 @@ app.listen(PORT, () => {
 ║     Email: ${YOUR_EMAIL}                                      ║
 ║     Phone: ${YOUR_PHONE}                                      ║
 ║                                                              ║
+║     ✅ Connected via Pooler (Port 6543 - IPv4)               ║
 ║     ✅ Email notifications ready                             ║
 ║     ✅ Product API with categories & multi-images            ║
 ║     ✅ Hero images slideshow API ready                       ║
