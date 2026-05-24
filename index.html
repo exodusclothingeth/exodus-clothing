@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>EXODUS CLOTHING - Coming Soon</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #000000;
+            color: #ffffff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            overflow-x: hidden;
+        }
+        
+        /* Animated Background */
+        .bg-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            background: #000000;
+        }
+        
+        .bg-animation::before {
+            content: '';
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            top: -50%;
+            left: -50%;
+            background-image: repeating-linear-gradient(0deg, rgba(255,255,255,0.02) 0px, rgba(255,255,255,0.02) 1px, transparent 1px, transparent 10px),
+                              repeating-linear-gradient(90deg, rgba(255,255,255,0.02) 0px, rgba(255,255,255,0.02) 1px, transparent 1px, transparent 10px);
+            animation: gridMove 20s linear infinite;
+        }
+        
+        @keyframes gridMove {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(20px, 20px); }
+        }
+        
+        .scanline {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(0deg, rgba(0,0,0,0.15) 0px, rgba(0,0,0,0.15) 2px, transparent 2px, transparent 8px);
+            pointer-events: none;
+            z-index: 999;
+            opacity: 0.3;
+        }
+        
+        .container {
+            text-align: center;
+            max-width: 600px;
+            padding: 40px 20px;
+            z-index: 1;
+        }
+        
+        .logo {
+            margin-bottom: 40px;
+            animation: fadeInUp 0.8s ease;
+        }
+        
+        .logo img {
+            height: 120px;
+            width: auto;
+        }
+        
+        h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(2.5rem, 6vw, 4rem);
+            font-weight: 800;
+            margin-bottom: 20px;
+            letter-spacing: -0.02em;
+            background: linear-gradient(135deg, #fff 0%, #aaa 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            animation: fadeInUp 0.8s ease 0.1s backwards;
+        }
+        
+        .coming-soon-badge {
+            display: inline-block;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            padding: 8px 24px;
+            border-radius: 40px;
+            font-size: 0.7rem;
+            letter-spacing: 3px;
+            margin-bottom: 30px;
+            font-family: 'Space Mono', monospace;
+            animation: fadeInUp 0.8s ease 0.05s backwards;
+        }
+        
+        p {
+            color: #aaa;
+            line-height: 1.6;
+            margin-bottom: 40px;
+            font-size: 1rem;
+            animation: fadeInUp 0.8s ease 0.2s backwards;
+        }
+        
+        .countdown {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 50px;
+            flex-wrap: wrap;
+            animation: fadeInUp 0.8s ease 0.3s backwards;
+        }
+        
+        .countdown-item {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 16px;
+            padding: 20px 25px;
+            min-width: 100px;
+        }
+        
+        .countdown-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            font-family: 'Space Mono', monospace;
+            color: white;
+        }
+        
+        .countdown-label {
+            font-size: 0.7rem;
+            color: #888;
+            letter-spacing: 1px;
+            margin-top: 5px;
+        }
+        
+        .notify-form {
+            display: flex;
+            gap: 10px;
+            max-width: 400px;
+            margin: 0 auto;
+            flex-wrap: wrap;
+            justify-content: center;
+            animation: fadeInUp 0.8s ease 0.4s backwards;
+        }
+        
+        .notify-input {
+            flex: 1;
+            padding: 14px 20px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 40px;
+            color: white;
+            font-size: 0.9rem;
+            min-width: 250px;
+        }
+        
+        .notify-input:focus {
+            outline: none;
+            border-color: white;
+        }
+        
+        .notify-btn {
+            background: white;
+            color: black;
+            border: none;
+            padding: 14px 28px;
+            border-radius: 40px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+            font-family: 'Space Mono', monospace;
+        }
+        
+        .notify-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(255,255,255,0.15);
+        }
+        
+        .social-links {
+            margin-top: 60px;
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            animation: fadeInUp 0.8s ease 0.5s backwards;
+        }
+        
+        .social-links a {
+            color: white;
+            font-size: 1.3rem;
+            opacity: 0.6;
+            transition: 0.3s;
+        }
+        
+        .social-links a:hover {
+            opacity: 1;
+        }
+        
+        footer {
+            margin-top: 60px;
+            color: #444;
+            font-size: 0.7rem;
+            animation: fadeInUp 0.8s ease 0.55s backwards;
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .countdown-item {
+                padding: 15px 20px;
+                min-width: 70px;
+            }
+            .countdown-number {
+                font-size: 1.8rem;
+            }
+            .logo img {
+                height: 80px;
+            }
+            h1 {
+                font-size: 1.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-animation"></div>
+    <div class="scanline"></div>
+    
+    <div class="container">
+        <div class="logo">
+            <img src="images/exoduss.png" alt="EXODUS">
+        </div>
+        
+        <div class="coming-soon-badge">COMING SOON</div>
+        
+        <h1>Something <span style="color:white;">Extraordinary</span> is Coming</h1>
+        
+        <p>We're preparing something special for you.<br>Our new collection is almost here.</p>
+        
+        <div class="countdown" id="countdown">
+            <div class="countdown-item">
+                <div class="countdown-number" id="days">00</div>
+                <div class="countdown-label">DAYS</div>
+            </div>
+            <div class="countdown-item">
+                <div class="countdown-number" id="hours">00</div>
+                <div class="countdown-label">HOURS</div>
+            </div>
+            <div class="countdown-item">
+                <div class="countdown-number" id="minutes">00</div>
+                <div class="countdown-label">MINUTES</div>
+            </div>
+            <div class="countdown-item">
+                <div class="countdown-number" id="seconds">00</div>
+                <div class="countdown-label">SECONDS</div>
+            </div>
+        </div>
+        
+        <form class="notify-form" id="notifyForm" action="https://formspree.io/f/mlgzwdbj" method="POST">
+            <input type="email" class="notify-input" name="email" placeholder="Enter your email" required>
+            <input type="hidden" name="_subject" value="📧 New EXODUS Coming Soon Subscriber">
+            <input type="hidden" name="_replyto" value="exodusclothingeth@gmail.com">
+            <button type="submit" class="notify-btn">NOTIFY ME</button>
+        </form>
+        
+        <div class="social-links">
+            <a href="https://www.instagram.com/exodus_stw" target="_blank"><i class="fab fa-instagram"></i></a>
+            <a href="#" target="_blank"><i class="fab fa-telegram"></i></a>
+            <a href="https://www.tiktok.com/@exodus...7" target="_blank"><i class="fab fa-tiktok"></i></a>
+        </div>
+        
+        <footer>
+            <p>EXODUS CLOTHING — Ethiopian Streetwear</p>
+            <p style="margin-top: 8px;">📞 +251968621548 | ✉️ exodusclothingeth@gmail.com</p>
+        </footer>
+    </div>
+
+    <script>
+        // Set your launch date here (Year, Month-1, Day, Hour, Minute, Second)
+        // Example: July 1, 2025 = new Date(2025, 6, 1, 0, 0, 0)
+        const launchDate = new Date(2025, 6, 1, 0, 0, 0);
+        
+        function updateCountdown() {
+            const now = new Date().getTime();
+            const distance = launchDate - now;
+            
+            if (distance < 0) {
+                document.getElementById('countdown').innerHTML = '<div style="text-align:center; width:100%;"><p style="color:#00c853;">🎉 We\'re live! <a href="/" style="color:white;">Enter Store →</a></p></div>';
+                return;
+            }
+            
+            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+            
+            document.getElementById('days').innerText = String(days).padStart(2, '0');
+            document.getElementById('hours').innerText = String(hours).padStart(2, '0');
+            document.getElementById('minutes').innerText = String(minutes).padStart(2, '0');
+            document.getElementById('seconds').innerText = String(seconds).padStart(2, '0');
+        }
+        
+        updateCountdown();
+        setInterval(updateCountdown, 1000);
+    </script>
+</body>
+</html>
