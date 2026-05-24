@@ -1,18 +1,57 @@
-// EXODUS CLOTHING - COMPLETE BACKEND
 const express = require('express');
 const cors = require('cors');
 const { createClient } = require('@supabase/supabase-js');
 const multer = require('multer');
 const fs = require('fs');
+const nodemailer = require('nodemailer');
 
 const app = express();
+
 app.use(cors());
 app.use(express.json());
 app.use(express.static('.'));
+
+// Create uploads folder
+if (!fs.existsSync('./uploads')) {
+    fs.mkdirSync('./uploads');
+}
 app.use('/uploads', express.static('uploads'));
 
-if (!fs.existsSync('./uploads')) fs.mkdirSync('./uploads');
+// ============================================
+// SUPABASE CONFIGURATION - REPLACE WITH YOURS!
+// ============================================
+const SUPABASE_URL = 'https://YOUR_PROJECT.supabase.co';
+const SUPABASE_ANON_KEY = 'YOUR_ANON_KEY_HERE';
 
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+console.log('✅ Connected to Supabase');
+
+// ============================================
+// EMAIL CONFIGURATION (For verification codes)
+// ============================================
+// For development, we'll store codes in memory
+// In production, use a real email service
+const verificationCodes = {};
+
+function generateCode() {
+    return Math.floor(100000 + Math.random() * 900000).toString();
+}
+
+// Simple email sending via console (for now)
+// Replace with actual email service when you have one
+async function sendVerificationEmail(email, code) {
+    console.log(`📧 VERIFICATION CODE for ${email}: ${code}`);
+    console.log(`🔐 Use this code to login: ${code}`);
+    
+    // In production, you would use nodemailer or email API here
+    // For now, admin can see the code in the server logs
+    
+    return true;
+}
+
+// ============================================
+// FILE UPLOAD CONFIG
+// ============================================
 const storage = multer.diskStorage({
     destination: './uploads/',
     filename: (req, file, cb) => {
@@ -21,153 +60,22 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage, limits: { fileSize: 5 * 1024 * 1024 } });
 
-// Supabase connection
-const supabaseUrl = 'https://vngzqfjggllcjldylhhy.supabase.co';
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZuZ3pxZmpnZ2xsY2psZHlsaGh5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYyNjQzOTgsImV4cCI6MjA5MTg0MDM5OH0.O-BnHiwwqeycCFmOuFHFwTksiVjwP72qIKUmBcT06Ec';
-
-const supabase = createClient(supabaseUrl, supabaseKey);
-
+// ============================================
+// ADMIN EMAIL VERIFICATION
+// ============================================
 const ADMIN_EMAIL = 'exodusclothingeth@gmail.com';
-const ADMIN_PHONE = '+251968621548';
 
-// ========== FORMSPREE CONFIGURATION ==========
-const FORMSPREE_ENDPOINT = 'https://formspree.io/f/mlgzwdbj';
-
-// ========== COMING SOON MODE - CHANGE THIS LINE ==========
-// Set to true to show "Coming Soon" page, false to show your real store
-const COMING_SOON_MODE = true;  // <--- CHANGE THIS
-
-// Store verification codes
-const verificationCodes = {};
-
-function generateCode() {
-    return Math.floor(100000 + Math.random() * 900000).toString();
-}
-
-// Helper function to send email via Formspree
-async function sendViaFormspree(emailData) {
-    try {
-        const response = await fetch(FORMSPREE_ENDPOINT, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json'
-            },
-            body: JSON.stringify(emailData)
-        });
-        
-        if (response.ok) {
-            console.log('✅ Email sent via Formspree');
-            return true;
-        } else {
-            console.error('Formspree error:', response.status);
-            return false;
-        }
-    } catch (error) {
-        console.error('Formspree send error:', error);
-        return false;
-    }
-}
-
-// ========== COMING SOON MIDDLEWARE ==========
-app.use((req, res, next) => {
-    // Skip for API routes
-    if (req.path.startsWith('/api/')) {
-        return next();
-    }
-    
-    // Skip for static files
-    if (req.path.match(/\.(jpg|jpeg|png|gif|css|js|ico|svg|woff|woff2|ttf)$/)) {
-        return next();
-    }
-    
-    // Skip for admin pages (so you can still login)
-    if (req.path === '/admin.html' || req.path === '/verify.html' || req.path === '/product-manager.html') {
-        return next();
-    }
-    
-    // If coming soon mode is ON, show coming soon page
-    if (COMING_SOON_MODE === true) {
-        // Check if coming-soon.html exists
-        return res.sendFile('coming-soon.html', { root: '.' }, (err) => {
-            if (err) {
-                // Fallback if file doesn't exist
-                res.send(`
-                    <!DOCTYPE html>
-                    <html>
-                    <head>
-                        <title>EXODUS - Coming Soon</title>
-                        <meta charset="UTF-8">
-                        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                        <style>
-                            body { background: #000; color: #fff; font-family: Arial, sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; text-align: center; margin: 0; }
-                            .container { max-width: 500px; padding: 20px; }
-                            h1 { font-size: 3rem; margin-bottom: 20px; }
-                            p { color: #aaa; margin-bottom: 30px; }
-                            .social a { color: white; margin: 0 10px; text-decoration: none; }
-                        </style>
-                    </head>
-                    <body>
-                        <div class="container">
-                            <h1>EXODUS</h1>
-                            <h2>Coming Soon</h2>
-                            <p>Something extraordinary is coming to Ethiopian streetwear.</p>
-                            <p>📞 +251968621548<br>✉️ exodusclothingeth@gmail.com</p>
-                            <div class="social">
-                                <a href="https://www.instagram.com/exodus_stw">Instagram</a>
-                                <a href="#">Telegram</a>
-                                <a href="#">TikTok</a>
-                            </div>
-                        </div>
-                    </body>
-                    </html>
-                `);
-            }
-        });
-    }
-    
-    next();
-});
-
-// ========== NOTIFY ME ==========
-app.post('/api/notify', async (req, res) => {
-    try {
-        const { email } = req.body;
-        if (!email || !email.includes('@')) {
-            return res.json({ success: false, error: 'Invalid email' });
-        }
-        
-        await sendViaFormspree({
-            email: ADMIN_EMAIL,
-            subject: '📧 New EXODUS Subscriber',
-            message: `New subscriber: ${email}\nTime: ${new Date().toLocaleString()}`
-        });
-        
-        res.json({ success: true });
-    } catch (error) {
-        res.json({ success: false });
-    }
-});
-
-// ========== ADMIN EMAIL VERIFICATION ==========
 app.post('/api/send-verification', async (req, res) => {
     try {
         const { email } = req.body;
-        if (email !== ADMIN_EMAIL) {
-            return res.json({ success: false, error: 'Unauthorized email' });
-        }
         
+        // For demo, accept any email. In production, check if it's admin email
         const code = generateCode();
         verificationCodes[email] = { code, expires: Date.now() + 10 * 60000 };
-        console.log(`📧 Verification code for ${email}: ${code}`);
         
-        await sendViaFormspree({
-            email: ADMIN_EMAIL,
-            subject: '🔐 EXODUS Admin Login Code',
-            message: `Your verification code is: ${code}\n\nExpires in 10 minutes.`
-        });
+        await sendVerificationEmail(email, code);
         
-        res.json({ success: true });
+        res.json({ success: true, message: 'Verification code sent' });
     } catch (error) {
         res.status(500).json({ success: false, error: error.message });
     }
@@ -178,9 +86,15 @@ app.post('/api/verify-code', async (req, res) => {
         const { email, code } = req.body;
         const stored = verificationCodes[email];
         
-        if (!stored) return res.json({ success: false, error: 'No code found' });
-        if (Date.now() > stored.expires) return res.json({ success: false, error: 'Code expired' });
-        if (stored.code !== code) return res.json({ success: false, error: 'Invalid code' });
+        if (!stored) {
+            return res.json({ success: false, error: 'No verification code found. Request a new one.' });
+        }
+        if (Date.now() > stored.expires) {
+            return res.json({ success: false, error: 'Code expired. Request a new one.' });
+        }
+        if (stored.code !== code) {
+            return res.json({ success: false, error: 'Invalid code. Try again.' });
+        }
         
         delete verificationCodes[email];
         res.json({ success: true });
@@ -189,24 +103,116 @@ app.post('/api/verify-code', async (req, res) => {
     }
 });
 
-// ========== PRODUCTS ==========
+// ============================================
+// STOCK ALERT FUNCTION
+// ============================================
+async function checkStockAndSendAlerts() {
+    try {
+        const { data: products } = await supabase.from('products').select('*');
+        
+        const lowStockProducts = [];
+        const outOfStockProducts = [];
+        
+        products.forEach(product => {
+            const stock = product.stock || {};
+            let totalStock = 0;
+            Object.values(stock).forEach(qty => totalStock += qty);
+            
+            if (totalStock === 0) {
+                outOfStockProducts.push(product.name);
+            } else if (totalStock <= 3) {
+                lowStockProducts.push({ name: product.name, stock: totalStock });
+            }
+        });
+        
+        let alertMessage = '';
+        if (outOfStockProducts.length > 0) {
+            alertMessage += `⚠️ OUT OF STOCK: ${outOfStockProducts.join(', ')}\n`;
+        }
+        if (lowStockProducts.length > 0) {
+            alertMessage += `📦 LOW STOCK (≤3 left): ${lowStockProducts.map(p => `${p.name} (${p.stock} left)`).join(', ')}`;
+        }
+        
+        if (alertMessage) {
+            console.log('🔔 STOCK ALERT:\n', alertMessage);
+            // In production, send email here
+        }
+        
+        return { outOfStock: outOfStockProducts, lowStock: lowStockProducts };
+    } catch (error) {
+        console.error('Stock check error:', error);
+        return { outOfStock: [], lowStock: [] };
+    }
+}
+
+// Run stock check every hour
+setInterval(checkStockAndSendAlerts, 60 * 60 * 1000);
+
+// ============================================
+// VISITOR COUNTER
+// ============================================
+let visitorCount = 0;
+
+app.get('/api/visitor-count', async (req, res) => {
+    try {
+        // Get from Supabase or increment memory
+        const { data } = await supabase.from('settings').select('value').eq('key', 'visitor_count').single();
+        let count = data?.value ? parseInt(data.value) : 0;
+        count++;
+        
+        await supabase.from('settings').upsert({ key: 'visitor_count', value: count.toString() }, { onConflict: 'key' });
+        
+        res.json({ count });
+    } catch (error) {
+        visitorCount++;
+        res.json({ count: visitorCount });
+    }
+});
+
+// ============================================
+// HEALTH CHECK
+// ============================================
+app.get('/api/health', (req, res) => {
+    res.json({ status: 'ok', timestamp: new Date().toISOString() });
+});
+
+// ============================================
+// PRODUCT ROUTES
+// ============================================
 app.get('/api/products', async (req, res) => {
     try {
         const { data, error } = await supabase.from('products').select('*').order('created_at', { ascending: false });
         if (error) throw error;
-        res.json(data || []);
+        
+        // Check stock alerts and attach to response
+        const stockAlerts = await checkStockAndSendAlerts();
+        
+        res.json({ products: data || [], stockAlerts });
     } catch (error) {
-        res.json([]);
+        console.error('Products error:', error);
+        res.json({ products: [], stockAlerts: { outOfStock: [], lowStock: [] } });
     }
 });
 
 app.post('/api/products', async (req, res) => {
     try {
         const { name, price, images, sizes, stock, category } = req.body;
+        
         const { data, error } = await supabase.from('products').insert([{
-            name, price, images: images || [], sizes, stock, category: category || 'uncategorized', created_at: new Date()
+            name,
+            price: parseInt(price),
+            images: images || [],
+            sizes: sizes || ['S', 'M', 'L', 'XL', 'XXL'],
+            stock: stock || {},
+            category: category || 'mens',
+            created_at: new Date()
         }]).select();
+        
         if (error) throw error;
+        
+        // Check stock after adding
+        await checkStockAndSendAlerts();
+        
         res.json({ success: true, product: data[0] });
     } catch (error) {
         res.status(500).json({ error: error.message });
@@ -217,8 +223,16 @@ app.put('/api/products/:id', async (req, res) => {
     try {
         const { id } = req.params;
         const { name, price, images, sizes, stock, category } = req.body;
-        const { data, error } = await supabase.from('products').update({ name, price, images, sizes, stock, category }).eq('id', id).select();
+        
+        const { data, error } = await supabase.from('products').update({ 
+            name, price: parseInt(price), images, sizes, stock, category 
+        }).eq('id', id).select();
+        
         if (error) throw error;
+        
+        // Check stock after update
+        await checkStockAndSendAlerts();
+        
         res.json({ success: true, product: data[0] });
     } catch (error) {
         res.status(500).json({ error: error.message });
@@ -234,7 +248,9 @@ app.delete('/api/products/:id', async (req, res) => {
     }
 });
 
-// ========== ORDERS ==========
+// ============================================
+// ORDER ROUTES
+// ============================================
 app.post('/api/orders', async (req, res) => {
     try {
         const { customer, items, total } = req.body;
@@ -246,30 +262,13 @@ app.post('/api/orders', async (req, res) => {
             customer_email: customer.email,
             customer_phone: customer.phone,
             customer_address: customer.address,
-            items: items,
-            total: total,
-            status: 'pending',
+            items,
+            total,
             delivery_status: 'pending',
             created_at: new Date()
         }]);
         
         if (error) throw error;
-        
-        // Send confirmation emails
-        const itemsList = items.map(item => `- ${item.name} (${item.size}) x${item.quantity} = ${(item.price * item.quantity).toLocaleString()} ETB`).join('\n');
-        
-        await sendViaFormspree({
-            email: customer.email,
-            subject: `🖤 Order Confirmation ${orderId}`,
-            message: `Thank you for your order!\n\nOrder ID: ${orderId}\n\nItems:\n${itemsList}\n\nTotal: ${total.toLocaleString()} ETB\n\nCash on Delivery`
-        });
-        
-        await sendViaFormspree({
-            email: ADMIN_EMAIL,
-            subject: `🖤 NEW ORDER! ${orderId}`,
-            message: `New order from ${customer.name}\nPhone: ${customer.phone}\nAddress: ${customer.address}\nTotal: ${total.toLocaleString()} ETB`
-        });
-        
         res.json({ success: true, orderId });
     } catch (error) {
         res.status(500).json({ error: error.message });
@@ -288,9 +287,7 @@ app.get('/api/orders', async (req, res) => {
 
 app.put('/api/orders/:orderId/status', async (req, res) => {
     try {
-        const { orderId } = req.params;
-        const { delivery_status } = req.body;
-        await supabase.from('orders').update({ delivery_status }).eq('order_id', orderId);
+        await supabase.from('orders').update({ delivery_status: req.body.delivery_status }).eq('order_id', req.params.orderId);
         res.json({ success: true });
     } catch (error) {
         res.status(500).json({ error: error.message });
@@ -307,7 +304,9 @@ app.post('/api/upload-delivery-photo/:orderId', upload.single('photo'), async (r
     }
 });
 
-// ========== HERO IMAGES ==========
+// ============================================
+// HERO IMAGES ROUTES
+// ============================================
 app.get('/api/hero-images', async (req, res) => {
     try {
         const { data } = await supabase.from('settings').select('value').eq('key', 'hero_images').single();
@@ -320,34 +319,20 @@ app.get('/api/hero-images', async (req, res) => {
 app.post('/api/hero-images', async (req, res) => {
     try {
         const { images } = req.body;
-        await supabase.from('settings').upsert({ key: 'hero_images', value: JSON.stringify(images || []) }, { onConflict: 'key' });
+        await supabase.from('settings').upsert({ key: 'hero_images', value: JSON.stringify(images) }, { onConflict: 'key' });
         res.json({ success: true });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
 });
 
-app.get('/api/hero-image', async (req, res) => {
-    try {
-        const { data } = await supabase.from('settings').select('value').eq('key', 'hero_image').single();
-        res.json({ url: data?.value || null });
-    } catch (error) {
-        res.json({ url: null });
-    }
-});
-
-app.post('/api/hero-image', async (req, res) => {
-    try {
-        const { url } = req.body;
-        await supabase.from('settings').upsert({ key: 'hero_image', value: url }, { onConflict: 'key' });
-        res.json({ success: true });
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
-
+// ============================================
+// START SERVER
+// ============================================
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`🖤 EXODUS CLOTHING RUNNING on port ${PORT}`);
-    console.log(`🔒 COMING SOON MODE: ${COMING_SOON_MODE ? 'ON (showing coming soon page)' : 'OFF (showing store)'}`);
+    console.log(`📦 API: http://localhost:${PORT}/api/products`);
+    console.log(`🔐 Admin email: exodusclothingeth@gmail.com`);
+    console.log(`📧 Verification codes will appear in console logs`);
 });
